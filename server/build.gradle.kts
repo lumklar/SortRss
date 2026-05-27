@@ -3,11 +3,24 @@ plugins {
     kotlin("plugin.spring") version "2.3.20"
     id("org.springframework.boot") version "4.1.0-RC1"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.graalvm.buildtools.native") version "0.11.5"
 }
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+tasks.bootJar {
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            buildArgs.add("-O2")
+//            buildArgs.add("--enable-all-security-services")
+        }
     }
 }
 
