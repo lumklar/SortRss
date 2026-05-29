@@ -1,9 +1,11 @@
-# IDE
+# IDEA
 .idea/
 target/
 *.iml
 *.ipr
 build/
+.kotlin/
+.intellijPlatform/
 
 # Compiled class file
 *.class
