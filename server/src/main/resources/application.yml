@@ -1,3 +1,9 @@
+server:
+  port: 80
 spring:
   application:
     name: server
+  profiles:
+    active: dev
+  jpa:
+    open-in-view: false
