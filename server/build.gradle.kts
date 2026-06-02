@@ -42,7 +42,7 @@ dependencies {
 //    implementation("com.baomidou:mybatis-plus-jsqlparser:3.5.16")
 //    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:4.0.1")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    runtimeOnly("com.mysql:mysql-connector-j")
+    runtimeOnly("org.postgresql:postgresql")
 
     //lombok
     compileOnly("org.projectlombok:lombok")
