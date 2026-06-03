@@ -22,7 +22,7 @@ graalvmNative {
     }
     binaries {
         named("main") {
-            buildArgs.add("-O2")
+            buildArgs.add("-Ob")
 //            buildArgs.add("--enable-all-security-services")
         }
     }

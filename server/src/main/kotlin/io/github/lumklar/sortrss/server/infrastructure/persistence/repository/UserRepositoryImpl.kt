@@ -1,9 +1,9 @@
-package io.github.lumklar.sortrss.server.infrastruncture.persistence.repository
+package io.github.lumklar.sortrss.server.infrastructure.persistence.repository
 
 import io.github.lumklar.sortrss.common.domain.model.User
 import io.github.lumklar.sortrss.common.domain.repository.UserRepository
-import io.github.lumklar.sortrss.server.infrastructure.persistence.repository.UserJpaRepository
-import io.github.lumklar.sortrss.server.infrastruncture.persistence.convert.UserConverter
+import io.github.lumklar.sortrss.server.infrastructure.persistence.convert.UserConverter
+import io.github.lumklar.sortrss.server.infrastructure.persistence.repository.jpa.UserJpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository

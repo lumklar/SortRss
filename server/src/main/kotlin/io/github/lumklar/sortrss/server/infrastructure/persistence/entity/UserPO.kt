@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.server.infrastruncture.persistence.entity
+package io.github.lumklar.sortrss.server.infrastructure.persistence.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -8,7 +8,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 class UserPO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
