@@ -1,6 +1,6 @@
 package io.github.lumklar.sortrss.common.domain.repository
 
-import io.github.lumklar.sortrss.common.domain.model.User
+import io.github.lumklar.sortrss.common.domain.model.entity.User
 
 interface UserRepository {
     fun findById(id: Long): User?

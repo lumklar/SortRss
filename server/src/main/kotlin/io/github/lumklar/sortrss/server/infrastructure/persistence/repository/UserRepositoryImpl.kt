@@ -1,6 +1,6 @@
 package io.github.lumklar.sortrss.server.infrastructure.persistence.repository
 
-import io.github.lumklar.sortrss.common.domain.model.User
+import io.github.lumklar.sortrss.common.domain.model.entity.User
 import io.github.lumklar.sortrss.common.domain.repository.UserRepository
 import io.github.lumklar.sortrss.server.infrastructure.persistence.convert.UserConverter
 import io.github.lumklar.sortrss.server.infrastructure.persistence.repository.jpa.UserJpaRepository

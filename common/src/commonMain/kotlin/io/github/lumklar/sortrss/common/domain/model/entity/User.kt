@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.common.domain.model
+package io.github.lumklar.sortrss.common.domain.model.entity
 
 import io.github.lumklar.sortrss.common.domain.service.PasswordEncoder
 
