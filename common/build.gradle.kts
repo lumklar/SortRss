@@ -17,8 +17,7 @@ kotlin {
         // 公共代码（所有平台共享）
         val commonMain by getting {
             dependencies {
-                // 这里放所有平台共享的依赖
-                // 例如：implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+                api("io.github.oshai:kotlin-logging:8.0.02")
             }
         }
         val commonTest by getting {
@@ -28,16 +27,16 @@ kotlin {
         }
 
         // JVM 特定代码
-//        val jvmMain by getting {
-//            dependencies {
-                // 仅 JVM 需要的依赖
-//            }
-//        }
-//        val jvmTest by getting {
-//            dependencies {
-                // 仅 JVM 测试需要的依赖
-//            }
-//        }
+        val jvmMain by getting {
+            dependencies {
+                runtimeOnly("io.github.oshai:kotlin-logging-jvm:8.0.02")
+            }
+        }
+        val jvmTest by getting {
+            dependencies {
+                runtimeOnly("org.slf4j:slf4j-simple:2.0.18")
+            }
+        }
     }
 }
 

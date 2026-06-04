@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "2.3.21"
+//    kotlin("kapt") version "2.3.21"
     kotlin("plugin.jpa") version "2.3.21"
     kotlin("plugin.spring") version "2.3.21"
     id("org.springframework.boot") version "4.1.0-RC1"
@@ -17,13 +18,9 @@ tasks.bootJar {
 }
 
 graalvmNative {
-    metadataRepository {
-        enabled = true
-    }
     binaries {
         named("main") {
             buildArgs.add("-Ob")
-//            buildArgs.add("--enable-all-security-services")
         }
     }
 }
@@ -31,18 +28,22 @@ graalvmNative {
 dependencies {
     implementation(project(":common"))
 
+    //kotlin反射依赖
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+
     //web
     implementation("org.springframework.boot:spring-boot-starter-web")
     //缓存
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("com.github.ben-manes.caffeine:caffeine")
-    //数据库
+    //持久层框架
     implementation("jakarta.persistence:jakarta.persistence-api")
-//    implementation("com.baomidou:mybatis-plus-spring-boot4-starter:3.5.16")
-//    implementation("com.baomidou:mybatis-plus-jsqlparser:3.5.16")
-//    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:4.0.1")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    //数据库驱动
+    runtimeOnly("org.xerial:sqlite-jdbc:3.53.1.0")
     runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("com.mysql:mysql-connector-j")
 
     //lombok
     compileOnly("org.projectlombok:lombok")
@@ -51,10 +52,11 @@ dependencies {
     // 测试依赖
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
-    //工具类
+    //加密工具类
     implementation("org.mindrot:jbcrypt:0.4")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    //rss依赖
+    implementation("com.rometools:rome:2.1.0")
+    implementation("com.rometools:rome-modules:2.1.0")
 }
 
 tasks.withType<Test> {
