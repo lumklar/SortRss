@@ -1,12 +1,12 @@
 package io.github.lumklar.sortrss.common.domain.model.entity
 
-import io.github.lumklar.sortrss.common.domain.service.PasswordEncoder
+import io.github.lumklar.sortrss.common.domain.model.ability.PasswordEncoder
 
+// io.github.lumklar.sortrss.common.domain.model.entity.User
 class User private constructor(
     val id: Long,
     val username: String,
     private var passwordHash: String,
-    private val passwordEncoder: PasswordEncoder
 ) {
 
     companion object {
@@ -23,25 +23,29 @@ class User private constructor(
                 "密码长度不能小于 $MIN_PASSWORD_LENGTH"
             }
             val hash = passwordEncoder.encode(plainPassword)
-            return User(id, username.trim(), hash, passwordEncoder)
+            return User(id, username.trim(), hash)
         }
 
         fun fromPersistence(
             id: Long,
             username: String,
             passwordHash: String,
-            passwordEncoder: PasswordEncoder
         ): User {
             require(username.isNotBlank()) { "用户名不能为空" }
-            return User(id, username.trim(), passwordHash, passwordEncoder)
+            return User(id, username.trim(), passwordHash)
         }
     }
 
-    fun verifyPassword(plainPassword: String): Boolean =
+    // ==================== 修复：加密器作为参数传入 ====================
+    fun verifyPassword(plainPassword: String, passwordEncoder: PasswordEncoder): Boolean =
         passwordEncoder.matches(plainPassword, passwordHash)
 
-    fun changePassword(oldPlain: String, newPlain: String) {
-        require(verifyPassword(oldPlain)) { "原密码错误" }
+    fun changePassword(
+        oldPlain: String,
+        newPlain: String,
+        passwordEncoder: PasswordEncoder
+    ) {
+        require(verifyPassword(oldPlain, passwordEncoder)) { "原密码错误" }
         require(newPlain.length >= MIN_PASSWORD_LENGTH) {
             "新密码长度不能小于 $MIN_PASSWORD_LENGTH"
         }
@@ -50,3 +54,4 @@ class User private constructor(
 
     fun getPasswordHash(): String = passwordHash
 }
+

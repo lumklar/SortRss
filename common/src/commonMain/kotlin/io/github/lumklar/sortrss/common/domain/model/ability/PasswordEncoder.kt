@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.common.domain.service
+package io.github.lumklar.sortrss.common.domain.model.ability
 
 /**
  * 密码编码器接口（领域层抽象）

@@ -1,10 +1,8 @@
 package io.github.lumklar.sortrss.server.infrastructure.security
 
-import io.github.lumklar.sortrss.common.domain.service.PasswordEncoder
+import io.github.lumklar.sortrss.common.domain.model.ability.PasswordEncoder
 import org.mindrot.jbcrypt.BCrypt
-import org.springframework.stereotype.Component
 
-@Component
 class BCryptPasswordEncoder : PasswordEncoder {
     /**
      * 对原始密码进行 BCrypt 哈希编码，自动生成随机盐并包含在结果中。

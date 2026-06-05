@@ -1,13 +1,11 @@
 package io.github.lumklar.sortrss.server.infrastructure.persistence.convert
 
 import io.github.lumklar.sortrss.common.domain.model.entity.User
-import io.github.lumklar.sortrss.common.domain.service.PasswordEncoder
 import io.github.lumklar.sortrss.server.infrastructure.persistence.entity.UserPO
 import org.springframework.stereotype.Component
 
 @Component
 class UserConverter(
-    private val passwordEncoder: PasswordEncoder
 ) {
 
     fun toDomain(po: UserPO): User {
@@ -23,7 +21,6 @@ class UserConverter(
             id = id,
             username = username,
             passwordHash = passwordHash,
-            passwordEncoder = passwordEncoder
         )
     }
 
