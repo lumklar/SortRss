@@ -11,6 +11,14 @@ allprojects {
     }
 }
 
+plugins {
+    kotlin("jvm") version "2.3.21" apply false
+    kotlin("multiplatform") version "2.3.21" apply false
+    kotlin("kapt") version "2.3.21" apply false
+    kotlin("plugin.jpa") version "2.3.21" apply false
+    kotlin("plugin.spring") version "2.3.21" apply false
+}
+
 // 子项目配置
 subprojects {
     // TODO 修复这个问题。给所有子项目添加缺失的任务（终极保险）

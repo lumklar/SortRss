@@ -1,8 +1,8 @@
 plugins {
-    kotlin("jvm") version "2.3.21"
-//    kotlin("kapt") version "2.3.21"
-    kotlin("plugin.jpa") version "2.3.21"
-    kotlin("plugin.spring") version "2.3.21"
+    kotlin("jvm")
+//    kotlin("kapt")
+    kotlin("plugin.jpa")
+    kotlin("plugin.spring")
     id("org.springframework.boot") version "4.1.0-RC1"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.graalvm.buildtools.native") version "0.11.5"

@@ -1,10 +1,10 @@
-pluginManagement {
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}
+//pluginManagement {
+//    repositories {
+//        google()
+//        mavenCentral()
+//        gradlePluginPortal()
+//    }
+//}
 
 // 根项目名称
 rootProject.name = "sortrss"
