@@ -17,3 +17,8 @@ logging:
     path: ./logs
   charset:
     console: UTF-8
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
