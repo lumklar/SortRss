@@ -26,7 +26,8 @@ graalvmNative {
 }
 
 dependencies {
-    implementation(project(":common"))
+    implementation(project(":common:common-domain"))
+    implementation(project(":common:common-api"))
 
     //kotlin反射依赖
     implementation("org.jetbrains.kotlin:kotlin-stdlib")

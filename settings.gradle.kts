@@ -10,5 +10,7 @@
 rootProject.name = "sortrss"
 
 // 包含子模块
-include("common")
-include("server")
+include(":common")
+include(":common:common-api")
+include(":common:common-domain")
+include(":server")
