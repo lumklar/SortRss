@@ -22,7 +22,7 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                
+
             }
         }
 
@@ -38,8 +38,4 @@ kotlin {
             }
         }
     }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
 }

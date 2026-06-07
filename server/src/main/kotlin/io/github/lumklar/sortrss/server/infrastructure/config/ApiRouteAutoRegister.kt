@@ -1,0 +1,75 @@
+package io.github.lumklar.sortrss.server.infrastructure.config
+
+import io.github.lumklar.sortrss.common.api.annotation.ApiRoute
+import io.github.lumklar.sortrss.common.api.annotation.HttpMethod
+import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.boot.CommandLineRunner
+import org.springframework.context.ApplicationContext
+import org.springframework.stereotype.Controller
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+import java.lang.reflect.Method
+
+/**
+ * TODO 和requestMapping冲突怎么处理？
+ */
+class ApiRouteAutoRegister(
+    private val applicationContext: ApplicationContext,
+    // 注入 Spring 原生的路由注册器（核心！）
+    private val requestMappingHandlerMapping: RequestMappingHandlerMapping
+) : CommandLineRunner {
+
+    private val logger = KotlinLogging.logger {}
+
+    override fun run(vararg args: String) {
+        registerCustomRoutes()
+    }
+
+    private fun registerCustomRoutes() {
+        // 获取所有 @RestController
+        val controllers = applicationContext.getBeansWithAnnotation(Controller::class.java).values
+
+        for (controller in controllers) {
+            val controllerClass = controller::class.java
+
+            // 遍历实现的接口
+            for (apiInterface in controllerClass.interfaces) {
+                for (interfaceMethod in apiInterface.declaredMethods) {
+                    // 获取 @ApiRoute 注解
+                    val apiRoute = interfaceMethod.getAnnotation(ApiRoute::class.java) ?: continue
+
+                    // 找到实现方法
+                    val targetMethod = findMethod(controllerClass, interfaceMethod) ?: continue
+
+                    // 构建路由
+                    val mapping = RequestMappingInfo
+                        .paths(apiRoute.value)
+                        .methods(convertMethod(apiRoute.method))
+                        .build()
+
+                    // 🔥 注册到 Spring 原生路由里（永不404！）
+                    requestMappingHandlerMapping.registerMapping(mapping, controller, targetMethod)
+
+                    logger.info { "✅ 注册路由成功：${apiRoute.method} ${apiRoute.value}" }
+                }
+            }
+        }
+    }
+
+    // 匹配方法
+    private fun findMethod(controllerClass: Class<*>, method: Method): Method? {
+        return runCatching {
+            controllerClass.getMethod(method.name, *method.parameterTypes)
+        }.getOrNull()
+    }
+
+    // 转换HTTP方法
+    private fun convertMethod(method: HttpMethod): org.springframework.web.bind.annotation.RequestMethod {
+        return when (method) {
+            HttpMethod.GET -> org.springframework.web.bind.annotation.RequestMethod.GET
+            HttpMethod.POST -> org.springframework.web.bind.annotation.RequestMethod.POST
+            HttpMethod.PUT -> org.springframework.web.bind.annotation.RequestMethod.PUT
+            HttpMethod.DELETE -> org.springframework.web.bind.annotation.RequestMethod.DELETE
+        }
+    }
+}

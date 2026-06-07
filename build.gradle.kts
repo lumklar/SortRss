@@ -11,6 +11,7 @@ allprojects {
     }
 }
 
+//TODO 版本都在这里统一管理？
 plugins {
     kotlin("jvm") version "2.3.21" apply false
     kotlin("multiplatform") version "2.3.21" apply false
