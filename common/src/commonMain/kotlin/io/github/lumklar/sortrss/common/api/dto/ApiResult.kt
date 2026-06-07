@@ -20,12 +20,12 @@ sealed class ApiResult<out T> {
      * 失败响应
      * @param code 对外标准错误码（前端用）
      * @param msg 对外提示信息
-//     * @param subCode 内部领域错误码（排查问题用，不强制前端处理）
+     * @param extra 扩展信息：领域错误 + 异常堆栈
      */
     data class Failure(
         val code: Int,
         val msg: String,
-//        val subCode: Int? = null
+        val extra: ApiExtra? = null
     ) : ApiResult<Nothing>()
 
     /**
@@ -41,11 +41,61 @@ sealed class ApiResult<out T> {
         // 失败：标准对外码
         fun failure(code: ApiResultCode): Failure = Failure(code.code, code.msg)
 
-        // 失败：标准码 + 内部子码
-//        fun failure(code: ApiResultCode, subCode: Int): Failure = Failure(code.code, code.msg, subCode)
+        /**
+         * 标准失败：对外码 + 内部扩展信息（通用）
+         */
+        fun failure(code: ApiResultCode, extra: ApiExtra? = null): Failure {
+            return Failure(code.code, code.msg, extra)
+        }
 
-        // 失败：标准码 + 自定义信息 + 内部子码
-//        fun failure(code: ApiResultCode, msg: String, subCode: Int? = null): Failure = Failure(code.code, msg, subCode)
+        /**
+         * 系统异常失败：对外码 + 原生异常（自动填充 SYSTEM 错误来源 + 异常信息）
+         */
+        fun failure(code: ApiResultCode, e: Throwable): Failure {
+            val extra = ApiExtra(
+                errorSource = ErrorSource.SYSTEM,
+                exceptionMsg = e.message,
+                stackTrace = e.stackTraceToString().take(2000)
+            )
+            return Failure(code.code, code.msg, extra)
+        }
+
+        /**
+         * 业务/框架错误失败：对外码 + 错误来源 + 内部错误码/信息
+         */
+        fun failure(
+            code: ApiResultCode,
+            errorSource: ErrorSource,
+            errorCode: Int? = null,
+            errorMsg: String? = null
+        ): Failure {
+            val extra = ApiExtra(
+                errorSource = errorSource,
+                errorCode = errorCode,
+                errorMsg = errorMsg
+            )
+            return Failure(code.code, code.msg, extra)
+        }
+
+        /**
+         * 完整失败：对外码 + 错误来源 + 内部错误 + 原生异常（全量信息）
+         * 适用于：既需要业务错误码，又需要记录异常堆栈的场景
+         */
+        fun failure(
+            code: ApiResultCode,
+            errorSource: ErrorSource,
+            errorCode: Int? = null,
+            errorMsg: String? = null,
+            e: Throwable? = null
+        ): Failure {
+            val extra = ApiExtra(
+                errorSource = errorSource,
+                errorCode = errorCode,
+                errorMsg = errorMsg,
+                exceptionMsg = e?.message,
+                stackTrace = e?.stackTraceToString()?.take(2000)
+            )
+            return Failure(code.code, code.msg, extra)
+        }
     }
 }
-
