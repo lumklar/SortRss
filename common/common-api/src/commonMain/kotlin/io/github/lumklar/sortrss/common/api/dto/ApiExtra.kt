@@ -21,8 +21,7 @@ data class ApiExtra(
     /**
      *原生异常堆栈信息
      */
-    val stackTrace: String? = null,
-    val exceptionMsg: String? = null,
+    val stackTrace: List<String>? = null,
 )
 
 /**

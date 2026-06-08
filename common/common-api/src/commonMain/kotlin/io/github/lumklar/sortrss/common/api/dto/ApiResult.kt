@@ -49,18 +49,6 @@ sealed class ApiResult<out T> {
         }
 
         /**
-         * 系统异常失败：对外码 + 原生异常（自动填充 SYSTEM 错误来源 + 异常信息）
-         */
-        fun failure(code: ApiResultCode, e: Throwable): Failure {
-            val extra = ApiExtra(
-                errorSource = ErrorSource.SYSTEM,
-                exceptionMsg = e.message,
-                stackTrace = e.stackTraceToString().take(2000)
-            )
-            return Failure(code.code, code.msg, extra)
-        }
-
-        /**
          * 业务/框架错误失败：对外码 + 错误来源 + 内部错误码/信息
          */
         fun failure(
@@ -86,14 +74,13 @@ sealed class ApiResult<out T> {
             errorSource: ErrorSource,
             errorCode: Int? = null,
             errorMsg: String? = null,
-            e: Throwable? = null
+            stackTrace: List<String>? = null,
         ): Failure {
             val extra = ApiExtra(
                 errorSource = errorSource,
                 errorCode = errorCode,
                 errorMsg = errorMsg,
-                exceptionMsg = e?.message,
-                stackTrace = e?.stackTraceToString()?.take(2000)
+                stackTrace = stackTrace
             )
             return Failure(code.code, code.msg, extra)
         }
