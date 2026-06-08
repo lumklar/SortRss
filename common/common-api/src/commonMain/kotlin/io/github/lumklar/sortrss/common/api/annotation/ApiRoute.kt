@@ -9,5 +9,5 @@ annotation class ApiRoute(
 )
 
 // 配套枚举（common层）
-enum class HttpMethod { GET, POST, PUT, DELETE }
+enum class HttpMethod { GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, TRACE }
 
