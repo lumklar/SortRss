@@ -1,0 +1,84 @@
+[versions]
+# 核心框架版本
+kotlin = "2.3.21"
+spring-boot = "4.1.0-RC1"
+coroutines = "1.11.0"
+
+# 插件版本
+graalvm = "0.11.5"
+dependency-management = "1.1.7"
+
+# 工具库版本
+kotlinLogging = "8.0.02"
+springdoc = "3.0.3"
+jbcrypt = "0.4"
+rome = "2.1.0"
+sqlite = "3.53.1.0"
+
+[libraries]
+# ==============================================
+# 🚀 Kotlin 核心依赖
+# ==============================================
+# Kotlin 标准库（Spring Boot BOM 管理）
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect" }
+
+# Kotlin 协程
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-core-jvm = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core-jvm", version.ref = "coroutines" }
+kotlinx-coroutines-reactor = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-reactor", version.ref = "coroutines" }
+
+# ==============================================
+# 📝 日志依赖
+# ==============================================
+kotlin-logging = { group = "io.github.oshai", name = "kotlin-logging", version.ref = "kotlinLogging" }
+kotlin-logging-jvm = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlinLogging" }
+
+# kotlin 测试
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+
+# ==============================================
+# 🌱 Spring Boot 官方 Starter（BOM 管理）
+# ==============================================
+spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web" }
+spring-boot-starter-data-jpa = { group = "org.springframework.boot", name = "spring-boot-starter-data-jpa" }
+spring-boot-starter-cache = { group = "org.springframework.boot", name = "spring-boot-starter-cache" }
+spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test" }
+
+# ==============================================
+# 📦 Spring Boot BOM 管理的第三方依赖
+# ==============================================
+caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine"}
+
+# ==============================================
+# 🗄️ 数据库驱动
+# ==============================================
+sqlite-jdbc = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqlite" }
+postgresql = { group = "org.postgresql", name = "postgresql" }
+mysql-connector-j = { group = "com.mysql", name = "mysql-connector-j" }
+
+# ==============================================
+# 🛠️ 第三方工具依赖
+# ==============================================
+lombok = { group = "org.projectlombok", name = "lombok" }
+springdoc-openapi-webmvc = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
+jbcrypt = { group = "org.mindrot", name = "jbcrypt", version.ref = "jbcrypt" }
+rome = { group = "com.rometools", name = "rome", version.ref = "rome" }
+rome-modules = { group = "com.rometools", name = "rome-modules", version.ref = "rome" }
+
+[plugins]
+# ==============================================
+# 🔧 Kotlin 插件
+# ==============================================
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+
+# ==============================================
+# 🔧 Spring 生态插件
+# ==============================================
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "dependency-management" }
+graalvm-native = { id = "org.graalvm.buildtools.native", version.ref = "graalvm" }

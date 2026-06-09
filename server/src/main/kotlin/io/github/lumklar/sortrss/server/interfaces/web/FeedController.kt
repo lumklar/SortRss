@@ -17,5 +17,4 @@ class FeedController : FeedApi {
         //该订阅不存在，创建一条订阅，同时生成对应token(可修改)
         return "{}";
     }
-
 }

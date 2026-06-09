@@ -1,3 +1,14 @@
+plugins {
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.multiplatform) apply false
+    alias(libs.plugins.kotlin.kapt) apply false
+    alias(libs.plugins.kotlin.spring) apply false
+    alias(libs.plugins.kotlin.jpa) apply false
+    alias(libs.plugins.spring.boot) apply false
+    alias(libs.plugins.spring.dependency.management) apply false
+    alias(libs.plugins.graalvm.native) apply false
+}
+
 // 全局项目信息
 allprojects {
     group = "com.github.lumklar"
@@ -9,15 +20,6 @@ allprojects {
         mavenCentral()
         google()
     }
-}
-
-//TODO 版本都在这里统一管理？
-plugins {
-    kotlin("jvm") version "2.3.21" apply false
-    kotlin("multiplatform") version "2.3.21" apply false
-    kotlin("kapt") version "2.3.21" apply false
-    kotlin("plugin.jpa") version "2.3.21" apply false
-    kotlin("plugin.spring") version "2.3.21" apply false
 }
 
 // 子项目配置

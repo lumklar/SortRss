@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform")
+    alias(libs.plugins.kotlin.multiplatform)
 }
 
 java {
@@ -17,24 +17,12 @@ kotlin {
         // 公共代码（所有平台共享）
         val commonMain by getting {
             dependencies {
-                api("io.github.oshai:kotlin-logging:8.0.02")
+                implementation(libs.kotlin.logging)
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation(kotlin("test")) // 公共测试框架
-            }
-        }
-
-        // JVM 特定代码
-        val jvmMain by getting {
-            dependencies {
-                runtimeOnly("io.github.oshai:kotlin-logging-jvm:8.0.02")
-            }
-        }
-        val jvmTest by getting {
-            dependencies {
-                runtimeOnly("org.slf4j:slf4j-simple:2.0.18")
+                implementation(libs.kotlin.test)
             }
         }
     }

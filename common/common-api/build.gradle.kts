@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform")
+    alias(libs.plugins.kotlin.multiplatform)
 }
 
 java {
@@ -22,19 +22,7 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-
-            }
-        }
-
-        // JVM 特定代码
-        val jvmMain by getting {
-            dependencies {
-
-            }
-        }
-        val jvmTest by getting {
-            dependencies {
-
+                implementation(libs.kotlin.test)
             }
         }
     }

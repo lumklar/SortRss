@@ -1,11 +1,10 @@
 plugins {
-    kotlin("jvm")
-//    kotlin("kapt")
-    kotlin("plugin.jpa")
-    kotlin("plugin.spring")
-    id("org.springframework.boot") version "4.1.0-RC1"
-    id("io.spring.dependency-management") version "1.1.7"
-    id("org.graalvm.buildtools.native") version "0.11.5"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.spring)
+    alias(libs.plugins.kotlin.jpa)
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.graalvm.native)
 }
 
 java {
@@ -26,41 +25,48 @@ graalvmNative {
 }
 
 dependencies {
+    // 多模块依赖
     implementation(project(":common:common-domain"))
     implementation(project(":common:common-api"))
     implementation(project(":common:common-infrastructure"))
     implementation(project(":common:common-shared"))
 
-    //kotlin反射依赖
-    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    // Kotlin
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.kotlin.reflect)
 
-    //web
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
-    //缓存
-    implementation("org.springframework.boot:spring-boot-starter-cache")
-    implementation("com.github.ben-manes.caffeine:caffeine")
-    //持久层框架
-    implementation("jakarta.persistence:jakarta.persistence-api")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    //数据库驱动
-    runtimeOnly("org.xerial:sqlite-jdbc:3.53.1.0")
-    runtimeOnly("org.postgresql:postgresql")
-    runtimeOnly("com.mysql:mysql-connector-j")
+    //日志
+    implementation(libs.kotlin.logging.jvm)
 
-    //lombok
-    compileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
+    // Web
+    implementation(libs.spring.boot.starter.web)
+    implementation(libs.springdoc.openapi.webmvc)
 
-    // 测试依赖
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    // 缓存
+    implementation(libs.spring.boot.starter.cache)
+    runtimeOnly(libs.caffeine)
 
-    //加密工具类
-    implementation("org.mindrot:jbcrypt:0.4")
-    //rss依赖
-    implementation("com.rometools:rome:2.1.0")
-    implementation("com.rometools:rome-modules:2.1.0")
+    // 数据持久化
+    implementation(libs.spring.boot.starter.data.jpa)
+
+    // 数据库驱动
+    runtimeOnly(libs.sqlite.jdbc)
+    runtimeOnly(libs.postgresql)
+    runtimeOnly(libs.mysql.connector.j)
+
+    // Lombok
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
+
+    // 加密
+    implementation(libs.jbcrypt)
+
+    // RSS
+    implementation(libs.rome)
+    implementation(libs.rome.modules)
+
+    // 测试
+    testImplementation(libs.spring.boot.starter.test)
 }
 
 tasks.withType<Test> {

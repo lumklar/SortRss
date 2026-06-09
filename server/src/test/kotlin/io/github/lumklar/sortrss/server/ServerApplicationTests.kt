@@ -8,6 +8,7 @@ class ServerApplicationTests {
 
     @Test
     fun contextLoads() {
+        println("测试成功")
     }
 
 }
