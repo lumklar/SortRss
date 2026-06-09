@@ -8,10 +8,14 @@ enum class ApiResultCode(
     val code: Int,
     val msg: String
 ) {
-    // 成功
+    /**
+     *成功
+     */
     SUCCESS(200, "操作成功"),
 
-    // 客户端错误
+    /**
+     *客户端错误
+     */
     PARAM_ERROR(400, "请求参数错误"),
     UNAUTHORIZED(401, "未登录或登录已过期"),
     FORBIDDEN(403, "无权限访问"),

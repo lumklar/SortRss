@@ -15,6 +15,7 @@ import java.lang.reflect.Method
 
 /**
  * 自动扫描并注册 [ApiRoute] 注解的路由配置
+ * TODO 支持native
  * @see ApiRoute
  */
 class ApiRouteAutoRegister(
@@ -45,17 +46,20 @@ class ApiRouteAutoRegister(
                     // 找到实现方法
                     val targetMethod = findMethod(controllerClass, interfaceMethod) ?: continue
 
-                    checkMethodConflict(targetMethod, apiRoute)
+                    val needRegister = checkMethodConflict(targetMethod, apiRoute)
 
-                    // 构建路由
-                    val mapping = RequestMappingInfo
-                        .paths(apiRoute.value)
-                        .methods(convertMethod(apiRoute.method))
-                        .build()
-                    //注册路由
-                    requestMappingHandlerMapping.registerMapping(mapping, controller, targetMethod)
-
-                    logger.info { "✅ 注册路由成功：${apiRoute.method} ${apiRoute.value}" }
+                    if (needRegister) {
+                        // 构建路由
+                        val mapping = RequestMappingInfo
+                            .paths(apiRoute.value)
+                            .methods(convertMethod(apiRoute.method))
+                            .build()
+                        //注册路由
+                        requestMappingHandlerMapping.registerMapping(mapping, controller, targetMethod)
+                        logger.info { "Route registered successfully: ${apiRoute.method} ${apiRoute.value}" }
+                    } else {
+                        logger.info { "Route registered via RequestMapping annotation: ${apiRoute.method} ${apiRoute.value}" }
+                    }
                 }
             }
         }

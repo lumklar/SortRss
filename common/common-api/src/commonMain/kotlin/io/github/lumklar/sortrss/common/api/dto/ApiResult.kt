@@ -32,13 +32,19 @@ sealed class ApiResult<out T> {
      * 伴生对象：简化创建（最常用写法）
      */
     companion object {
-        // 成功：仅数据
+        /**
+         *成功：仅数据
+         */
         fun <T> success(data: T): Success<T> = Success(data = data)
 
-        // 成功：自定义提示
+        /**
+         *成功：自定义提示
+         */
         fun <T> success(data: T, msg: String): Success<T> = Success(msg = msg, data = data)
 
-        // 失败：标准对外码
+        /**
+         *失败：标准对外码
+         */
         fun failure(code: ApiResultCode): Failure = Failure(code.code, code.msg)
 
         /**

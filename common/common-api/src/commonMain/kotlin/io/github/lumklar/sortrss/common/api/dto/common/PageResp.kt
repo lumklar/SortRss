@@ -9,16 +9,26 @@ package io.github.lumklar.sortrss.common.api.dto.common
  * @param size 每页条数
  */
 data class PageResp<T>(
-    // 分页数据列表
+    /**
+     *分页数据列表
+     */
     val records: List<T> = emptyList(),
-    // 总条数
+    /**
+     *总条数
+     */
     val total: Long = 0,
-    // 当前页
+    /**
+     *当前页
+     */
     val current: Long = 1,
-    // 每页条数
+    /**
+     *每页条数
+     */
     val size: Long = 10
 ) {
-    // 自动计算总页数
+    /**
+     *自动计算总页数
+     */
     val pages: Long
         get() = if (size == 0L) 0 else (total + size - 1) / size
 

@@ -17,6 +17,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException
 /**
  * Spring Boot 4 全局异常处理器
  * 统一封装返回 ApiResult，根据配置控制是否暴露 ApiExtra
+ * TODO 支持native
  */
 @RestControllerAdvice
 class GlobalExceptionHandler(

@@ -6,7 +6,9 @@ package io.github.lumklar.sortrss.common.api.dto
  * @param stackTrace 异常堆栈（精简关键信息）
  */
 data class ApiExtra(
-    // 错误来源：前端核心判断字段
+    /**
+     * 错误来源：前端核心判断字段
+     */
     val errorSource: ErrorSource? = null,
 
     /**
