@@ -8,6 +8,11 @@ coroutines = "1.11.0"
 ksp = "2.3.9"
 graalvm = "0.11.5"
 dependency-management = "1.1.7"
+# TODO 漏洞检查，版本检查，冲突检查，未使用检查
+dependency-check-jvm = "12.1.9"
+dependency-update = "0.51.0"
+dependency-unused = "0"
+dependency-conflict = "0"
 
 # 工具库版本
 therapi = "0.15.0"
@@ -46,6 +51,10 @@ spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-b
 spring-boot-starter-data-jpa = { group = "org.springframework.boot", name = "spring-boot-starter-data-jpa" }
 spring-boot-starter-cache = { group = "org.springframework.boot", name = "spring-boot-starter-cache" }
 spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test" }
+spring-boot-starter-validation = { group = "org.springframework.boot", name = "spring-boot-starter-validation" }
+spring-boot-starter-security = { group = "org.springframework.boot", name = "spring-boot-starter-security" }
+spring-boot-starter-aop = { group = "org.springframework.boot", name = "spring-boot-starter-aop" }
+spring-boot-starter-actuator = { group = "org.springframework.boot", name = "spring-boot-starter-actuator" }
 
 # ==============================================
 # 📦 Spring Boot BOM 管理的第三方依赖
@@ -80,6 +89,12 @@ kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotl
 kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+# ==============================================
+# 🔧 通用插件
+# ==============================================
+dependency-check-jvm = { id = "org.owasp.dependencycheck", version.ref = "dependency-check-jvm" }
+dependency-update = { id = "com.github.ben-manes.versions", version.ref = "dependency-update" }
 
 # ==============================================
 # 🔧 Spring 生态插件

@@ -33,11 +33,12 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                compileOnly(libs.therapi.scribe)
+
             }
         }
     }
 }
+
 dependencies {
     add("kapt", libs.therapi.scribe)
 }

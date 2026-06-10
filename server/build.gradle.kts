@@ -1,10 +1,14 @@
 plugins {
+    // Kotlin 核心插件
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.kotlin.jpa)
+    // Spring Boot 生态
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
+    //其他插件
     alias(libs.plugins.graalvm.native)
+    alias(libs.plugins.dependency.check.jvm)
 }
 
 java {
@@ -16,6 +20,10 @@ java {
 tasks.bootJar {
 }
 
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
 graalvmNative {
     binaries {
         named("main") {
@@ -23,6 +31,16 @@ graalvmNative {
         }
     }
 }
+
+dependencyCheck {
+    // 在此处指定NVD API Key的值
+    nvd {
+        apiKey.set(
+            (project.findProperty("nvdApiKey") as? String) ?: System.getenv("NVD_API_KEY")
+        )
+    }
+}
+
 
 dependencies {
     // 多模块依赖
@@ -68,8 +86,4 @@ dependencies {
 
     // 测试
     testImplementation(libs.spring.boot.starter.test)
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
 }

@@ -13,6 +13,6 @@ rootProject.name = "sortrss"
 include(":common")
 include(":common:common-api")
 include(":common:common-domain")
-include("common:common-infrastructure")
-include("common:common-shared")
+include(":common:common-infrastructure")
+include(":common:common-shared")
 include(":server")
