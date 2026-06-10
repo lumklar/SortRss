@@ -1,18 +1,8 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.kotlin.kapt)
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
-    }
 }
 
 kotlin {
-    jvm {
-
-    }
 
     js(IR) {
         browser()
@@ -27,7 +17,13 @@ kotlin {
         // 公共代码（所有平台共享）
         val commonMain by getting {
             dependencies {
+                implementation(project(":client:client-contract"))
+                implementation(project(":common:common-api"))
 
+                implementation("io.ktor:ktor-client-core:2.3.11")
+                implementation("io.ktor:ktor-client-js:2.3.11")
+                implementation("io.ktor:ktor-client-content-negotiation:2.3.11")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.11")
             }
         }
         val commonTest by getting {
@@ -35,14 +31,5 @@ kotlin {
                 implementation(libs.kotlin.test)
             }
         }
-        val jvmMain by getting {
-            dependencies {
-
-            }
-        }
     }
-}
-
-dependencies {
-    add("kapt", libs.therapi.scribe)
 }

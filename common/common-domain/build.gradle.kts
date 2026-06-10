@@ -9,7 +9,6 @@ java {
 }
 
 kotlin {
-    // 仅配置 JVM 目标
     jvm {}
 
     // 配置源集（source sets）

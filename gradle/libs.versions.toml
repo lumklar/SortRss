@@ -1,8 +1,10 @@
 [versions]
 # 核心框架版本
-kotlin = "2.3.21"
+kotlin = "2.4.0"
 spring-boot = "4.1.0-RC1"
 coroutines = "1.11.0"
+compose = "1.11.1"
+material3 = "1.11.0-alpha07"
 
 # 插件版本
 ksp = "2.3.9"
@@ -23,6 +25,16 @@ rome = "2.1.0"
 sqlite = "3.53.1.0"
 
 [libraries]
+# Compose 核心
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
+compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "compose" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
+compose-js = { module = "org.jetbrains.compose.ui:ui-js", version.ref = "compose" }
+compose-wasm = { module = "org.jetbrains.compose.ui:ui-wasm-js", version.ref = "compose" }
+compose-desktop = { module = "org.jetbrains.compose.ui:ui-desktop", version.ref = "compose" }
+
 # ==============================================
 # 🚀 Kotlin 核心依赖
 # ==============================================
@@ -89,6 +101,7 @@ kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotl
 kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 # ==============================================
 # 🔧 通用插件

@@ -2,14 +2,14 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
-    }
-}
-
 kotlin {
-    jvm {}
+    js(IR) {
+        browser()
+    }
+
+    wasmJs {
+        browser()
+    }
 
     // 配置源集（source sets）
     sourceSets {
@@ -21,7 +21,7 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                implementation(libs.kotlin.test)
+
             }
         }
     }

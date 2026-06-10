@@ -1,25 +1,22 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.kotlin.kapt)
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
-    }
 }
 
 kotlin {
-    jvm {
-
-    }
-
+    // 配置 Kotlin/JS target
     js(IR) {
+        // 以浏览器为目标环境
         browser()
+        // 明确告诉编译器，需要生成可执行的 .js 文件
+        binaries.executable()
     }
 
+    // 配置 Kotlin/Wasm target
     wasmJs {
+        // 浏览器配置
         browser()
+        // 明确告诉编译器，需要生成可执行文件
+        binaries.executable()
     }
 
     // 配置源集（source sets）
@@ -27,7 +24,8 @@ kotlin {
         // 公共代码（所有平台共享）
         val commonMain by getting {
             dependencies {
-
+                implementation(project(":client:client-ui"))
+//                implementation(project(":client:client-network-impl"))
             }
         }
         val commonTest by getting {
@@ -35,14 +33,5 @@ kotlin {
                 implementation(libs.kotlin.test)
             }
         }
-        val jvmMain by getting {
-            dependencies {
-
-            }
-        }
     }
-}
-
-dependencies {
-    add("kapt", libs.therapi.scribe)
 }
