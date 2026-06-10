@@ -5,7 +5,13 @@ package io.github.lumklar.sortrss.common.api.dto
  * 前端/客户端唯一使用的错误码
  */
 enum class ApiResultCode(
+    /**
+     * result编码
+     */
     val code: Int,
+    /**
+     * result信息
+     */
     val msg: String
 ) {
     /**

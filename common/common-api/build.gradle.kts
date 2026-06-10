@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.kapt)
+//    id("com.google.devtools.ksp") version "2.3.9"
 }
 
 java {
@@ -10,7 +12,11 @@ java {
 
 kotlin {
     // 仅配置 JVM 目标
-    jvm {}
+    jvm {
+        compilations.all {
+
+        }
+    }
 
     // 配置源集（source sets）
     sourceSets {
@@ -25,5 +31,13 @@ kotlin {
                 implementation(libs.kotlin.test)
             }
         }
+        val jvmMain by getting {
+            dependencies {
+                compileOnly(libs.therapi.scribe)
+            }
+        }
     }
+}
+dependencies {
+    add("kapt", libs.therapi.scribe)
 }

@@ -41,6 +41,7 @@ dependencies {
     // Web
     implementation(libs.spring.boot.starter.web)
     implementation(libs.springdoc.openapi.webmvc)
+    implementation(libs.therapi)
 
     // 缓存
     implementation(libs.spring.boot.starter.cache)

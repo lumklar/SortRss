@@ -9,6 +9,9 @@ sealed class ApiResult<out T> {
 
     /**
      * 成功响应
+     * @param code 对外成功码（前端用）
+     * @param msg 对外提示成功信息
+     * @param data 结果的数据
      */
     data class Success<out T>(
         val code: Int = ApiResultCode.SUCCESS.code,
