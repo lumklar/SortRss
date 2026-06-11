@@ -5,6 +5,8 @@ spring-boot = "4.1.0-RC1"
 coroutines = "1.11.0"
 compose = "1.11.1"
 material3 = "1.11.0-alpha07"
+androidx-lifecycle = "2.11.0-beta01"
+kotlin-wrappers = "2026.6.1"
 
 # 插件版本
 ksp = "2.3.9"
@@ -34,6 +36,12 @@ compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
 compose-js = { module = "org.jetbrains.compose.ui:ui-js", version.ref = "compose" }
 compose-wasm = { module = "org.jetbrains.compose.ui:ui-wasm-js", version.ref = "compose" }
 compose-desktop = { module = "org.jetbrains.compose.ui:ui-desktop", version.ref = "compose" }
+androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose" }
+compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose" }
+wrappers-browser = { module = "org.jetbrains.kotlin-wrappers:kotlin-browser", version.ref = "kotlin-wrappers" }
+kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 
 # ==============================================
 # 🚀 Kotlin 核心依赖
@@ -102,6 +110,7 @@ kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose" }
 
 # ==============================================
 # 🔧 通用插件

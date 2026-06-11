@@ -12,6 +12,7 @@ rootProject.name = "sortrss"
 // 包含子模块
 //include(":app")
 include(":app:webApp")
+include(":app:desktopApp")
 //include(":client")
 include(":client:contract")
 include(":client:networkImpl")

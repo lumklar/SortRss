@@ -3,7 +3,14 @@ plugins {
 }
 
 kotlin {
-    js(IR) {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+
+    jvm{
+    }
+
+    js {
         browser()
     }
 
