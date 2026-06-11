@@ -17,7 +17,7 @@ kotlin {
         // 公共代码（所有平台共享）
         val commonMain by getting {
             dependencies {
-                implementation(project(":client:client-contract"))
+                implementation(project(":client:contract"))
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)

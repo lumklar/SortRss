@@ -43,11 +43,10 @@ dependencyCheck {
 
 
 dependencies {
-    // 多模块依赖
-    implementation(project(":common:common-domain"))
-    implementation(project(":common:common-api"))
-    implementation(project(":common:common-infrastructure"))
-    implementation(project(":common:common-shared"))
+    implementation(project(":common:domain"))
+    implementation(project(":common:api"))
+    implementation(project(":common:infrastructure"))
+    implementation(project(":common:shared"))
 
     // Kotlin
     implementation(libs.kotlin.stdlib)
