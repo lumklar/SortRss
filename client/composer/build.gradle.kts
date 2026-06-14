@@ -7,6 +7,7 @@ plugins {
 }
 
 //TODO 改为公共方法，传入key，value
+//TODO 用枚举类约束
 val dataFlavor = (System.getenv("FLAVOR_DATA") ?: project.findProperty("flavor.data") as? String ?: "network")
 
 kotlin {
