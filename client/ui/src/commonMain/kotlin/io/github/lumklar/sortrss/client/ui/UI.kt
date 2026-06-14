@@ -11,15 +11,13 @@ import io.github.lumklar.sortrss.client.contract.all.AllContractFactory
 
 @Composable
 fun UI(factory: AllContractFactory) {
-    val dataFactory = factory.data()
-    print(dataFactory)
     MaterialTheme {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Hello World",
+                text = "Hello World!",
                 style = MaterialTheme.typography.headlineMedium
             )
         }

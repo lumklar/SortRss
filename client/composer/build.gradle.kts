@@ -6,11 +6,37 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
 }
 
-//TODO 改为公共方法，传入key，value
-//TODO 用枚举类约束
-val dataFlavor = (System.getenv("FLAVOR_DATA") ?: project.findProperty("flavor.data") as? String ?: "network")
+interface StringEnum {
+    val value: String
+}
+
+// 实现接口
+enum class DataFlavor(override val value: String) : StringEnum {
+    MOCK("mock"),
+    NETWORK("network")
+}
+
+inline fun <reified T : Enum<T>> Project.getFlavorEnum(
+    propertyKey: String,
+    default: T,
+    noinline valueMapper: (T) -> String = { (it as? StringEnum)?.value ?: it.name.lowercase() }
+): T {
+    val envKey = propertyKey.uppercase().replace(".", "_")
+    val rawValue = (System.getenv(envKey) ?: findProperty(propertyKey) as? String)?.lowercase()
+
+    if (rawValue == null) return default
+
+    val matched = enumValues<T>().find { enumValue ->
+        valueMapper(enumValue).equals(rawValue, ignoreCase = true)
+    }
+    return matched ?: default.also {
+        logger.warn("未知的配置值 '$rawValue' (key=$propertyKey)，使用默认值 ${default.name}")
+    }
+}
 
 kotlin {
+    val dataFlavor = getFlavorEnum("flavor.data", DataFlavor.NETWORK)
+
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
     }
@@ -37,8 +63,8 @@ kotlin {
                 implementation(libs.compose.runtime)
                 implementation(libs.kotlin.insert)
                 when (dataFlavor) {
-                    "mock" -> implementation(project(":client:impl-data:mock"))
-                    "network" -> implementation(project(":client:impl-data:network"))
+                    DataFlavor.MOCK -> implementation(project(":client:impl-data:mock"))
+                    DataFlavor.NETWORK -> implementation(project(":client:impl-data:network"))
                 }
             }
         }

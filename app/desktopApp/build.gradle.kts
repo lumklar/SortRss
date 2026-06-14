@@ -19,7 +19,7 @@ dependencies {
     implementation(libs.kotlinx.coroutinesSwing)
 
     //TODO 需要删除吗？
-    implementation(libs.compose.uiToolingPreview)
+    compileOnly(libs.compose.uiToolingPreview)
 }
 compose.desktop {
     application {
