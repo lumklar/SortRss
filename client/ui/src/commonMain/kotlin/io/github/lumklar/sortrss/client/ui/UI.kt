@@ -7,11 +7,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import io.github.lumklar.sortrss.client.contract.all.AllContractFactory
 
 @Composable
-@Preview
-fun UI() {
+fun UI(factory: AllContractFactory) {
     MaterialTheme {
         Box(
             modifier = Modifier.fillMaxSize(),

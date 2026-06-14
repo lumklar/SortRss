@@ -13,11 +13,12 @@ java {
 }
 
 dependencies {
-    implementation(project(":client:ui"))
+    implementation(project(":client:composer"))
 
     implementation(compose.desktop.currentOs)
     implementation(libs.kotlinx.coroutinesSwing)
 
+    //TODO 需要删除吗？
     implementation(libs.compose.uiToolingPreview)
 }
 compose.desktop {

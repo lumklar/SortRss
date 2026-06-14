@@ -6,22 +6,23 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
 }
 
+val dataFlavor: String = project.properties["flavor.data"] as? String ?: "mock"
+
 kotlin {
-    // 配置 Kotlin/JS target
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+
+    jvm {
+    }
+
     js {
-        // 以浏览器为目标环境
         browser()
-        // 明确告诉编译器，需要生成可执行的 .js 文件
-        binaries.executable()
     }
 
     @OptIn(ExperimentalWasmDsl::class)
-    // 配置 Kotlin/Wasm target
     wasmJs {
-        // 浏览器配置
         browser()
-        // 明确告诉编译器，需要生成可执行文件
-        binaries.executable()
     }
 
     // 配置源集（source sets）
@@ -29,12 +30,16 @@ kotlin {
         // 公共代码（所有平台共享）
         val commonMain by getting {
             dependencies {
-                implementation(project(":client:composer"))
-                implementation(libs.compose.ui)
+                implementation(project(":client:contract:all"))
+                implementation(project(":client:impl-data:network"))
+//                implementation(project(":client:impl-data:mock"))
+                implementation(project(":client:ui"))
+                implementation(libs.compose.runtime)
             }
         }
         val commonTest by getting {
             dependencies {
+
             }
         }
     }

@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
 }
@@ -7,13 +9,14 @@ kotlin {
         languageVersion.set(JavaLanguageVersion.of(21))
     }
 
-    jvm{
+    jvm {
     }
 
     js {
         browser()
     }
 
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
     }
@@ -23,13 +26,12 @@ kotlin {
         // 公共代码（所有平台共享）
         val commonMain by getting {
             dependencies {
-                implementation(project(":client:contract"))
-                implementation(project(":common:api"))
+                api(project(":client:contract:data"))
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation(libs.kotlin.test)
+
             }
         }
     }

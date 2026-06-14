@@ -10,6 +10,8 @@ plugins {
     alias(libs.plugins.dependency.check.jvm) apply false
 }
 
+val buildEnv = project.findProperty("ENV")?.toString() ?: System.getenv("ENV") ?: "dev"
+
 //TODO 写一个脚本+配置统一管理，防止泄露删除
 //漏洞修复
 extra["tomcat.version"] = "11.0.22"

@@ -1,10 +1,23 @@
-//pluginManagement {
-//    repositories {
-//        google()
-//        mavenCentral()
-//        gradlePluginPortal()
-//    }
-//}
+pluginManagement {
+    repositories {
+        mavenLocal()
+        maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        mavenLocal()
+        maven { url = uri("https://maven.aliyun.com/repository/public") }
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        mavenCentral()
+        maven { url = uri("https://npmmirror.com/mirrors/node/") }
+    }
+}
 
 // 根项目名称
 rootProject.name = "sortrss"
@@ -14,8 +27,12 @@ rootProject.name = "sortrss"
 include(":app:webApp")
 include(":app:desktopApp")
 //include(":client")
-include(":client:contract")
-include(":client:networkImpl")
+include(":client:composer")
+//include(":client:contract")
+include(":client:contract:all")
+include(":client:contract:data")
+include(":client:impl-data:network")
+include(":client:impl-data:mock")
 include(":client:ui")
 //include(":common")
 include(":common:api")
