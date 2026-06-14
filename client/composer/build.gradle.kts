@@ -6,16 +6,16 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
 }
 
+/**
+ * 风味枚举实现接口
+ */
 interface StringEnum {
     val value: String
 }
 
-// 实现接口
-enum class DataFlavor(override val value: String) : StringEnum {
-    MOCK("mock"),
-    NETWORK("network")
-}
-
+/**
+ * 获取风味值
+ */
 inline fun <reified T : Enum<T>> Project.getFlavorEnum(
     propertyKey: String,
     default: T,
@@ -32,6 +32,21 @@ inline fun <reified T : Enum<T>> Project.getFlavorEnum(
     return matched ?: default.also {
         logger.warn("未知的配置值 '$rawValue' (key=$propertyKey)，使用默认值 ${default.name}")
     }
+}
+
+/**
+ * 数据风味
+ */
+enum class DataFlavor(override val value: String) : StringEnum {
+    /**
+     * mock数据
+     */
+    MOCK("mock"),
+
+    /**
+     * 网络远端实现
+     */
+    NETWORK("network")
 }
 
 kotlin {
