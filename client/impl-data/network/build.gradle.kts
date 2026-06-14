@@ -28,6 +28,7 @@ kotlin {
             dependencies {
                 implementation(project(":client:contract:data"))
                 implementation(project(":common:api"))
+                implementation(libs.kotlin.insert)
             }
         }
         val commonTest by getting {

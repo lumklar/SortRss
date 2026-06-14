@@ -2,11 +2,12 @@ package io.github.lumklar.sortrss.client.composer
 
 import io.github.lumklar.sortrss.client.contract.all.AllContractFactory
 import io.github.lumklar.sortrss.client.contract.data.DataContractFactory
-import io.github.lumklar.sortrss.client.impl.data.network.DataContractNetworkFactory
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 
 class FlavorAllContractFactory(
-    private val dataFactory: DataContractFactory = DataContractNetworkFactory()
-) : AllContractFactory {
+) : AllContractFactory, KoinComponent {
+    private val dataFactory: DataContractFactory by inject()
     override fun data(): DataContractFactory = dataFactory
 }

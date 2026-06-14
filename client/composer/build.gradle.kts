@@ -6,7 +6,8 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
 }
 
-val dataFlavor: String = project.properties["flavor.data"] as? String ?: "mock"
+//TODO 改为公共方法，传入key，value
+val dataFlavor = (System.getenv("FLAVOR_DATA") ?: project.findProperty("flavor.data") as? String ?: "network")
 
 kotlin {
     jvmToolchain {
@@ -31,10 +32,13 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":client:contract:all"))
-                implementation(project(":client:impl-data:network"))
-//                implementation(project(":client:impl-data:mock"))
                 implementation(project(":client:ui"))
                 implementation(libs.compose.runtime)
+                implementation(libs.kotlin.insert)
+                when (dataFlavor) {
+                    "mock" -> implementation(project(":client:impl-data:mock"))
+                    "network" -> implementation(project(":client:impl-data:network"))
+                }
             }
         }
         val commonTest by getting {

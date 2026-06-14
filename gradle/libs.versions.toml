@@ -7,6 +7,7 @@ compose = "1.11.1"
 material3 = "1.11.0-alpha07"
 androidx-lifecycle = "2.11.0-beta01"
 kotlin-wrappers = "2026.6.1"
+kotlin-insert = "4.2.1"
 
 # 插件版本
 ksp = "2.3.9"
@@ -43,6 +44,8 @@ compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-previ
 compose-uiToolingDesktopPreview = { module = "org.jetbrains.compose.ui:ui-tooling-desktop", version.ref = "compose" }
 wrappers-browser = { module = "org.jetbrains.kotlin-wrappers:kotlin-browser", version.ref = "kotlin-wrappers" }
 kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
+kotlin-insert = {module = "io.insert-koin:koin-core",version.ref = "kotlin-insert"}
+kotlin-insert-compose = {module = "io.insert-koin:koin-compose",version.ref = "kotlin-insert"}
 
 # ==============================================
 # 🚀 Kotlin 核心依赖
