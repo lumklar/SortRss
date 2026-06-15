@@ -1,3 +1,23 @@
+allprojects {
+    repositories {
+        mavenLocal()
+        maven { url = uri("https://maven.aliyun.com/repository/public") }
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        mavenCentral()
+        google()
+    }
+
+    buildscript {
+        repositories {
+            mavenLocal()
+            maven { url = uri("https://maven.aliyun.com/repository/public") }
+            maven { url = uri("https://maven.aliyun.com/repository/google") }
+            mavenCentral()
+            google()
+        }
+    }
+}
+
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.multiplatform) apply false

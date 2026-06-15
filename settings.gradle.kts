@@ -5,18 +5,20 @@ pluginManagement {
         maven { url = uri("https://maven.aliyun.com/repository/google") }
         mavenCentral()
         gradlePluginPortal()
+        google()
     }
 }
 
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
-    repositories {
-        mavenLocal()
-        maven { url = uri("https://maven.aliyun.com/repository/public") }
-        maven { url = uri("https://maven.aliyun.com/repository/google") }
-        mavenCentral()
-    }
-}
+//dependencyResolutionManagement {
+//    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+//    repositories {
+//        mavenLocal()
+//        maven { url = uri("https://maven.aliyun.com/repository/public") }
+//        maven { url = uri("https://maven.aliyun.com/repository/google") }
+//        mavenCentral()
+//        google()
+//    }
+//}
 
 // 根项目名称
 rootProject.name = "sortrss"

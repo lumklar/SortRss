@@ -7,7 +7,7 @@ import io.github.lumklar.sortrss.client.composer.CLIENT
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
-        title = "SortRss",
+        title = "Sort Rss",
     ) {
         CLIENT()
     }
