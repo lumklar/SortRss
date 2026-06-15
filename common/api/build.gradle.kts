@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.kapt)
@@ -14,10 +16,11 @@ kotlin {
 
     }
 
-    js(IR) {
+    js {
         browser()
     }
 
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
     }
