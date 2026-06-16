@@ -4,7 +4,7 @@ import io.github.lumklar.sortrss.common.api.dto.ApiExtra
 import io.github.lumklar.sortrss.common.api.dto.ApiResult
 import io.github.lumklar.sortrss.common.api.dto.ApiResultCode
 import io.github.lumklar.sortrss.common.api.dto.ErrorSource
-import io.github.lumklar.sortrss.common.domain.model.exception.BusinessException
+import io.github.lumklar.sortrss.common.domain.shared.exception.BusinessException
 import io.github.lumklar.sortrss.common.shared.utils.ExceptionStackTraceUtil
 import org.springframework.dao.DataAccessException
 import org.springframework.web.bind.MethodArgumentNotValidException

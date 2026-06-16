@@ -2,10 +2,12 @@
 # 核心框架版本
 kotlin = "2.4.0"
 spring-boot = "4.1.0-RC1"
+json = "1.11.0"
 coroutines = "1.11.0"
 compose = "1.11.1"
 material3 = "1.11.0-alpha07"
-androidx-lifecycle = "2.11.0-beta01"
+androidx-lifecycle = "2.10.0"
+androidx-navigation = "2.9.2"
 kotlin-wrappers = "2026.6.1"
 kotlin-insert = "4.2.1"
 
@@ -39,6 +41,7 @@ compose-ui-wasm = { group = "org.jetbrains.compose.ui", name = "ui-wasm-js", ver
 compose-ui-desktop = { group = "org.jetbrains.compose.ui", name = "ui-desktop", version.ref = "compose" }
 androidx-lifecycle-viewmodelCompose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtimeCompose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+androidx-navigation = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "androidx-navigation" }
 compose-components-resources = { group = "org.jetbrains.compose.components", name = "components-resources", version.ref = "compose" }
 compose-uiToolingPreview = { group = "org.jetbrains.compose.ui", name = "ui-tooling-preview", version.ref = "compose" }
 compose-uiToolingDesktopPreview = { group = "org.jetbrains.compose.ui", name = "ui-tooling-desktop", version.ref = "compose" }
@@ -53,7 +56,6 @@ kotlin-insert-compose = { group = "io.insert-koin", name = "koin-compose", versi
 # Kotlin 标准库（Spring Boot BOM 管理）
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect" }
-kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json" }
 
 # Kotlin 协程
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -65,9 +67,13 @@ kotlinx-coroutines-reactor = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 # ==============================================
 kotlin-logging = { group = "io.github.oshai", name = "kotlin-logging", version.ref = "kotlinLogging" }
 kotlin-logging-jvm = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlinLogging" }
+kotlin-logging-js = { group = "io.github.oshai", name = "kotlin-logging-js", version.ref = "kotlinLogging" }
+kotlin-logging-wasm-js = { group = "io.github.oshai", name = "kotlin-logging-wasm-js", version.ref = "kotlinLogging" }
 
 # kotlin 测试
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+
+kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "json"}
 
 # ==============================================
 # 🌱 Spring Boot 官方 Starter（BOM 管理）
@@ -116,6 +122,7 @@ kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose" }
+serialization = {id="org.jetbrains.kotlin.plugin.serialization",version.ref="kotlin"}
 
 # ==============================================
 # 🔧 通用插件

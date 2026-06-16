@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
 }
@@ -9,16 +11,22 @@ java {
 }
 
 kotlin {
-    jvm {}
+    jvm {
+
+    }
+
+    js {
+        browser()
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
 
     // 配置源集（source sets）
     sourceSets {
         // 公共代码（所有平台共享）
-        val commonMain by getting {
-            dependencies {
-                implementation(libs.kotlin.logging)
-            }
-        }
         val commonTest by getting {
             dependencies {
                 implementation(libs.kotlin.test)

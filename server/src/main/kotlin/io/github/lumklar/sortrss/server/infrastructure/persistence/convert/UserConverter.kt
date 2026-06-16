@@ -26,7 +26,7 @@ class UserConverter(
 
     fun toPO(user: User): UserPO {
         return UserPO().apply {
-            id = if (user.id == 0L) null else user.id
+            id = if (user.id.value == 0L) null else user.id.value
             username = user.username
             password = user.getPasswordHash()
         }

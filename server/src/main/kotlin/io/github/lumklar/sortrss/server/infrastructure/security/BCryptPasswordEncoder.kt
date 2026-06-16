@@ -1,6 +1,6 @@
 package io.github.lumklar.sortrss.server.infrastructure.security
 
-import io.github.lumklar.sortrss.common.domain.model.ability.PasswordEncoder
+import io.github.lumklar.sortrss.common.domain.shared.ability.PasswordEncoder
 import org.mindrot.jbcrypt.BCrypt
 
 class BCryptPasswordEncoder : PasswordEncoder {

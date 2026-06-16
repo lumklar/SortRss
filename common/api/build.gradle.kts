@@ -27,20 +27,9 @@ kotlin {
 
     // 配置源集（source sets）
     sourceSets {
-        // 公共代码（所有平台共享）
-        val commonMain by getting {
-            dependencies {
-
-            }
-        }
         val commonTest by getting {
             dependencies {
                 implementation(libs.kotlin.test)
-            }
-        }
-        val jvmMain by getting {
-            dependencies {
-
             }
         }
     }

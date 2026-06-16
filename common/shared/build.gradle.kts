@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
 }
@@ -9,7 +11,18 @@ java {
 }
 
 kotlin {
-    jvm {}
+    jvm {
+
+    }
+
+    js {
+        browser()
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
 
     // 配置源集（source sets）
     sourceSets {
