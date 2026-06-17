@@ -27,6 +27,8 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":client:contract:data"))
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.androidx.lifecycle.viewmodelCompose)
                 implementation(libs.kotlin.insert)
             }
         }

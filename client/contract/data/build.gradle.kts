@@ -26,7 +26,7 @@ kotlin {
         // 公共代码（所有平台共享）
         val commonMain by getting {
             dependencies {
-
+                implementation(libs.androidx.lifecycle.viewmodelCompose)
             }
         }
         val commonTest by getting {

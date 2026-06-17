@@ -1,12 +1,14 @@
 package io.github.lumklar.sortrss.client.impl.data.local
 
 import io.github.lumklar.sortrss.client.contract.data.DataContractFactory
-import io.github.lumklar.sortrss.common.domain.model.entity.User
+import io.github.lumklar.sortrss.client.contract.data.repository.UserRepository
 
 class LocalDataContractFactory : DataContractFactory {
     override fun hello(): String {
-        //TODO 删除
-        val user = User.fromPersistence(12, "测试用户", "asdlfhalksdf")
-        return "local-impl:" + user.id.value + "." + user.username
+        return "local-impl"
+    }
+
+    override fun userRepository(): UserRepository {
+        TODO("Not yet implemented")
     }
 }

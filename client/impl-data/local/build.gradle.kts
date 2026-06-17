@@ -27,7 +27,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":client:contract:data"))
-                implementation(project(":common:domain"))
                 implementation(libs.kotlin.insert)
             }
         }
