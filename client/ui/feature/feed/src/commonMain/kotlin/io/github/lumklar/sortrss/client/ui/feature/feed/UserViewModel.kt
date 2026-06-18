@@ -14,6 +14,10 @@ class UserViewModel(
     // 直接暴露 Repository 的 StateFlow，UI 订阅即可
     val user: StateFlow<User?> = userRepository.user
 
+    init {
+        refresh()
+    }
+
     /**
      * 手动刷新（例如下拉刷新时调用）
      */

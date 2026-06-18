@@ -4,6 +4,7 @@ import io.github.lumklar.sortrss.client.contract.data.model.User
 import io.github.lumklar.sortrss.client.contract.data.repository.BaseRepository
 import io.github.lumklar.sortrss.client.contract.data.repository.UserRepository
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 class MockUserRepository : BaseRepository<User?>(null), UserRepository {
 
@@ -14,11 +15,11 @@ class MockUserRepository : BaseRepository<User?>(null), UserRepository {
      */
     override suspend fun fetchFromSource(): User? {
         // 模拟网络延迟
-        delay(500)
+        delay(500.milliseconds)
         // 使用领域工厂方法创建用户（需提供 PasswordEncoder，这里使用假实现）
         return User.fromPersistence(
             id = 1L,
-            username = "JohnDoe",
+            username = "测试用户",
             passwordHash = "fakeHash"
         )
     }
