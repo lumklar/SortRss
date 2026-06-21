@@ -4,7 +4,7 @@ allprojects {
         maven { url = uri("https://maven.aliyun.com/repository/public") }
         maven { url = uri("https://maven.aliyun.com/repository/google") }
         mavenCentral()
-        google()
+//        google()
     }
 
     buildscript {
@@ -13,7 +13,7 @@ allprojects {
             maven { url = uri("https://maven.aliyun.com/repository/public") }
             maven { url = uri("https://maven.aliyun.com/repository/google") }
             mavenCentral()
-            google()
+//            google()
         }
     }
 }
@@ -30,8 +30,6 @@ plugins {
     alias(libs.plugins.dependency.check.jvm) apply false
 }
 
-val buildEnv = project.findProperty("ENV")?.toString() ?: System.getenv("ENV") ?: "dev"
-
 //TODO 写一个脚本+配置统一管理，防止泄露删除
 //漏洞修复
 extra["tomcat.version"] = "11.0.22"
@@ -41,12 +39,6 @@ allprojects {
     group = "com.github.lumklar"
     version = "0.0.1-SNAPSHOT"
     description = "Sort-Rss multi-module project"
-
-    // 所有模块共用仓库
-    repositories {
-        mavenCentral()
-        google()
-    }
 }
 
 subprojects {
