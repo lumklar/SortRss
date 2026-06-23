@@ -1,7 +1,7 @@
 [versions]
 # 核心框架版本
 kotlin = "2.4.0"
-spring-boot = "4.1.0-RC1"
+spring-boot = "4.1.0"
 json = "1.11.0"
 coroutines = "1.11.0"
 compose = "1.11.1"

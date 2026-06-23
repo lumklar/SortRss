@@ -1,3 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://{POSTGRES_HOST}:5432/postgres?currentSchema=public
+    username: postgres
+    password: 123456
 springdoc:
   api-docs:
     enabled: false
