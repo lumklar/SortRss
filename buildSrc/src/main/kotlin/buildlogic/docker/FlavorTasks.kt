@@ -4,6 +4,7 @@ import buildlogic.utils.getConfigString
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
@@ -17,16 +18,17 @@ abstract class DockerPushTask @Inject constructor(
     @get:Input
     abstract val tags: ListProperty<String>
 
+    @get:Input
+    abstract val multiPlatformEnabled: Property<Boolean>   // 新增
+
     @TaskAction
     fun push() {
-        //TODO 统一管理key，统一管理isMultiPlatform的逻辑
-        val isMultiPlatform = project.getConfigString("DOCKER_PLATFORMS")?.isNotEmpty() ?: false
-        if (isMultiPlatform) {
+        if (multiPlatformEnabled.get()) {
             println("Multi‑platform mode enabled, image already pushed during build. Skipping separate push.")
             return
         }
         tags.get().forEach { tag ->
-            execOps.exec {  // 使用注入的 ExecOperations
+            execOps.exec {
                 commandLine("docker", "push", tag)
             }
         }
@@ -84,7 +86,7 @@ fun Project.createFlavorWrapperTasks(
                 description = "Push Docker image for flavor ${flavor.data} using ${config.suffix}"
                 dependsOn(wrapperTaskName)
 
-                // 计算所有标签并设置到 tags 属性
+                // 原有的标签计算
                 val tags = mutableListOf<String>()
                 tags.add("$imageNamePrefix${config.suffix}")
                 tags.add("$dockerRegistry/$dockerNamespace/$dockerImageName:latest-${config.suffix}")
@@ -92,6 +94,10 @@ fun Project.createFlavorWrapperTasks(
                     tags.add("$dockerRegistry/$dockerNamespace/$dockerImageName:latest")
                 }
                 this.tags.set(tags)
+
+                // 在配置阶段读取 DOCKER_PLATFORMS 并设置给任务属性
+                val dockerPlatforms = project.getConfigString("DOCKER_PLATFORMS")
+                this.multiPlatformEnabled.set(dockerPlatforms?.isNotEmpty() == true)
             }
             pushTaskNames.add(pushTaskName)
         }

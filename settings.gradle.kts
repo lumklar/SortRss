@@ -1,22 +1,39 @@
 pluginManagement {
     repositories {
+        val isCI = providers.environmentVariable("CI").map { it.toBoolean() }.getOrElse(false)
         mavenLocal()
-//        maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
-//        maven { url = uri("https://maven.aliyun.com/repository/google") }
-        mavenCentral()
-        gradlePluginPortal()
-        google()
+        if (isCI) {
+            mavenCentral()
+            gradlePluginPortal()
+            google()
+        } else {
+            // 本地开发环境：使用阿里云镜像加速
+            maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
+            maven { url = uri("https://maven.aliyun.com/repository/google") }
+            // 备用官方仓库（防止阿里云缺包）
+            mavenCentral()
+            gradlePluginPortal()
+        }
     }
 }
 
 //dependencyResolutionManagement {
+//    val isCI = providers.environmentVariable("CI").map { it.toBoolean() }.getOrElse(false)
 //    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
 //    repositories {
 //        mavenLocal()
-//        maven { url = uri("https://maven.aliyun.com/repository/public") }
-//        maven { url = uri("https://maven.aliyun.com/repository/google") }
-//        mavenCentral()
-//        google()
+//        if (isCI) {
+//            mavenCentral()
+//            google()
+//            maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+//        } else {
+//            maven { url = uri("https://maven.aliyun.com/repository/public") }
+//            maven { url = uri("https://maven.aliyun.com/repository/google") }
+//            mavenCentral()
+//            google()
+//            // 本地保留 Compose 依赖仓库（Skiko 只能在这下载）
+//            maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+//        }
 //    }
 //}
 
