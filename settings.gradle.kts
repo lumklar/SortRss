@@ -1,13 +1,13 @@
-//pluginManagement {
-//    repositories {
-//        mavenLocal()
+pluginManagement {
+    repositories {
+        mavenLocal()
 //        maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
 //        maven { url = uri("https://maven.aliyun.com/repository/google") }
-//        mavenCentral()
-//        gradlePluginPortal()
-////        google()
-//    }
-//}
+        mavenCentral()
+        gradlePluginPortal()
+        google()
+    }
+}
 
 //dependencyResolutionManagement {
 //    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
