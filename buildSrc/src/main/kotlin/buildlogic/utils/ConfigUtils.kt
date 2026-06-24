@@ -1,3 +1,5 @@
+package buildlogic.utils
+
 import org.gradle.api.Project
 
 /**

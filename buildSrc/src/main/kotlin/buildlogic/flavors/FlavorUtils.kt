@@ -1,3 +1,7 @@
+package buildlogic.flavors
+
+import buildlogic.utils.getConfigString
+import buildlogic.utils.getRequiredConfigString
 import org.gradle.api.Project
 
 /**
@@ -33,5 +37,6 @@ inline fun <reified T> Project.getRequiredFlavorEnum(propertyKey: String): T
         where T : Enum<T>, T : StringEnum {
     val rawValue = getRequiredConfigString(propertyKey)
     val matched = matchEnum(rawValue, enumValues<T>())
-    return matched ?: error("未知的配置值 '$rawValue'，可接受的值：${enumValues<T>().joinToString { it.name.lowercase() }}")
+    return matched
+        ?: error("未知的配置值 '$rawValue'，可接受的值：${enumValues<T>().joinToString { it.name.lowercase() }}")
 }

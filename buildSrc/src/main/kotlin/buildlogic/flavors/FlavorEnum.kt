@@ -1,3 +1,5 @@
+package buildlogic.flavors
+
 /**
  * 枚举值统一接口
  */

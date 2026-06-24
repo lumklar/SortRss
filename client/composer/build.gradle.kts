@@ -1,6 +1,5 @@
+import buildlogic.flavors.*
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import getRequiredFlavorEnum   // 导入扩展函数
-import DataFlavor                    // 导入枚举
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
