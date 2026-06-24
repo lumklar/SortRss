@@ -1,22 +1,9 @@
 package buildlogic.docker
 
-import buildlogic.flavors.DataFlavor
+import buildlogic.utils.getConfigString
+import buildlogic.flavors.*
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
-
-// ========== 数据类 ==========
-data class FlavorCombination(
-    val data: DataFlavor,
-)
-
-data class DockerTaskConfig(
-    val dockerFileRelativePath: String,
-    val suffix: String,
-    val buildArgs: Map<String, String> = emptyMap(),
-    val tagAsGlobalLatest: Boolean = false,
-    val dependencies: List<String> = emptyList(),
-    val flavors: FlavorCombination? = null
-)
 
 // ========== 扩展函数（都在 Project 上） ==========
 
@@ -36,10 +23,27 @@ fun Project.createDockerBuildTask(
         description = "Build Docker image using $dockerFileDir/Dockerfile"
         dependsOn(dependencies.toList())
 
-        val cmd = mutableListOf(
-            "docker", "build",
-            "--file", "$dockerFileDir/Dockerfile",
-            "--tag", imageTag
+        val dockerPlatforms = project.getConfigString("DOCKER_PLATFORMS")
+        val isMultiPlatform = dockerPlatforms?.isNotEmpty() ?: false
+
+        val cmd = mutableListOf<String>()
+        if (isMultiPlatform && dockerPlatforms.isNotBlank()) {
+            cmd.add("docker")
+            cmd.add("buildx")
+            cmd.add("build")
+            cmd.addAll(listOf("--platform", dockerPlatforms))
+            cmd.add("--push")                // 直接推送所有平台
+            // 不添加 --load（多平台无法加载到本地）
+        } else {
+            cmd.add("docker")
+            cmd.add("build")
+        }
+
+        cmd.addAll(
+            listOf(
+                "--file", "$dockerFileDir/Dockerfile",
+                "--tag", imageTag
+            )
         )
         extraTags.forEach { extraTag ->
             cmd.addAll(listOf("--tag", extraTag))

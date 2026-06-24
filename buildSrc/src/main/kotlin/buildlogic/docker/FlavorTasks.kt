@@ -1,5 +1,6 @@
 package buildlogic.docker
 
+import buildlogic.utils.getConfigString
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.provider.ListProperty
@@ -18,6 +19,12 @@ abstract class DockerPushTask @Inject constructor(
 
     @TaskAction
     fun push() {
+        //TODO 统一管理key，统一管理isMultiPlatform的逻辑
+        val isMultiPlatform = project.getConfigString("DOCKER_PLATFORMS")?.isNotEmpty() ?: false
+        if (isMultiPlatform) {
+            println("Multi‑platform mode enabled, image already pushed during build. Skipping separate push.")
+            return
+        }
         tags.get().forEach { tag ->
             execOps.exec {  // 使用注入的 ExecOperations
                 commandLine("docker", "push", tag)
@@ -48,6 +55,7 @@ fun Project.createFlavorWrapperTasks(
     configs.forEach { config ->
         val flavor = config.flavors
         if (flavor != null) {
+            //TODO 自动获取所有的
             val flavorSuffix = "-${flavor.data.value.lowercase()}"
             val wrapperTaskName = "buildDockerImage-${config.suffix}${flavorSuffix}-latest"
             val baseTaskName = "buildDockerImage-${config.suffix}-latest"
@@ -56,6 +64,7 @@ fun Project.createFlavorWrapperTasks(
             tasks.register(wrapperTaskName, Exec::class.java) {
                 group = "docker"
                 description = "Build Docker image with flavor data=${flavor.data} using ${config.suffix}"
+                //TODO 自动转换，非写死
                 environment("FLAVOR_DATA", flavor.data.toString())
 
                 val gradlew = if (System.getProperty("os.name").lowercase().contains("windows")) {

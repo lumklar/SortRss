@@ -1,0 +1,76 @@
+name: Deploy Web App to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]       # main 分支推送时触发
+  workflow_dispatch:         # 允许手动在 Actions 页面触发
+
+# 关键权限：允许 GitHub Token 向 gh-pages 分支推送代码
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# 并发控制，防止页面被覆盖
+concurrency:
+  group: "page"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ------------------------------------------------------------
+      # 1. 设置 JDK（Gradle 运行环境）
+      #    虽然这是 Kotlin/JS 项目，但 Gradle 9.5.1 需要 JDK 17~21。
+      #    如果其他 JVM 模块依赖 JDK 8/25，Gradle Toolchain 会自动处理。
+      # ------------------------------------------------------------
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Set up JDK 8 (for Toolchain)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+      - name: Reset JAVA_HOME to JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      # ------------------------------------------------------------
+      # 2. 配置 Gradle（自动开启缓存，加速构建）
+      # ------------------------------------------------------------
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: wrapper   # 使用项目中的 gradle-wrapper.properties
+
+      # ------------------------------------------------------------
+      # 3. 执行编译任务，并注入环境变量 FLAVOR_DATA=mock
+      # ------------------------------------------------------------
+      - name: Build WASM JS distribution
+        run: ./gradlew :app:webApp:wasmJsBrowserDistribution
+        env:
+          FLAVOR_DATA: mock   # 这里注入，Gradle 中可通过 System.getenv("FLAVOR_DATA") 读取
+
+      # ------------------------------------------------------------
+      # 4. 部署到 GitHub Pages（gh-pages 分支）
+      #    产物路径: app/webApp/build/dist/wasmJs/productionExecutable
+      # ------------------------------------------------------------
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./app/webApp/build/dist/wasmJs/productionExecutable
+          publish_branch: gh-pages    # 目标分支，GitHub Pages 默认读取这个分支
+          force_orphan: true          # 强制清空历史记录，保持分支干净（推荐）
+          # 可选：保留已部署文件的版本历史，如果想保留，设为 false
+          # keep_files: false
