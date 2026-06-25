@@ -26,7 +26,7 @@ kotlin {
     // 配置源集（source sets）
     sourceSets {
         // 公共代码（所有平台共享）
-        val commonMain by getting {
+        val commonMain = getByName("commonMain") {
             dependencies {
                 implementation(project(":client:contract:all"))
                 implementation(project(":client:ui:components"))
@@ -39,12 +39,12 @@ kotlin {
                 implementation(libs.androidx.lifecycle.viewmodelCompose)
             }
         }
-        val commonTest by getting {
+        val commonTest = getByName("commonTest") {
             dependencies {
 
             }
         }
-        val jsMain by getting {
+        val jsMain = getByName("jsMain") {
             dependencies {
                 implementation(libs.wrappers.browser)
             }

@@ -24,12 +24,12 @@ kotlin {
     // 配置源集（source sets）
     sourceSets {
         // 公共代码（所有平台共享）
-        val commonMain by getting {
+        val commonMain = getByName("commonMain") {
             dependencies {
                 api(project(":client:contract:data"))
             }
         }
-        val commonTest by getting {
+        val commonTest = getByName("commonTest") {
             dependencies {
 
             }

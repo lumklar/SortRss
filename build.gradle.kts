@@ -51,3 +51,4 @@ plugins {
 
 apply(from = "gradle/common.gradle.kts")
 apply(from = "gradle/docker.gradle.kts")
+apply(from = "gradle/release.gradle.kts")

@@ -1,3 +1,4 @@
+import org.gradle.declarative.dsl.schema.FqName.Empty.packageName
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
@@ -26,9 +27,18 @@ compose.desktop {
         mainClass = "io.github.lumklar.sortrss.app.desktop.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "io.github.lumklar.sortrss.app.desktop"
-            packageVersion = "1.0.0"
+            targetFormats(
+                TargetFormat.Dmg,  // macOS
+                TargetFormat.Pkg,  // macOS
+                TargetFormat.Exe,  // Windows
+                TargetFormat.Msi,  // Windows
+                TargetFormat.Deb,  // Linux (Debian/Ubuntu)
+                TargetFormat.Rpm,  // Linux (Red Hat/Fedora/CentOS)
+                TargetFormat.AppImage, // Linux
+            )
+            //TODO 统一变量名
+            packageName = "SortRSS"
+            packageVersion = project.version.toString().replace("-SNAPSHOT", "")
         }
     }
 }

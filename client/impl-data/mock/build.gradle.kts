@@ -24,7 +24,7 @@ kotlin {
     // 配置源集（source sets）
     sourceSets {
         // 公共代码（所有平台共享）
-        val commonMain by getting {
+        val commonMain = getByName("commonMain") {
             dependencies {
                 implementation(project(":client:contract:data"))
                 implementation(libs.kotlinx.coroutines.core)
@@ -32,7 +32,7 @@ kotlin {
                 implementation(libs.kotlin.insert)
             }
         }
-        val commonTest by getting {
+        val commonTest = getByName("commonTest") {
             dependencies {
                 implementation(libs.kotlin.test)
             }

@@ -27,7 +27,7 @@ kotlin {
 
     // 配置源集（source sets）
     sourceSets {
-        val commonTest by getting {
+        val commonTest = getByName("commonTest") {
             dependencies {
                 implementation(libs.kotlin.test)
             }

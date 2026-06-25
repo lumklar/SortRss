@@ -26,12 +26,12 @@ kotlin {
 
     // 配置源集（source sets）
     sourceSets {
-        val commonMain by getting {
+        val commonMain = getByName("commonMain") {
             dependencies {
 //                implementation(libs.kotlin.logging)
             }
         }
-        val commonTest by getting {
+        val commonTest = getByName("commonTest") {
             dependencies {
                 implementation(libs.kotlin.test)
             }
