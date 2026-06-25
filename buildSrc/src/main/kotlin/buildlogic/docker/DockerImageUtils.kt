@@ -33,7 +33,7 @@ fun resolveImageTags(
     tagAsGlobalLatest: Boolean = false,
     registries: List<String> = emptyList()
 ): ImageTags {
-    val flavorSuffix = flavors.joinToString(separator = "") { "-${it.value}" }
+    val flavorSuffix = buildFlavorSuffix(flavors)
     val fullSuffix = suffix + flavorSuffix
     val baseWithoutVersion = "$namespace/$imageName"
     val versionTag = "$baseWithoutVersion:$version-$fullSuffix"
@@ -100,4 +100,8 @@ fun parseImageNamePrefix(prefix: String): Triple<String, String, String> {
     val version = versionWithDash.dropLast(1)
 
     return Triple(namespace, imageName, version)
+}
+
+fun buildFlavorSuffix(flavors: List<StringEnum>): String {
+    return flavors.joinToString(separator = "") { "-${it.value.lowercase()}" }
 }

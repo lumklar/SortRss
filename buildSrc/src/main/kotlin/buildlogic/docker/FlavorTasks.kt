@@ -2,7 +2,6 @@ package buildlogic.docker
 
 import buildlogic.constant.EnvConstant
 import buildlogic.constant.PropertiesContant
-import buildlogic.flavors.DataFlavor
 import buildlogic.utils.EnvPropertyConverter
 import buildlogic.utils.getConfigString
 import org.gradle.api.DefaultTask
@@ -78,10 +77,10 @@ fun Project.createFlavorWrapperTasks(
     val version = parseImageNamePrefix(imageNamePrefix).third
 
     configs.forEach { config ->
-        val flavor = config.flavors
-        if (flavor != null) {
+        val flavors = config.flavors
+        for (flavor in flavors) {
             // TODO 任务名称之类的全部用公共方法管理
-            val flavorSuffix = "-${flavor.data.value.lowercase()}"
+            val flavorSuffix = buildFlavorSuffix(flavor.getFlavors())
             val wrapperTaskName = "buildDockerImage-${config.suffix}${flavorSuffix}-latest"
             val baseTaskName = "buildDockerImage-${config.suffix}-latest"
             val imageTagSuffix = "${config.suffix}${flavorSuffix}"
@@ -89,8 +88,10 @@ fun Project.createFlavorWrapperTasks(
             // 注册 wrapper 任务（通过 gradlew 调用基础构建任务）
             tasks.register(wrapperTaskName, Exec::class.java) {
                 group = "docker"
-                description = "Build Docker image with flavor data=${flavor.data} using ${config.suffix}"
-                environment(DataFlavor.ENV_KEY, flavor.data.toString())
+                description = "Build Docker image with flavor ${flavor.toKeyValueString()} using ${config.suffix}"
+                for (f in flavor.getFlavors()) {
+                    environment(f.envKey, f.value)
+                }
                 environment(
                     EnvPropertyConverter.propertyToEnv(PropertiesContant.DOCKER_TAG_SUFFIX),
                     imageTagSuffix
@@ -112,7 +113,7 @@ fun Project.createFlavorWrapperTasks(
                 imageName = dockerImageName,
                 version = version,
                 suffix = config.suffix,
-                flavors = listOf(flavor.data),
+                flavors = flavor.getFlavors(),
                 tagAsLatestVariant = true,   // 对应 base 任务的 latest-variant
                 tagAsGlobalLatest = config.tagAsGlobalLatest,
                 registries = registries
@@ -121,7 +122,7 @@ fun Project.createFlavorWrapperTasks(
             val pushTaskName = "pushDockerImage-${config.suffix}${flavorSuffix}-latest"
             tasks.register<DockerPushTask>(pushTaskName) {
                 group = "docker"
-                description = "Push Docker image for flavor ${flavor.data} using ${config.suffix}"
+                description = "Push Docker image for flavor ${flavor.toKeyValueString()} using ${config.suffix}"
                 dependsOn(wrapperTaskName)
 
                 this.tags.set(imageTags.pushTags)

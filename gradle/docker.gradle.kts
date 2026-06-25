@@ -18,7 +18,7 @@ val dockerTaskConfigs = listOf(
         buildArgs = mapOf("DIST_ROOT" to "wasmJs/productionExecutable"),
         tagAsGlobalLatest = true,
         dependencies = listOf(":server:bootJar", ":app:webApp:wasmJsBrowserDistribution"),
-        flavors = FlavorCombination(DataFlavor.NETWORK)
+        flavors = listOf(FlavorCombination(DataFlavor.NETWORK))
     ),
 )
 
