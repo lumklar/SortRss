@@ -1,4 +1,5 @@
-import buildlogic.flavors.*
+import buildlogic.flavors.DataFlavor
+import buildlogic.flavors.getRequiredFlavorEnum
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
@@ -8,7 +9,7 @@ plugins {
 }
 
 kotlin {
-    val dataFlavor = getRequiredFlavorEnum<DataFlavor>("flavor.data")
+    val dataFlavor = getRequiredFlavorEnum<DataFlavor>(DataFlavor.KEY)
 
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(21))

@@ -1,15 +1,16 @@
+import buildlogic.constant.*
 import buildlogic.docker.*
 import buildlogic.flavors.*
 import buildlogic.utils.getConfigString
 
 // 1. 读取配置
-val dockerRegistry = getConfigString("docker.registry", "ghcr.io")
-val dockerNamespace = getConfigString("docker.namespace", "lumklar")
-val dockerImageName = getConfigString("docker.imageName", "sortrss")
+val dockerRegistry = getConfigString(PropertiesContant.DOCKER_REGISTRY, "")
+val dockerNamespace = getConfigString(PropertiesContant.DOCKER_NAMESPACE, "lumklar")
+val dockerImageName = getConfigString(PropertiesContant.DOCKER_IMAGE_NAME, "sortrss")
 val projectVersion = project.version.toString()
-val imageNamePrefix = "${dockerRegistry}/${dockerNamespace}/${dockerImageName}:${projectVersion}-"
+val imageNamePrefix = buildImageNamePrefix(dockerNamespace, dockerImageName, projectVersion)
 
-// 2. 定义配置列表（项目特有）
+// 2. 定义配置列表（保持不变）
 val dockerTaskConfigs = listOf(
     DockerTaskConfig(
         dockerFileRelativePath = "jvm-with-frontend",
@@ -21,19 +22,19 @@ val dockerTaskConfigs = listOf(
     ),
 )
 
-// 3. 注册所有基础镜像任务
+// 3. 注册基础镜像任务
 dockerTaskConfigs.forEach { config ->
     createLatestDockerTask(
         dockerFileRelativePath = config.dockerFileRelativePath,
         suffix = config.suffix,
-        imageTagPrefix = imageNamePrefix,
+        imageTagPrefix = imageNamePrefix,   // 无 Registry
         buildArgs = config.buildArgs,
         tagAsGlobalLatest = config.tagAsGlobalLatest,
         dependencies = config.dependencies.toTypedArray()
     )
 }
 
-// 4. 一键创建所有风味包装任务
+// 4. 创建风味包装任务（传入 dockerRegistry 用于多 Registry）
 val (wrapperNames, pushNames) = createFlavorWrapperTasks(
     configs = dockerTaskConfigs,
     imageNamePrefix = imageNamePrefix,

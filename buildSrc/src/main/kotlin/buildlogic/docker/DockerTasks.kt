@@ -1,21 +1,27 @@
 package buildlogic.docker
 
+import buildlogic.constant.EnvConstant
+import buildlogic.constant.PropertiesContant
 import buildlogic.utils.getConfigString
 import buildlogic.flavors.*
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
 
-// ========== 扩展函数（都在 Project 上） ==========
-
 /**
- * 底层 Docker 构建任务注册
+ * 注册一个执行 docker build 的任务
+ * @param taskName 任务名
+ * @param dockerFileDir Dockerfile 所在目录
+ * @param buildArgs 构建参数
+ * @param localTags 本地构建使用的标签列表（单平台），第一个作为主标签
+ * @param multiPlatformPushTags 多平台构建时使用的标签列表（带 Registry），将直接推送
+ * @param dependencies 前置任务
  */
 fun Project.createDockerBuildTask(
     taskName: String,
     dockerFileDir: String,
     buildArgs: Map<String, String>,
-    imageTag: String,
-    extraTags: List<String> = emptyList(),
+    localTags: List<String>,
+    multiPlatformPushTags: List<String> = emptyList(),
     vararg dependencies: String
 ) {
     tasks.register(taskName, Exec::class.java) {
@@ -23,31 +29,25 @@ fun Project.createDockerBuildTask(
         description = "Build Docker image using $dockerFileDir/Dockerfile"
         dependsOn(dependencies.toList())
 
-        val dockerPlatforms = project.getConfigString("DOCKER_PLATFORMS")
-        val isMultiPlatform = dockerPlatforms?.isNotEmpty() ?: false
+        val dockerPlatforms = project.getConfigString(EnvConstant.DOCKER_PLATFORMS)
+        val isMultiPlatform = !dockerPlatforms.isNullOrBlank()
 
         val cmd = mutableListOf<String>()
-        if (isMultiPlatform && dockerPlatforms.isNotBlank()) {
+        if (isMultiPlatform && multiPlatformPushTags.isNotEmpty()) {
             cmd.add("docker")
             cmd.add("buildx")
             cmd.add("build")
-            cmd.addAll(listOf("--platform", dockerPlatforms))
-            cmd.add("--push")                // 直接推送所有平台
-            // 不添加 --load（多平台无法加载到本地）
+            cmd.addAll(listOf("--platform", dockerPlatforms!!))
+            // 多平台直接推送所有标签
+            multiPlatformPushTags.forEach { tag -> cmd.addAll(listOf("--tag", tag)) }
+            cmd.add("--push")
         } else {
             cmd.add("docker")
             cmd.add("build")
+            localTags.forEach { tag -> cmd.addAll(listOf("--tag", tag)) }
         }
 
-        cmd.addAll(
-            listOf(
-                "--file", "$dockerFileDir/Dockerfile",
-                "--tag", imageTag
-            )
-        )
-        extraTags.forEach { extraTag ->
-            cmd.addAll(listOf("--tag", extraTag))
-        }
+        cmd.addAll(listOf("--file", "$dockerFileDir/Dockerfile"))
         buildArgs.forEach { (key, value) ->
             cmd.addAll(listOf("--build-arg", "$key=$value"))
         }
@@ -60,45 +60,58 @@ fun Project.createDockerBuildTask(
     }
 }
 
+// ==================== 便捷构建方法 ====================
+
 /**
- * 便捷创建：根据后缀生成镜像标签并注册任务
+ * 创建 Docker 构建任务（自动解析标签）
  */
 fun Project.createDockerTask(
     dockerFileRelativePath: String,
     tagSuffix: String,
     taskSuffix: String = tagSuffix,
-    imageTagPrefix: String,          // 例如 "ghcr.io/lumklar/sortrss:1.0-"
+    imageTagPrefix: String,          // 形如 "lumklar/sortrss:1.0-"  （无 Registry）
     buildArgs: Map<String, String> = emptyMap(),
     tagAsLatestVariant: Boolean = true,
     tagAsGlobalLatest: Boolean = false,
     vararg dependencies: String
 ) {
+    // 读取并解析 Registry 列表
+    val rawRegistries = getConfigString(PropertiesContant.DOCKER_REGISTRY, "")
+    val registries = rawRegistries.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+
+    // 从 imageTagPrefix 拆分出 namespace/imageName 和 version
+    val prefixBeforeColon = imageTagPrefix.substringBefore(":")
+    val version = imageTagPrefix.substringAfter(":").removeSuffix("-")
+    val parts = prefixBeforeColon.split("/")
+    require(parts.size == 2) { "imageTagPrefix must be in format 'namespace/imageName:version-'" }
+    val namespace = parts[0]
+    val imageName = parts[1]
+
+    val imageTags = resolveImageTags(
+        namespace = namespace,
+        imageName = imageName,
+        version = version,
+        suffix = tagSuffix,
+//        flavorSuffix = "",  // 基础任务不含风味，风味在 wrapper 层处理
+        tagAsLatestVariant = tagAsLatestVariant,
+        tagAsGlobalLatest = tagAsGlobalLatest,
+        registries = registries
+    )
+
     val taskName = "buildDockerImage-$taskSuffix"
     val dockerFileDir = "deploy/docker/$dockerFileRelativePath"
-    val imageTag = imageTagPrefix + tagSuffix
-
-    val extraTags = mutableListOf<String>()
-    if (tagAsLatestVariant) {
-        // 从 imageTagPrefix 提取 registry/namespace/image 部分，用于 latest-<suffix>
-        val baseWithoutVersion = imageTagPrefix.substringBeforeLast(":") // 去掉 ":version-"
-        extraTags.add("$baseWithoutVersion:latest-$tagSuffix")
-    }
-    if (tagAsGlobalLatest) {
-        val baseWithoutVersion = imageTagPrefix.substringBeforeLast(":")
-        extraTags.add("$baseWithoutVersion:latest")
-    }
 
     createDockerBuildTask(
         taskName = taskName,
         dockerFileDir = dockerFileDir,
-        buildArgs = mapOf("VERSION" to (imageTagPrefix.substringAfterLast(":").removeSuffix("-"))) + buildArgs,
-        imageTag = imageTag,
-        extraTags = extraTags,
+        buildArgs = mapOf("VERSION" to version) + buildArgs,
+        localTags = imageTags.buildTags,
+        multiPlatformPushTags = imageTags.pushTags,
         dependencies = dependencies
     )
 }
 
-// 重载：当 tagSuffix == taskSuffix 时简化调用
+// 简化重载（suffix 与 taskSuffix 相同）
 fun Project.createDockerTask(
     dockerFileRelativePath: String,
     suffix: String,
@@ -121,7 +134,7 @@ fun Project.createDockerTask(
 }
 
 /**
- * 创建 "latest-<suffix>" 变体任务（版本标签 + latest-<suffix>）
+ * 创建 latest 变体任务（版本标签 + latest-<suffix>）
  */
 fun Project.createLatestDockerTask(
     dockerFileRelativePath: String,
@@ -139,12 +152,12 @@ fun Project.createLatestDockerTask(
         buildArgs = buildArgs,
         tagAsLatestVariant = true,
         tagAsGlobalLatest = tagAsGlobalLatest,
-        dependencies = dependencies,
+        dependencies = dependencies
     )
 }
 
 /**
- * 同时创建两个任务：一个普通版本（仅版本标签），一个 latest 变体
+ * 同时创建两个任务：普通版本（仅版本标签） + latest 变体
  */
 fun Project.createDockerTasks(
     dockerFileRelativePath: String,
@@ -161,7 +174,7 @@ fun Project.createDockerTasks(
         buildArgs = buildArgs,
         tagAsLatestVariant = false,
         tagAsGlobalLatest = tagAsGlobalLatest,
-        dependencies = dependencies,
+        dependencies = dependencies
     )
     createLatestDockerTask(
         dockerFileRelativePath = dockerFileRelativePath,
@@ -169,6 +182,6 @@ fun Project.createDockerTasks(
         imageTagPrefix = imageTagPrefix,
         buildArgs = buildArgs,
         tagAsGlobalLatest = tagAsGlobalLatest,
-        dependencies = dependencies,
+        dependencies = dependencies
     )
 }
