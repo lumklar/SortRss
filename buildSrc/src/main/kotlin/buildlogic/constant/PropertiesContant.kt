@@ -11,4 +11,5 @@ object PropertiesContant {
     const val DOCKER_REGISTRY = DOCKER_PREFIX + "registry"
     const val DOCKER_NAMESPACE = DOCKER_PREFIX + "namespace"
     const val DOCKER_IMAGE_NAME = DOCKER_PREFIX + "image.name"
+    const val DOCKER_TAG_SUFFIX = DOCKER_PREFIX + "tag.suffix"
 }

@@ -1,8 +1,10 @@
 package buildlogic.docker
 
-import buildlogic.utils.getConfigString
-import buildlogic.flavors.*
 import buildlogic.constant.EnvConstant
+import buildlogic.constant.PropertiesContant
+import buildlogic.flavors.DataFlavor
+import buildlogic.utils.EnvPropertyConverter
+import buildlogic.utils.getConfigString
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.provider.ListProperty
@@ -78,16 +80,21 @@ fun Project.createFlavorWrapperTasks(
     configs.forEach { config ->
         val flavor = config.flavors
         if (flavor != null) {
-            // 生成风味后缀
+            // TODO 任务名称之类的全部用公共方法管理
             val flavorSuffix = "-${flavor.data.value.lowercase()}"
             val wrapperTaskName = "buildDockerImage-${config.suffix}${flavorSuffix}-latest"
             val baseTaskName = "buildDockerImage-${config.suffix}-latest"
+            val imageTagSuffix = "${config.suffix}${flavorSuffix}"
 
             // 注册 wrapper 任务（通过 gradlew 调用基础构建任务）
             tasks.register(wrapperTaskName, Exec::class.java) {
                 group = "docker"
                 description = "Build Docker image with flavor data=${flavor.data} using ${config.suffix}"
                 environment(DataFlavor.ENV_KEY, flavor.data.toString())
+                environment(
+                    EnvPropertyConverter.propertyToEnv(PropertiesContant.DOCKER_TAG_SUFFIX),
+                    imageTagSuffix
+                )
 
                 val gradlew = if (System.getProperty("os.name").lowercase().contains("windows")) {
                     "./gradlew.bat"
@@ -105,7 +112,7 @@ fun Project.createFlavorWrapperTasks(
                 imageName = dockerImageName,
                 version = version,
                 suffix = config.suffix,
-//                flavorSuffix = flavorSuffix,
+                flavors = listOf(flavor.data),
                 tagAsLatestVariant = true,   // 对应 base 任务的 latest-variant
                 tagAsGlobalLatest = config.tagAsGlobalLatest,
                 registries = registries

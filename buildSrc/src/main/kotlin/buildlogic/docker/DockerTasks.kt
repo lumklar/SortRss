@@ -3,7 +3,6 @@ package buildlogic.docker
 import buildlogic.constant.EnvConstant
 import buildlogic.constant.PropertiesContant
 import buildlogic.utils.getConfigString
-import buildlogic.flavors.*
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
 
@@ -91,8 +90,7 @@ fun Project.createDockerTask(
         namespace = namespace,
         imageName = imageName,
         version = version,
-        suffix = tagSuffix,
-//        flavorSuffix = "",  // 基础任务不含风味，风味在 wrapper 层处理
+        suffix = getConfigString(PropertiesContant.DOCKER_TAG_SUFFIX, tagSuffix),
         tagAsLatestVariant = tagAsLatestVariant,
         tagAsGlobalLatest = tagAsGlobalLatest,
         registries = registries
@@ -134,6 +132,7 @@ fun Project.createDockerTask(
 }
 
 /**
+ * TODO 考虑隐藏对外暴露的方法，imageTagPrefix不传入？内部构造？
  * 创建 latest 变体任务（版本标签 + latest-<suffix>）
  */
 fun Project.createLatestDockerTask(

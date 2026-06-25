@@ -1,5 +1,7 @@
 package buildlogic.docker
 
+import buildlogic.flavors.StringEnum
+
 
 /**
  * 镜像标签计算结果
@@ -26,14 +28,13 @@ fun resolveImageTags(
     imageName: String,
     version: String,
     suffix: String,
-//    flavorSuffix: String = "",
+    flavors: List<StringEnum> = emptyList(),
     tagAsLatestVariant: Boolean = true,
     tagAsGlobalLatest: Boolean = false,
     registries: List<String> = emptyList()
 ): ImageTags {
-    //TODO 是否需要风味后缀，需要同步修改DockerTasks和FlavorTasks中的逻辑(包括多平台)
-//    val fullSuffix = suffix + flavorSuffix
-    val fullSuffix = suffix
+    val flavorSuffix = flavors.joinToString(separator = "") { "-${it.value}" }
+    val fullSuffix = suffix + flavorSuffix
     val baseWithoutVersion = "$namespace/$imageName"
     val versionTag = "$baseWithoutVersion:$version-$fullSuffix"
 
