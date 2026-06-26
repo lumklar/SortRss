@@ -22,6 +22,12 @@ release也按风味组装，提供gradle方法统一构建(增加参数是否同
 
 github action 增加各类缓存
 
+各模块任务与产物相对路径，类型用枚举类管理，用`
+val demoSourceProvider = project(":app:webApp").layout.buildDirectory.dir("dist/wasmJs/productionExecutable")`
+语法获取产物相对路径
+
+gradle任务并行执行
+
 ## 首页
 
 docs编译为html

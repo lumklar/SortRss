@@ -1,3 +1,6 @@
+import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.tasks.Sync
+
 // 应用 base 插件，提供 assemble、clean 等标准生命周期任务
 plugins {
     id("base")
@@ -17,6 +20,8 @@ val prepareDistribution = tasks.register<Sync>("prepareDistribution") {
     from(project.projectDir.resolve("src")) {
         include("**/*")
     }
+
+    //TODO 增加环境变量风味?
 
     // 方式二：复制 demo 产物到 dist/demo
     // 通过 provider 延迟获取源目录，避免配置时直接调用 .get() 引发警告
