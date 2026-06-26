@@ -1,9 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sort Rss Home</title>
+    <style>
+        /* 简单样式，可根据需要调整 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f7fa;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 3rem 4rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        h1 {
+            color: #2c3e50;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        p.sub {
+            color: #7f8c8d;
+            margin-bottom: 2rem;
+        }
+        .links {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .links a {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .links a:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        .links a:active {
+            transform: translateY(0);
+        }
+        .links a.demo {
+            background-color: #2ecc71;
+        }
+        .links a.demo:hover {
+            background-color: #27ae60;
+        }
+    </style>
 </head>
-<body style="">
+<body>
+<div class="container">
+    <h1>🚀 项目导航</h1>
+    <p class="sub">选择您要访问的模块</p>
+    <div class="links">
+        <!-- 相对路径指向 docs/ 和 demo/ 子目录 -->
+        <a href="docs/">📄 文档 (docs)</a>
+        <a href="demo/" class="demo">🎮 演示 (demo)</a>
+    </div>
+<!--    <p style="margin-top: 2rem; font-size: 0.9rem; color: #95a5a6;">-->
+<!--        子目录中请放置各自独立的 <code>index.html</code>-->
+<!--    </p>-->
+</div>
 </body>
 </html>

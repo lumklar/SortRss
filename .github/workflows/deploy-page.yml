@@ -60,7 +60,7 @@ jobs:
       # 3. 执行编译任务，并注入环境变量 FLAVOR_DATA=mock
       # ------------------------------------------------------------
       - name: Build WASM JS distribution
-        run: ./gradlew :app:webApp:wasmJsBrowserDistribution
+        run: ./gradlew :home:assemble
         env:
           FLAVOR_DATA: mock   # 这里注入，Gradle 中可通过 System.getenv("FLAVOR_DATA") 读取
 
@@ -72,7 +72,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./app/webApp/build/dist/wasmJs/productionExecutable
+          publish_dir: ./home/build/dist
           publish_branch: gh-pages    # 目标分支，GitHub Pages 默认读取这个分支
           force_orphan: true          # 强制清空历史记录，保持分支干净（推荐）
           # 可选：保留已部署文件的版本历史，如果想保留，设为 false

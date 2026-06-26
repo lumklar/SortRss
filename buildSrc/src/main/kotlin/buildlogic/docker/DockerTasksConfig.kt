@@ -5,6 +5,7 @@ import buildlogic.flavors.StringEnum
 /**
  * 风味组合
  */
+@Suppress("UNCHECKED_CAST")
 data class FlavorCombination(
     private val flavors: Set<StringEnum> // 使用 Set 可以天然去重对象，但我们需要自定义校验逻辑
 ) {
