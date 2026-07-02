@@ -13,6 +13,9 @@ COPY server/build/libs/server-${VERSION}.jar app.jar
 # 复制前端静态资源（Wasm 产物）到 ./static 目录
 COPY app/webApp/build/dist/${DIST_ROOT} ./static
 
+# 设置默认环境变量（用户启动时可不传，自动使用 ./data/rss.db）
+ENV SQLITE_DB_PATH=/data/rss.db
+
 # 暴露 Spring Boot 端口
 EXPOSE 80
 

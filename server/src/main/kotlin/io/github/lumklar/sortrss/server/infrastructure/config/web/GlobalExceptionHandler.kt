@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.server.infrastructure.config
+package io.github.lumklar.sortrss.server.infrastructure.config.web
 
 import io.github.lumklar.sortrss.common.api.dto.ApiExtra
 import io.github.lumklar.sortrss.common.api.dto.ApiResult
@@ -6,13 +6,13 @@ import io.github.lumklar.sortrss.common.api.dto.ApiResultCode
 import io.github.lumklar.sortrss.common.api.dto.ErrorSource
 import io.github.lumklar.sortrss.common.domain.shared.exception.BusinessException
 import io.github.lumklar.sortrss.common.shared.utils.ExceptionStackTraceUtil
+import io.github.lumklar.sortrss.server.infrastructure.config.ApiResponseProperties
 import org.springframework.dao.DataAccessException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.servlet.resource.NoResourceFoundException
-
 
 /**
  * Spring Boot 4 全局异常处理器

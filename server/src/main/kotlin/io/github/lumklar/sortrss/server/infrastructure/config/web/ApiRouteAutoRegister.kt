@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.server.infrastructure.config
+package io.github.lumklar.sortrss.server.infrastructure.config.web
 
 import io.github.lumklar.sortrss.common.api.annotation.ApiRoute
 import io.github.lumklar.sortrss.common.api.annotation.HttpMethod
@@ -14,9 +14,9 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import java.lang.reflect.Method
 
 /**
- * 自动扫描并注册 [ApiRoute] 注解的路由配置
+ * 自动扫描并注册 [io.github.lumklar.sortrss.common.api.annotation.ApiRoute] 注解的路由配置
  * TODO 支持native
- * @see ApiRoute
+ * @see io.github.lumklar.sortrss.common.api.annotation.ApiRoute
  */
 class ApiRouteAutoRegister(
     private val applicationContext: ApplicationContext,
@@ -112,7 +112,7 @@ class ApiRouteAutoRegister(
     }
 
     // 转换HTTP方法
-    private fun convertMethod(method: HttpMethod): org.springframework.web.bind.annotation.RequestMethod {
+    private fun convertMethod(method: HttpMethod): RequestMethod {
         return when (method) {
             HttpMethod.GET -> RequestMethod.GET
             HttpMethod.POST -> RequestMethod.POST

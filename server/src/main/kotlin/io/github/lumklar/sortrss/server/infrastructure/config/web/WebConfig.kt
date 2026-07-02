@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.server.infrastructure.config
+package io.github.lumklar.sortrss.server.infrastructure.config.web
 
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean

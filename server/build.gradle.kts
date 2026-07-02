@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.spring.boot.starter.data.jpa)
 
     // 数据库驱动
+    runtimeOnly(libs.sqlite.jpa)
     runtimeOnly(libs.sqlite.jdbc)
     runtimeOnly(libs.postgresql)
     runtimeOnly(libs.mysql.connector.j)

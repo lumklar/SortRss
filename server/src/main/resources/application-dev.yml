@@ -1,10 +1,11 @@
 spring:
   jpa:
-    generate-ddl: true
-    hibernate:
-      ddl-auto: update
     show-sql: true
-  datasource:
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=public
-    username: postgres
-    password: 123456
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+logging:
+  level:
+    io.github.lumklar.server: debug
+    org.hibernate.SQL: DEBUG

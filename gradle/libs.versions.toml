@@ -28,6 +28,7 @@ springdoc = "3.0.3"
 jbcrypt = "0.4"
 rome = "2.1.0"
 sqlite = "3.53.1.0"
+sqlite-jpa = "7.4.3.Final"
 
 [libraries]
 # Compose 核心
@@ -95,6 +96,7 @@ caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine" }
 # ==============================================
 # 🗄️ 数据库驱动
 # ==============================================
+sqlite-jpa = { group = "org.hibernate.orm", name = "hibernate-community-dialects", version.ref = "sqlite-jpa" }
 sqlite-jdbc = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqlite" }
 postgresql = { group = "org.postgresql", name = "postgresql" }
 mysql-connector-j = { group = "com.mysql", name = "mysql-connector-j" }

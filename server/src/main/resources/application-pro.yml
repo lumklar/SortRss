@@ -1,10 +1,15 @@
 spring:
   datasource:
-    url: jdbc:postgresql://{POSTGRES_HOST}:5432/postgres?currentSchema=public
-    username: postgres
-    password: 123456
+    # 以下为占位，实际由环境变量覆盖（或完全省略，由 SQLite 兜底）
+    url: ${DB_URL:}
+    username: ${DB_USER:}
+    password: ${DB_PASSWORD:}
+    driver-class-name: ${DB_DRIVER:}
 springdoc:
   api-docs:
     enabled: false
   swagger-ui:
     enabled: false
+api:
+  response:
+    exclude-extra: true
