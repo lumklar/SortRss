@@ -43,3 +43,6 @@ replay_pid*
 
 ### Runtime ###
 /data/
+
+### node ###
+node_modules/

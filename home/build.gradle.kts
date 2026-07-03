@@ -1,42 +1,50 @@
+import org.codehaus.groovy.ast.tools.GeneralUtils.args
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.Sync
+import org.gradle.internal.logging.progress.ResourceOperation
 
-// 应用 base 插件，提供 assemble、clean 等标准生命周期任务
 plugins {
     id("base")
+    id("com.github.node-gradle.node") version "7.1.0"
 }
 
-// 使用 Sync 任务替代 Copy，自动清理目标目录中多余的旧文件，无需手动 deleteRecursively
+// -------- Node 配置 ----------
+node {
+    version = "20.0.0"          // 直接赋值
+    npmVersion = "10.5.0"       // 直接赋值
+}
+
+// -------- 压缩前端资源 ----------
+tasks.register<com.github.gradle.node.npm.task.NpmTask>("compressFrontend") {
+    dependsOn("npmInstall")           // 使用插件提供的 npmInstall
+    args.set(listOf("run", "compress")) // args 是 ListProperty，set() 方法可用
+    inputs.dir("src")
+    outputs.dir(layout.buildDirectory.dir("compressed"))
+}
+
+// -------- 准备分发目录 ----------
 val prepareDistribution = tasks.register<Sync>("prepareDistribution") {
-    // 依赖 :app:webApp 的构建任务
+    dependsOn("compressFrontend")
     dependsOn(project(":app:webApp").tasks.named("wasmJsBrowserDistribution"))
 
-    // 目标目录：build/dist
     val distDir = layout.buildDirectory.dir("dist").get().asFile
     into(distDir)
 
-    // 方式一：复制 home/src 全部内容到 dist 根目录
-    // 使用 project.projectDir.resolve("src") 并指定 include，确保目录结构
-    from(project.projectDir.resolve("src")) {
-        include("**/*")
-    }
-
-    //TODO 增加环境变量风味?
-
-    // 方式二：复制 demo 产物到 dist/demo
-    // 通过 provider 延迟获取源目录，避免配置时直接调用 .get() 引发警告
-    val demoSourceProvider = project(":app:webApp").layout.buildDirectory.dir("dist/wasmJs/productionExecutable")
-    from(demoSourceProvider) {
+    // demo 产物
+    from(project(":app:webApp").layout.buildDirectory.dir("dist/wasmJs/productionExecutable")) {
         into("demo")
         include("**/*")
     }
 
-    // 重复文件处理策略
+    // 压缩后的前端资源
+    from(layout.buildDirectory.dir("compressed")) {
+        include("**/*")
+    }
+
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
-// 将 prepareDistribution 挂接到 assemble 生命周期
-// 使用 tasks.named 安全地获取现有任务，如果 assemble 不存在（但已应用 base，肯定存在）
+// 挂接到 assemble
 tasks.named("assemble") {
     dependsOn(prepareDistribution)
 }
