@@ -33,9 +33,9 @@ object DatabaseTypeDetector {
     }
 
     // 便捷判断方法
-    fun isSQLite(dataSource: DataSource): Boolean = detect(dataSource) == DatabaseType.SQLITE
-    fun isPostgreSQL(dataSource: DataSource): Boolean = detect(dataSource) == DatabaseType.POSTGRESQL
-    fun isMySQL(dataSource: DataSource): Boolean = detect(dataSource) == DatabaseType.MYSQL
+    fun databaseIsSQLite(dataSource: DataSource): Boolean = detect(dataSource) == DatabaseType.SQLITE
+    fun databaseIsPostgres(dataSource: DataSource): Boolean = detect(dataSource) == DatabaseType.POSTGRESQL
+    fun databaseIsMySQL(dataSource: DataSource): Boolean = detect(dataSource) == DatabaseType.MYSQL
 
     /**
      * DataSource 扩展：获取数据库类型
@@ -45,9 +45,9 @@ object DatabaseTypeDetector {
     /**
      * DataSource 扩展：判断是否为 SQLite
      */
-    fun DataSource.isSQLite(): Boolean = DatabaseTypeDetector.isSQLite(this)
+    fun DataSource.isSQLite(): Boolean = DatabaseTypeDetector.databaseIsSQLite(this)
 
     // 其他类型同理
-    fun DataSource.isPostgreSQL(): Boolean = DatabaseTypeDetector.isPostgreSQL(this)
-    fun DataSource.isMySQL(): Boolean = DatabaseTypeDetector.isMySQL(this)
+    fun DataSource.isPostgreSQL(): Boolean = DatabaseTypeDetector.databaseIsPostgres(this)
+    fun DataSource.isMySQL(): Boolean = DatabaseTypeDetector.databaseIsMySQL(this)
 }
