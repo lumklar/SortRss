@@ -2,6 +2,7 @@ package buildlogic.release
 
 import buildlogic.flavors.StringEnum
 import org.gradle.api.Project
+import org.gradle.api.Task
 
 /**
  * 注册一个“发布产物”的 Gradle 任务。
@@ -51,5 +52,78 @@ fun Project.registerReleaseTask(
         this.envVars.set(envVars)
         // 输出目录固定为当前项目的 build/release
         this.destinationDir.set(destinationDir)
+    }
+}
+
+/**
+ * 批量注册发布任务。
+ *
+ * 根据传入的配置列表，依次为每个配置中的每个环境变量组合生成一个发布任务，
+ * 任务命名遵循 `release-<target>-<envSuffix>` 格式。
+ * 同时为每个 group 创建聚合任务 `release-<group>`，依赖该组所有子任务；
+ * 最后创建 `release-all` 任务，依赖所有 group 聚合任务。
+ *
+ * 版本号自动从 `project.version` 获取，用于产物重命名。
+ *
+ * @param configs 发布配置列表
+ */
+fun Project.registerReleaseTasks(configs: List<ReleaseConfig>) {
+    // 用于收集每个 group 下的所有任务（Task 对象）
+    val groupTasksMap = mutableMapOf<String, MutableList<Task>>()
+
+    configs.forEach { config ->
+        val group = config.group
+        config.envVarsCombinations.forEach { envVarsList ->
+            // 生成环境变量后缀（用 "-" 连接所有 value）
+            val envSuffix = if (envVarsList.isNotEmpty()) "-${envVarsList.joinToString("-") { it.value }}" else ""
+
+            // 任务名称：release-<target>-<envSuffix>
+            val taskName = "release-${config.target}$envSuffix"
+
+            // 从项目获取版本号，作为重命名的一部分
+            val version = project.version.toString()
+            // 基础名称：sortrss-<version>-<target>-<envSuffix>
+            val baseName = "sortrss-${config.target}-$envSuffix-$version"
+
+            // 构造 renameTo（遵循原有约定：打包时不含后缀，非打包时包含扩展名）
+            val renameTo = if (config.shouldPackage) {
+                baseName // 不含后缀，ReleasePublishTask 会自动添加 .tar.gz
+            } else {
+                // 提取 artifactRelativePath 的扩展名（如 ".jar"）
+                val ext = config.artifactRelativePath.substringAfterLast('.', "")
+                if (ext.isNotEmpty()) "$baseName.$ext" else baseName
+            }
+
+            // 调用原有的注册函数
+            registerReleaseTask(
+                taskName = taskName,
+                moduleName = config.moduleName,
+                moduleTask = config.moduleTask,
+                artifactRelativePath = config.artifactRelativePath,
+                shouldPackage = config.shouldPackage,
+                renameTo = renameTo,
+                envVars = envVarsList
+            )
+
+            // 将刚注册的任务加入分组映射
+            val task = tasks.getByName(taskName)
+            groupTasksMap.getOrPut(group) { mutableListOf() }.add(task)
+        }
+    }
+
+    // 为每个 group 创建聚合任务
+    groupTasksMap.forEach { (groupName, taskList) ->
+        tasks.register("release-$groupName") {
+            group = "release-group"
+            description = "发布所有 $groupName 产物"
+            dependsOn(taskList)
+        }
+    }
+
+    // 创建总任务 release-all，依赖所有 group 聚合任务
+    tasks.register("release-all") {
+        group = "release-group"
+        description = "发布所有组产物"
+        dependsOn(groupTasksMap.keys.map { "release-$it" })
     }
 }
