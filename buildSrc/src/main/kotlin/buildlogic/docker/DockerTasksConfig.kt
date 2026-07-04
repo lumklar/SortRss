@@ -52,7 +52,7 @@ data class FlavorCombination(
 
 /**
  * 描述一个 Docker 构建配置
- * @param dockerFileRelativePath Dockerfile 相对路径（相对于 deploy/docker）
+ * @param dockerFileRelativePath Dockerfile 相对路径（相对于 scripts/docker）
  * @param suffix 镜像标签后缀（如 "jvm-wasmJs"）
  * @param buildArgs 构建参数
  * @param tagAsGlobalLatest 是否同时打上 `latest` 标签

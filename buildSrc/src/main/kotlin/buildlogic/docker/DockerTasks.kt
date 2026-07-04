@@ -97,7 +97,7 @@ fun Project.createDockerTask(
     )
 
     val taskName = "buildDockerImage-$taskSuffix"
-    val dockerFileDir = "deploy/docker/$dockerFileRelativePath"
+    val dockerFileDir = "scripts/docker/$dockerFileRelativePath"
 
     createDockerBuildTask(
         taskName = taskName,
