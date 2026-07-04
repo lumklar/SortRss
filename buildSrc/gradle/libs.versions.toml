@@ -1,0 +1,5 @@
+[versions]
+commons-compress = "1.28.0"
+
+[libraries]
+commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "commons-compress" }

@@ -2,6 +2,11 @@ plugins {
     `kotlin-dsl`
 }
 
+dependencies {
+    implementation(gradleApi())
+    implementation(libs.commons.compress)
+}
+
 repositories {
     val isCI = providers.environmentVariable("CI").map { it.toBoolean() }.getOrElse(false)
     mavenLocal()

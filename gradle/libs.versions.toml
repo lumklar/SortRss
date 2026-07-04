@@ -29,6 +29,7 @@ jbcrypt = "0.4"
 rome = "2.1.0"
 sqlite = "3.53.1.0"
 sqlite-jpa = "7.4.3.Final"
+commons-compress = "1.28.0"
 
 [libraries]
 # Compose 核心
@@ -111,6 +112,7 @@ springdoc-openapi-webmvc = { group = "org.springdoc", name = "springdoc-openapi-
 jbcrypt = { group = "org.mindrot", name = "jbcrypt", version.ref = "jbcrypt" }
 rome = { group = "com.rometools", name = "rome", version.ref = "rome" }
 rome-modules = { group = "com.rometools", name = "rome-modules", version.ref = "rome" }
+commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "commons-compress" }
 
 [plugins]
 # ==============================================
