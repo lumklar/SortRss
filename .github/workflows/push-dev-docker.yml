@@ -68,7 +68,6 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      # TODO 如果将来有native版本，需要考虑缓存问题
       - name: Build and Push Docker Images
         run: ./gradlew pushDockerImage-jvm-wasmJs-network
         env:
