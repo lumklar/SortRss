@@ -110,11 +110,15 @@ fun Project.createFlavorWrapperTasks(
             }
             wrapperTaskNames.add(wrapperTaskName)
 
+            val envVersion = System.getenv(EnvConstant.DOCKER_IMAGE_VERSION)
+                ?.takeIf { it.isNotEmpty() }
+                ?: version
+
             // 计算标签，将 tagAsLatestVariant 设为 isLatest
             val imageTags = resolveImageTags(
                 namespace = dockerNamespace,
                 imageName = dockerImageName,
-                version = version,
+                version = envVersion,
                 suffix = config.suffix,
                 flavors = flavor.getFlavors(),
                 tagAsLatestVariant = isLatest,      // 根据参数控制是否生成 latest 标签
@@ -129,7 +133,8 @@ fun Project.createFlavorWrapperTasks(
                 dependsOn(wrapperTaskName)
 
                 this.tags.set(imageTags.pushTags)
-                this.sourceTag.set(imageTags.primaryBuildTag)
+                //FIXME 临时这样处理支持自定义版本nightly打包
+                this.sourceTag.set(imageTags.primaryBuildTag.replaceFirst(envVersion, version))
                 // 判断多平台
                 val platforms = project.getConfigString(EnvConstant.DOCKER_PLATFORMS)
                 this.multiPlatformEnabled.set(!platforms.isNullOrBlank())
