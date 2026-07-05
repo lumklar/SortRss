@@ -9,7 +9,7 @@ import buildlogic.utils.getConfigString
 val dockerRegistry = getConfigString(PropertiesContant.DOCKER_REGISTRY, "")
 val dockerNamespace = getConfigString(PropertiesContant.DOCKER_NAMESPACE, "lumklar")
 val dockerImageName = getConfigString(PropertiesContant.DOCKER_IMAGE_NAME, "sortrss")
-val projectVersion = project.version.toString()
+val projectVersion = System.getenv(EnvConstant.DOCKER_IMAGE_VERSION) ?: project.version.toString()
 val imageNamePrefix = buildImageNamePrefix(dockerNamespace, dockerImageName, projectVersion)
 
 // 2. 定义配置列表（保持不变）
