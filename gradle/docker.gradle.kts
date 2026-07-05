@@ -45,6 +45,15 @@ val (wrapperNames, pushNames) = createFlavorWrapperTasks(
     dockerImageName = dockerImageName
 )
 
+createFlavorWrapperTasks(
+    configs = dockerTaskConfigs,
+    imageNamePrefix = imageNamePrefix,
+    dockerRegistry = dockerRegistry,
+    dockerNamespace = dockerNamespace,
+    dockerImageName = dockerImageName,
+    isLatest = false
+)
+
 // 5. 聚合任务
 // 假设 wrapperNames 和 pushNames 是 List<String>，已在其他地方定义
 tasks.register("buildAllFlavorLatestDockerImage") {

@@ -65,7 +65,8 @@ fun Project.createFlavorWrapperTasks(
     imageNamePrefix: String,   // 无 Registry 前缀，如 "lumklar/sortrss:1.0-"
     dockerRegistry: String,    // 原始配置，可包含逗号
     dockerNamespace: String,
-    dockerImageName: String
+    dockerImageName: String,
+    isLatest: Boolean = true   // 新增参数，控制是否为 Latest 版本
 ): Pair<List<String>, List<String>> {
     val wrapperTaskNames = mutableListOf<String>()
     val pushTaskNames = mutableListOf<String>()
@@ -75,17 +76,19 @@ fun Project.createFlavorWrapperTasks(
 
     // 从 imageNamePrefix 提取 version
     val version = parseImageNamePrefix(imageNamePrefix).third
+    // 根据 isLatest 决定任务名中的后缀
+    val taskSuffix = if (isLatest) "-latest" else ""
 
     configs.forEach { config ->
         val flavors = config.flavors
         for (flavor in flavors) {
-            // TODO 任务名称之类的全部用公共方法管理
             val flavorSuffix = buildFlavorSuffix(flavor.getFlavors())
-            val wrapperTaskName = "buildDockerImage-${config.suffix}${flavorSuffix}-latest"
-            val baseTaskName = "buildDockerImage-${config.suffix}-latest"
+            // 任务名使用动态后缀
+            val wrapperTaskName = "buildDockerImage-${config.suffix}${flavorSuffix}$taskSuffix"
+            val baseTaskName = "buildDockerImage-${config.suffix}-latest"  // 基础任务名保持不变
             val imageTagSuffix = "${config.suffix}${flavorSuffix}"
 
-            // 注册 wrapper 任务（通过 gradlew 调用基础构建任务）
+            // 注册 wrapper 任务
             tasks.register(wrapperTaskName, Exec::class.java) {
                 group = "docker"
                 description = "Build Docker image with flavor ${flavor.toKeyValueString()} using ${config.suffix}"
@@ -107,19 +110,19 @@ fun Project.createFlavorWrapperTasks(
             }
             wrapperTaskNames.add(wrapperTaskName)
 
-            // 计算标签（用于推送）
+            // 计算标签，将 tagAsLatestVariant 设为 isLatest
             val imageTags = resolveImageTags(
                 namespace = dockerNamespace,
                 imageName = dockerImageName,
                 version = version,
                 suffix = config.suffix,
                 flavors = flavor.getFlavors(),
-                tagAsLatestVariant = true,   // 对应 base 任务的 latest-variant
+                tagAsLatestVariant = isLatest,      // 根据参数控制是否生成 latest 标签
                 tagAsGlobalLatest = config.tagAsGlobalLatest,
                 registries = registries
             )
 
-            val pushTaskName = "pushDockerImage-${config.suffix}${flavorSuffix}-latest"
+            val pushTaskName = "pushDockerImage-${config.suffix}${flavorSuffix}$taskSuffix"
             tasks.register<DockerPushTask>(pushTaskName) {
                 group = "docker"
                 description = "Push Docker image for flavor ${flavor.toKeyValueString()} using ${config.suffix}"
