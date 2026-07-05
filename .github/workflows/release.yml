@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # 架构无关的组（仅需在一个平台上构建一次）
+          - group: server
+            os: ubuntu-latest
+          - group: web
+            os: ubuntu-latest
+
+          # Windows（提供 x64 和 arm64）
+          - group: win
+            os: windows-latest
+          - group: win
+            os: windows-11-arm
+
+          # macOS（同时提供 Intel 和 Apple Silicon）
+          - group: mac
+            os: macos-15-intel          # Intel x64
+          - group: mac
+            os: macos-15          # Apple Silicon arm64
+
+          # Linux（提供 x64 和 arm64）
+          - group: linux
+            os: ubuntu-latest     # x64
+          - group: linux
+            os: ubuntu-24.04-arm  # arm64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ------------------------------------------------------------
+      # 1. 安装所有需要的 JDK，供 Gradle Toolchain 自动识别
+      #    Gradle 会扫描这些安装路径
+      # ------------------------------------------------------------
+      - name: Set up JDK 8 (用于 toolchain 编译)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+
+      - name: Set up JDK 25 (用于 toolchain 编译)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'oracle'        # Temurin 可能暂无 25，Oracle 提供早期版本
+        continue-on-error: true         # 若安装失败，Gradle 会自动下载，不影响构建
+
+      - name: Set up JDK 21 (用于运行 Gradle 守护进程)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        shell: bash
+
+      - name: Run release group task
+        run: ./gradlew release-${{ matrix.group }}
+        shell: bash
+
+      - name: Upload artifacts to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # 上传 build/release 目录下的所有文件（递归匹配）
+          files: build/release/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
