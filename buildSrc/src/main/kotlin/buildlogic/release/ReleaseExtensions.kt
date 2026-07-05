@@ -45,7 +45,7 @@ fun Project.registerReleaseTask(
         this.moduleTask.set(moduleTask)
         this.gradlewPath.set(gradlewPath)
         this.targetProjectDir.set(targetProject.projectDir)
-        this.targetBuildDir.set(targetBuildDir )
+        this.targetBuildDir.set(targetBuildDir)
         this.artifactRelativePath.set(artifactRelativePath)
         this.renameTo.set(renameTo)
         this.shouldPackage.set(shouldPackage)
@@ -56,6 +56,7 @@ fun Project.registerReleaseTask(
 }
 
 /**
+
  * 批量注册发布任务。
  *
  * 根据传入的配置列表，依次为每个配置中的每个环境变量组合生成一个发布任务，
@@ -68,8 +69,19 @@ fun Project.registerReleaseTask(
  * @param configs 发布配置列表
  */
 fun Project.registerReleaseTasks(configs: List<ReleaseConfig>) {
+    // 获取当前 CPU 架构，并规范化为常见的命名形式
+    val arch = System.getProperty("os.arch").let { raw ->
+        when (raw) {
+            "x86_64", "amd64" -> "x64"
+            "aarch64", "arm64" -> "arm64"
+            else -> raw // 保留原样，建议后续按需补充映射
+        }
+    }
+
     // 用于收集每个 group 下的所有任务（Task 对象）
     val groupTasksMap = mutableMapOf<String, MutableList<Task>>()
+    // 存储每个模块下的任务列表（Task 对象）
+    val moduleTasksMap = mutableMapOf<String, MutableList<Task>>()
 
     configs.forEach { config ->
         val group = config.group
@@ -82,8 +94,11 @@ fun Project.registerReleaseTasks(configs: List<ReleaseConfig>) {
 
             // 从项目获取版本号，作为重命名的一部分
             val version = project.version.toString()
-            // 基础名称：sortrss-<version>-<target>-<envSuffix>
-            val baseName = "sortrss-${config.target}-$envSuffix-$version"
+
+            // 构造基础名称
+            // 若架构无关，则不添加 arch 段；否则添加 -<arch>
+            val archSuffix = if (config.architectureIndependent) "" else "-$arch"
+            val baseName = "sortrss-${config.target}$archSuffix$envSuffix-$version"
 
             // 构造 renameTo（遵循原有约定：打包时不含后缀，非打包时包含扩展名）
             val renameTo = if (config.shouldPackage) {
@@ -108,6 +123,20 @@ fun Project.registerReleaseTasks(configs: List<ReleaseConfig>) {
             // 将刚注册的任务加入分组映射
             val task = tasks.getByName(taskName)
             groupTasksMap.getOrPut(group) { mutableListOf() }.add(task)
+
+            // 按模块名分组（用于串行约束）
+            moduleTasksMap.getOrPut(config.moduleName) { mutableListOf() }.add(task)
+        }
+    }
+
+    moduleTasksMap.values.forEach { taskList ->
+        if (taskList.size > 1) {
+            // 按任务名称排序，确保顺序稳定
+            val sorted = taskList.sortedBy { it.name }
+            for (i in 1 until sorted.size) {
+                // 后一个任务必须在前一个任务之后执行
+                sorted[i].mustRunAfter(sorted[i - 1])
+            }
         }
     }
 

@@ -3,6 +3,8 @@ import buildlogic.docker.*
 import buildlogic.flavors.*
 import buildlogic.utils.getConfigString
 
+//TODO多个同模块任务并行是不是会出错
+
 // 1. 读取配置
 val dockerRegistry = getConfigString(PropertiesContant.DOCKER_REGISTRY, "")
 val dockerNamespace = getConfigString(PropertiesContant.DOCKER_NAMESPACE, "lumklar")

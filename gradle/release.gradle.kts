@@ -17,7 +17,8 @@ registerReleaseTasks(
             envVarsCombinations = listOf(
                 emptyList()
             ),
-            group = "server"
+            group = "server",
+            architectureIndependent = true,
         ),
         ReleaseConfig(
             target = "wasmjs",
@@ -30,7 +31,8 @@ registerReleaseTasks(
                     DataFlavor.NETWORK
                 )
             ),
-            group = "web"
+            group = "web",
+            architectureIndependent = true,
         ),
         ReleaseConfig(
             target = "js",
@@ -43,14 +45,15 @@ registerReleaseTasks(
                     DataFlavor.NETWORK
                 )
             ),
-            group = "web"
+            group = "web",
+            architectureIndependent = true,
         ),
         // ========== macOS ==========
         ReleaseConfig(
             target = "dmg",
             moduleName = ":app:desktopApp",
             moduleTask = "packageReleaseDmg",
-            artifactRelativePath = "build/compose/binaries/main-release/dmg/SortRSS-$releaseVersion.dmg",
+            artifactRelativePath = "compose/binaries/main-release/dmg/SortRSS-$releaseVersion.dmg",
             shouldPackage = false,
             envVarsCombinations = listOf(
                 listOf(
@@ -63,7 +66,7 @@ registerReleaseTasks(
             target = "pkg",
             moduleName = ":app:desktopApp",
             moduleTask = "packageReleasePkg",
-            artifactRelativePath = "build/compose/binaries/main-release/pkg/SortRSS-$releaseVersion.pkg",
+            artifactRelativePath = "compose/binaries/main-release/pkg/SortRSS-$releaseVersion.pkg",
             shouldPackage = false,
             envVarsCombinations = listOf(
                 listOf(
@@ -77,7 +80,7 @@ registerReleaseTasks(
             target = "exe",
             moduleName = ":app:desktopApp",
             moduleTask = "packageReleaseExe",
-            artifactRelativePath = "build/compose/binaries/main-release/exe/SortRSS-$releaseVersion.exe",
+            artifactRelativePath = "compose/binaries/main-release/exe/SortRSS-$releaseVersion.exe",
             shouldPackage = false,
             envVarsCombinations = listOf(
                 listOf(
@@ -90,7 +93,7 @@ registerReleaseTasks(
             target = "msi",
             moduleName = ":app:desktopApp",
             moduleTask = "packageReleaseMsi",
-            artifactRelativePath = "build/compose/binaries/main-release/msi/SortRSS-$releaseVersion.msi",
+            artifactRelativePath = "compose/binaries/main-release/msi/SortRSS-$releaseVersion.msi",
             shouldPackage = false,
             envVarsCombinations = listOf(
                 listOf(
@@ -104,7 +107,7 @@ registerReleaseTasks(
             target = "deb",
             moduleName = ":app:desktopApp",
             moduleTask = "packageReleaseDeb",
-            artifactRelativePath = "build/compose/binaries/main-release/deb/SortRSS-$releaseVersion.deb",
+            artifactRelativePath = "compose/binaries/main-release/deb/SortRSS-$releaseVersion.deb",
             shouldPackage = false,
             envVarsCombinations = listOf(
                 listOf(
@@ -117,7 +120,7 @@ registerReleaseTasks(
             target = "rpm",
             moduleName = ":app:desktopApp",
             moduleTask = "packageReleaseRpm",
-            artifactRelativePath = "build/compose/binaries/main-release/rpm/SortRSS-$releaseVersion.rpm",
+            artifactRelativePath = "compose/binaries/main-release/rpm/SortRSS-$releaseVersion.rpm",
             shouldPackage = false,
             envVarsCombinations = listOf(
                 listOf(
@@ -130,7 +133,7 @@ registerReleaseTasks(
             target = "appimage",
             moduleName = ":app:desktopApp",
             moduleTask = "packageReleaseAppImage",
-            artifactRelativePath = "build/compose/binaries/main-release/appimage/SortRSS-$releaseVersion.AppImage",
+            artifactRelativePath = "compose/binaries/main-release/appimage/SortRSS-$releaseVersion.AppImage",
             shouldPackage = false,
             envVarsCombinations = listOf(
                 listOf(
