@@ -26,15 +26,8 @@ jobs:
 
       # ------------------------------------------------------------
       # 1. 设置 JDK（Gradle 运行环境）
-      #    虽然这是 Kotlin/JS 项目，但 Gradle 9.5.1 需要 JDK 17~21。
-      #    如果其他 JVM 模块依赖 JDK 8/25，Gradle Toolchain 会自动处理。
       # ------------------------------------------------------------
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-      - name: Set JAVA_HOME to JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
