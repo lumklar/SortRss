@@ -46,14 +46,27 @@ val (wrapperNames, pushNames) = createFlavorWrapperTasks(
 )
 
 // 5. 聚合任务
+// 假设 wrapperNames 和 pushNames 是 List<String>，已在其他地方定义
 tasks.register("buildAllFlavorLatestDockerImage") {
     group = "docker"
     description = "Build all latest Docker images for all configured flavor combinations"
     dependsOn(wrapperNames)
+    // 强制串行：按列表顺序执行
+    wrapperNames.forEachIndexed { index, name ->
+        if (index > 0) {
+            tasks.getByName(name).mustRunAfter(tasks.getByName(wrapperNames[index - 1]))
+        }
+    }
 }
 
 tasks.register("pushAllFlavorLatestDockerImage") {
     group = "docker"
     description = "Push all latest Docker images for all configured flavor combinations"
     dependsOn(pushNames)
+    // 强制串行：按列表顺序执行
+    pushNames.forEachIndexed { index, name ->
+        if (index > 0) {
+            tasks.getByName(name).mustRunAfter(tasks.getByName(pushNames[index - 1]))
+        }
+    }
 }
