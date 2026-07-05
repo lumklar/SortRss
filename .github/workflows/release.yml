@@ -28,17 +28,18 @@ jobs:
           - group: win
             os: windows-11-arm
 
+#TODO 编译mac和linux产物
           # macOS（同时提供 Intel 和 Apple Silicon）
-          - group: mac
-            os: macos-15-intel          # Intel x64
-          - group: mac
-            os: macos-15          # Apple Silicon arm64
+#          - group: mac
+#            os: macos-15-intel          # Intel x64
+#          - group: mac
+#            os: macos-15          # Apple Silicon arm64
 
           # Linux（提供 x64 和 arm64）
-          - group: linux
-            os: ubuntu-latest     # x64
-          - group: linux
-            os: ubuntu-24.04-arm  # arm64
+#          - group: linux
+#            os: ubuntu-latest     # x64
+#          - group: linux
+#            os: ubuntu-24.04-arm  # arm64
 
     steps:
       - uses: actions/checkout@v4
