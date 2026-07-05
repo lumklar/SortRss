@@ -14,6 +14,8 @@ import org.gradle.process.ExecOperations
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.RandomAccessFile
+import java.nio.channels.FileLock
 import java.nio.file.Files
 import javax.inject.Inject
 
@@ -21,6 +23,7 @@ import javax.inject.Inject
  * 发布产物任务：执行指定模块的 Gradle 任务 → 复制或打包产物到 build/release
  *
  * 所有输入属性在配置阶段设置，执行阶段不访问 Project 对象，兼容 Gradle 配置缓存。
+ * 通过文件锁保证同一模块的发布任务不会并发执行，避免增量缓存冲突。
  */
 abstract class ReleasePublishTask @Inject constructor(
     private val execOps: ExecOperations   // 注入执行外部命令的服务
@@ -66,108 +69,106 @@ abstract class ReleasePublishTask @Inject constructor(
 
     @TaskAction
     fun publish() {
-        // ========== 1. 执行目标模块的 Gradle 任务 ==========
-        // 使用 execOps.exec 执行外部命令（gradlew），并传入环境变量
-        execOps.exec {
-            // 工作目录设为目标模块根目录（让 gradlew 能正确解析模块路径）
-            workingDir = targetProjectDir.get()
-            // 命令：gradlew -p 项目目录 任务名
-            commandLine = listOf(
-                gradlewPath.get(),
-                "-p", targetProjectDir.get().absolutePath,
-                moduleTask.get()
-            )
-            // 继承当前进程的所有环境变量，并叠加自定义的
-            environment = System.getenv() + envVars.get().associate { it.envKey to it.value }
-        }
+        // ========== 0. 获取模块级文件锁，防止同一模块的多个发布任务并发 ==========
+        // 锁文件放在模块 build 目录下，每个模块独立，互不干扰
+        val lockFile = targetBuildDir.get().resolve("release-publish.lock")
+        lockFile.parentFile.mkdirs()
 
-        // ========== 2. 定位产物 ==========
-        // 拼接出产物文件（可能为目录）
-        val sourceFile = targetBuildDir.get().resolve(artifactRelativePath.get())
-        if (!sourceFile.exists()) {
-            throw GradleException("产物不存在: ${sourceFile.absolutePath}")
-        }
+        RandomAccessFile(lockFile, "rw").use { raf ->
+            val channel = raf.channel
+            val lock: FileLock = channel.lock()   // 阻塞直到获取独占锁
 
-        // 确保目标目录存在
-        val destDir = destinationDir.get()
-        destDir.mkdirs()
+            try {
+                // ========== 1. 执行目标模块的 Gradle 任务 ==========
+                execOps.exec {
+                    workingDir = targetProjectDir.get()
+                    commandLine = listOf(
+                        gradlewPath.get(),
+                        "-p", targetProjectDir.get().absolutePath,
+                        moduleTask.get()
+                    )
+                    environment = System.getenv() + envVars.get().associate { it.envKey to it.value }
+                }
 
-        // 确定最终文件名（若未指定重命名，则使用源文件名）
-        val baseName = renameTo.getOrElse(sourceFile.name)
+                // ========== 2. 定位产物 ==========
+                val sourceFile = targetBuildDir.get().resolve(artifactRelativePath.get())
+                if (!sourceFile.exists()) {
+                    throw GradleException("产物不存在: ${sourceFile.absolutePath}")
+                }
 
-        if (shouldPackage.get()) {
-            // ========== 3a. 打包为 tar.gz（不复制，直接打包） ==========
-            val tarFile = destDir.resolve("$baseName.tar.gz")
-            // 使用 Apache Commons Compress 生成 tar.gz
-            FileOutputStream(tarFile).use { fos ->
-                BufferedOutputStream(fos).use { bos ->
-                    GzipCompressorOutputStream(bos).use { gos ->
-                        TarArchiveOutputStream(gos).use { tarOut ->
-                            // 支持长文件名（POSIX 标准）
-                            tarOut.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX)
+                // 确保目标目录存在
+                val destDir = destinationDir.get()
+                destDir.mkdirs()
 
-                            // 递归添加目录或单个文件
-                            fun addFile(file: File, entryName: String = file.name) {
-                                val entry = TarArchiveEntry(file, entryName)
-                                entry.size = file.length()
-                                tarOut.putArchiveEntry(entry)
-                                if (file.isFile) {
-                                    Files.copy(file.toPath(), tarOut)
-                                }
-                                tarOut.closeArchiveEntry()
-                            }
+                // 确定最终文件名（若未指定重命名，则使用源文件名）
+                val baseName = renameTo.getOrElse(sourceFile.name)
 
-                            if (sourceFile.isDirectory) {
-                                // 遍历整个目录树
-                                sourceFile.walkTopDown().forEach { child ->
-                                    // 计算相对路径（相对于 sourceFile）
-                                    val relative = sourceFile.toURI().relativize(child.toURI()).path
-                                    if (child.isDirectory) {
-                                        // 目录项：以 '/' 结尾
-                                        val dirEntry = TarArchiveEntry(child, relative + "/")
-                                        tarOut.putArchiveEntry(dirEntry)
-                                        tarOut.closeArchiveEntry()
-                                    } else {
-                                        // 普通文件：添加文件内容
-                                        val entry = TarArchiveEntry(child, relative)
-                                        entry.size = child.length()
+                if (shouldPackage.get()) {
+                    // ========== 3a. 打包为 tar.gz（不复制，直接打包） ==========
+                    val tarFile = destDir.resolve("$baseName.tar.gz")
+                    FileOutputStream(tarFile).use { fos ->
+                        BufferedOutputStream(fos).use { bos ->
+                            GzipCompressorOutputStream(bos).use { gos ->
+                                TarArchiveOutputStream(gos).use { tarOut ->
+                                    tarOut.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX)
+
+                                    fun addFile(file: File, entryName: String = file.name) {
+                                        val entry = TarArchiveEntry(file, entryName)
+                                        entry.size = file.length()
                                         tarOut.putArchiveEntry(entry)
-                                        Files.copy(child.toPath(), tarOut)
+                                        if (file.isFile) {
+                                            Files.copy(file.toPath(), tarOut)
+                                        }
                                         tarOut.closeArchiveEntry()
                                     }
+
+                                    if (sourceFile.isDirectory) {
+                                        sourceFile.walkTopDown().forEach { child ->
+                                            val relative = sourceFile.toURI().relativize(child.toURI()).path
+                                            if (child.isDirectory) {
+                                                val dirEntry = TarArchiveEntry(child, relative + "/")
+                                                tarOut.putArchiveEntry(dirEntry)
+                                                tarOut.closeArchiveEntry()
+                                            } else {
+                                                val entry = TarArchiveEntry(child, relative)
+                                                entry.size = child.length()
+                                                tarOut.putArchiveEntry(entry)
+                                                Files.copy(child.toPath(), tarOut)
+                                                tarOut.closeArchiveEntry()
+                                            }
+                                        }
+                                    } else {
+                                        addFile(sourceFile)
+                                    }
+                                    tarOut.finish()
                                 }
-                            } else {
-                                // 单个文件
-                                addFile(sourceFile)
                             }
-                            tarOut.finish()   // 完成写入
                         }
                     }
-                }
-            }
-            logger.lifecycle("打包产物: ${tarFile.absolutePath}")
+                    logger.lifecycle("打包产物: ${tarFile.absolutePath}")
 
-        } else {
-            // ========== 3b. 复制产物到目标目录（可选重命名） ==========
-            val destFile = destDir.resolve(baseName)
-            if (sourceFile.isDirectory) {
-                // 递归复制目录
-                sourceFile.walkTopDown().forEach { src ->
-                    val relative = sourceFile.toURI().relativize(src.toURI()).path
-                    val target = destFile.resolve(relative)
-                    if (src.isDirectory) {
-                        target.mkdirs()
+                } else {
+                    // ========== 3b. 复制产物到目标目录（可选重命名） ==========
+                    val destFile = destDir.resolve(baseName)
+                    if (sourceFile.isDirectory) {
+                        sourceFile.walkTopDown().forEach { src ->
+                            val relative = sourceFile.toURI().relativize(src.toURI()).path
+                            val target = destFile.resolve(relative)
+                            if (src.isDirectory) {
+                                target.mkdirs()
+                            } else {
+                                target.parentFile.mkdirs()
+                                Files.copy(src.toPath(), target.toPath())
+                            }
+                        }
                     } else {
-                        // 复制文件（若目标父目录不存在，先创建）
-                        target.parentFile.mkdirs()
-                        Files.copy(src.toPath(), target.toPath())
+                        Files.copy(sourceFile.toPath(), destFile.toPath())
                     }
+                    logger.lifecycle("产物已复制到: ${destFile.absolutePath}")
                 }
-            } else {
-                // 复制单个文件
-                Files.copy(sourceFile.toPath(), destFile.toPath())
+            } finally {
+                lock.release()   // 无论如何都要释放锁
             }
-            logger.lifecycle("产物已复制到: ${destFile.absolutePath}")
         }
     }
 }
