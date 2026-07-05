@@ -5,4 +5,5 @@ package buildlogic.constant
  */
 object EnvConstant {
     const val DOCKER_PLATFORMS = "DOCKER_PLATFORMS"
+    const val DOCKER_IMAGE_VERSION = "DOCKER_IMAGE_VERSION"
 }
