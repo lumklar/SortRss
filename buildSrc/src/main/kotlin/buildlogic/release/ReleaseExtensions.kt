@@ -6,6 +6,7 @@ import org.gradle.api.Task
 
 /**
  * 注册一个“发布产物”的 Gradle 任务。
+ * TODO 支持不同cpu架构产物名称不一致
  *
  * 此函数在配置阶段会捕获所有需要的信息（路径、模块等），
  * 并将它们作为任务的输入属性，从而避免在执行阶段访问 Project，满足配置缓存要求。
@@ -18,7 +19,7 @@ import org.gradle.api.Task
  * @param renameTo 重命名（不含后缀，打包时自动加 .tar.gz）
  * @param envVars 需要传递给子任务的环境变量列表（实现 StringEnum）
  */
-fun Project.registerReleaseTask(
+private fun Project.registerReleaseTask(
     taskName: String,
     moduleName: String,
     moduleTask: String,
