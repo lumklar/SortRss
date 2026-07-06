@@ -1,10 +1,12 @@
-import buildlogic.docker.buildDockerCommand
+package buildlogic.docker
+
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.Exec
 import buildlogic.flavors.StringEnum
 import buildlogic.release.DockerBuildTask
 import java.io.File
+import kotlin.String
 
 /**
  * 原方法：无 stringEnums，使用 Exec 任务直接执行 docker build，依赖通过 dependsOn 添加（零额外开销）
@@ -13,22 +15,28 @@ fun Project.createDockerBuildTask(
     taskName: String,
     dockerfileDir: Any,
     namespace: String,
-    projectName: String,
-    imageName: String,
+    repository: String,
+    targetName: String,
     imageVersion: String,
     envVars: Map<String, String> = emptyMap(),
     dependencies: List<Pair<String, String>> = emptyList()
-): Task {
+){
     val dir = project.file(dockerfileDir)
-    val (fullImageName, dockerCommand) = buildDockerCommand(dir, namespace, projectName+"-"+imageName, imageVersion, envVars)
+    val (fullImageName, dockerCommand) = buildDockerCommand(
+        dockerfileDir = dir,
+        namespace = namespace,
+        repository = repository,
+        targetName = targetName,
+        imageVersion = imageVersion,
+        envVars = envVars
+    )
 
-    return tasks.register(taskName, Exec::class.java) {
+    tasks.register(taskName, Exec::class.java) {
         group = "docker-build"
         description = "Build Docker image '$fullImageName' from $dir"
         commandLine = dockerCommand
-    }.get().also { task ->
         dependencies.forEach { (modulePath, taskNameDep) ->
-            task.dependsOn("$modulePath:$taskNameDep")
+            dependsOn("$modulePath:$taskNameDep")
         }
     }
 }
@@ -40,15 +48,15 @@ fun Project.createDockerBuildTask(
     taskName: String,
     dockerfileDir: Any,
     namespace: String,
-    projectName: String,
-    imageName: String,
+    repository: String,
+    targetName: String,
     imageVersion: String,
     envVars: Map<String, String> = emptyMap(),
     dependencies: List<Pair<String, String>> = emptyList(),
     stringEnums: List<StringEnum>
-): Task {
+) {
     val gradlew = if (File(rootProject.projectDir, "gradlew.bat").exists()) "gradlew.bat" else "gradlew"
-    return tasks.register(taskName, DockerBuildTask::class.java) {
+    tasks.register(taskName, DockerBuildTask::class.java) {
         val dir = project.file(dockerfileDir)
         group = "docker-build-flavor"
         description = "Build Docker flavor image from $dir"
@@ -57,10 +65,11 @@ fun Project.createDockerBuildTask(
         rootProjectDir.set(rootProject.projectDir)
         this.dockerfileDir.set(project.file(dockerfileDir))
         this.namespace.set(namespace)
-        this.imageName.set(projectName+"-"+imageName)
+        this.repository.set(repository)
+        this.targetName.set(targetName)
         this.imageVersion.set(imageVersion)
         this.envVars.set(envVars)
         this.dependencies.set(dependencies)
         this.stringEnums.set(stringEnums)
-    }.get()
+    }
 }

@@ -29,7 +29,10 @@ abstract class DockerBuildTask @Inject constructor(
     abstract val namespace: Property<String>
 
     @get:Input
-    abstract val imageName: Property<String>
+    abstract val repository: Property<String>
+
+    @get:Input
+    abstract val targetName: Property<String>
 
     @get:Input
     abstract val imageVersion: Property<String>
@@ -66,7 +69,8 @@ abstract class DockerBuildTask @Inject constructor(
         val (_, dockerCommand) = buildDockerCommand(
             dockerfileDir = dockerfileDir.get(),
             namespace = namespace.get(),
-            imageName = imageName.get(),
+            repository = repository.get(),
+            targetName = targetName.get(),
             imageVersion = imageVersion.get(),
             envVars = envVars.getOrElse(emptyMap())
         )

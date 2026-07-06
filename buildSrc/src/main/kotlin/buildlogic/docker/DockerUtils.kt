@@ -11,14 +11,20 @@ import java.io.File
 internal fun buildDockerCommand(
     dockerfileDir: File,
     namespace: String,
-    imageName: String,
+    repository: String,
+    targetName: String,
     imageVersion: String,
-    envVars: Map<String, String>
+    envVars: Map<String, String>,
+    stringEnums: List<StringEnum> = emptyList()
 ): Pair<String, List<String>> {
     if (!dockerfileDir.exists()) {
         throw GradleException("Dockerfile directory does not exist: ${dockerfileDir.absolutePath}")
     }
-    val fullImageName = "$namespace/$imageName:$imageVersion-$imageName"
+    val fullImageName = "$namespace/$repository:" + buildDockerTag(
+        imageVersion = imageVersion,
+        targetName = targetName,
+        stringEnums = stringEnums
+    )
     val command = mutableListOf<String>().apply {
         add("docker")
         add("build")
@@ -35,10 +41,10 @@ internal fun buildDockerCommand(
     return fullImageName to command
 }
 
-internal fun buildDockerImageName(
+internal fun buildDockerTag(
     imageVersion: String,
-    imageName: String,
+    targetName: String,
     stringEnums: List<StringEnum> = emptyList()
-):String{
-    return imageVersion + "-" + imageName
+): String {
+    return imageVersion + "-" + targetName + stringEnums.joinToString(separator = "") { "-${it.value.lowercase()}" }
 }
