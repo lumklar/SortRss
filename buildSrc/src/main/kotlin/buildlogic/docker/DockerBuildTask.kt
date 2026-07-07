@@ -12,7 +12,7 @@ import org.gradle.process.ExecOperations
 import java.io.File
 import javax.inject.Inject
 
-abstract class DockerBuildTask @Inject constructor(
+internal abstract class DockerBuildTask @Inject constructor(
     private val execOps: ExecOperations
 ) : DefaultTask() {
 

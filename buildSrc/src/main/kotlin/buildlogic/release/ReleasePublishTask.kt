@@ -23,7 +23,7 @@ import javax.inject.Inject
  * 所有输入属性在配置阶段设置，执行阶段不访问 Project 对象，兼容 Gradle 配置缓存。
  * 通过文件锁保证同一模块的发布任务不会并发执行，避免增量缓存冲突。
  */
-abstract class ReleasePublishTask @Inject constructor(
+internal abstract class ReleasePublishTask @Inject constructor(
     private val execOps: ExecOperations   // 注入执行外部命令的服务
 ) : DefaultTask() {
 

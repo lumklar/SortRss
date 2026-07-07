@@ -1,7 +1,6 @@
 package buildlogic.docker
 
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.tasks.Exec
 import buildlogic.flavors.StringEnum
 import buildlogic.release.DockerBuildTask
@@ -11,9 +10,9 @@ import kotlin.String
 /**
  * 原方法：无 stringEnums，使用 Exec 任务直接执行 docker build，依赖通过 dependsOn 添加（零额外开销）
  */
-fun Project.createDockerBuildTask(
+internal fun Project.createDockerBuildTask(
     taskName: String,
-    dockerfileDir: Any,
+    dockerfileDir: String,
     namespace: String,
     repository: String,
     targetName: String,
@@ -44,16 +43,16 @@ fun Project.createDockerBuildTask(
 /**
  * 新方法：带 stringEnums，使用自定义 DockerBuildTask，依赖任务在子进程中执行以隔离参数
  */
-fun Project.createDockerBuildTask(
+internal fun Project.createDockerBuildTask(
     taskName: String,
-    dockerfileDir: Any,
+    dockerfileDir: String,
     namespace: String,
     repository: String,
     targetName: String,
     imageVersion: String,
     envVars: Map<String, String> = emptyMap(),
     dependencies: List<Pair<String, String>> = emptyList(),
-    stringEnums: List<StringEnum>
+    stringEnums: List<StringEnum> = emptyList()
 ) {
     val gradlew = if (File(rootProject.projectDir, "gradlew.bat").exists()) "gradlew.bat" else "gradlew"
     tasks.register(taskName, DockerBuildTask::class.java) {
