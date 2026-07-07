@@ -119,9 +119,8 @@ internal abstract class DockerPublishMultiArchTask @Inject constructor(
             add(metadataFile.get().asFile.absolutePath)
             // Dockerfile 路径
             add("-f")
-            add(dockerfile.absolutePath)
-            // 上下文
-            add(dockerfileDir.get().absolutePath)
+            add(dockerfile.absolutePath)              // Dockerfile 用绝对路径
+            add(rootProjectDir.get().absolutePath)    // 上下文改为项目根目录
         }
 
         execOps.exec {
