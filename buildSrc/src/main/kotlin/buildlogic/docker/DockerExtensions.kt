@@ -84,7 +84,7 @@ fun Project.createDockerTask(
                 envVars = config.envVars,
                 dependencies = config.dependencies,
                 stringEnums = enums,
-                targetRepositories = config.registryList.map { "/${config.namespace}/${config.repository}/$it" },
+                targetRepositories = config.registryList.map { "$it/${config.namespace}/${config.repository}" },
                 tags = tags,
                 platforms = platforms
             )
