@@ -54,16 +54,7 @@ jobs:
           cache: 'pip'                # 自动缓存 ~/.cache/pip
 
       # ------------------------------------------------------------
-      # 4. （新增）设置 Node.js 环境，并缓存 npm 依赖
-      # ------------------------------------------------------------
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'          # 可自行调整版本（如 lts/*）
-          cache: 'npm'                # 自动缓存 ~/.npm
-
-      # ------------------------------------------------------------
-      # 5. 执行编译任务，并注入环境变量 FLAVOR_DATA=mock
+      # 4. 执行编译任务，并注入环境变量 FLAVOR_DATA=mock
       # ------------------------------------------------------------
       - name: Build WASM JS distribution
         run: ./gradlew :home:prepareDistribution
@@ -71,7 +62,7 @@ jobs:
           FLAVOR_DATA: mock   # 这里注入，Gradle 中可通过 System.getenv("FLAVOR_DATA") 读取
 
       # ------------------------------------------------------------
-      # 6. 部署到 GitHub Pages（gh-pages 分支）
+      # 5. 部署到 GitHub Pages（gh-pages 分支）
       #    产物路径: home/build/dist
       # ------------------------------------------------------------
       - name: Deploy to GitHub Pages
