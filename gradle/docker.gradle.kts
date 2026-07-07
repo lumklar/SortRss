@@ -15,7 +15,7 @@ val projectVersion = project.version.toString()
 createDockerTask(
     listOf(
         DockerConfig(
-            targetName = "jvmWasmJs",
+            targetName = "jvm-wasmjs",
             //TODO 改为文件名而不是目录？
             dockerfileDir = "scripts/docker/jvm-with-frontend",
             namespace = dockerNamespace,
