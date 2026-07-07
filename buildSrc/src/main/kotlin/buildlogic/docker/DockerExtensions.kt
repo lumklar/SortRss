@@ -22,9 +22,8 @@ fun Project.createDockerTask(
     val envPlatforms = System.getenv(EnvConstant.DOCKER_PLATFORMS)
 
     for (config in configs) {
-        val buildTaskName = getTaskName("buildDockerImage", config.targetName)
         val buildProvider = createDockerBuildTask(
-            taskName = buildTaskName,
+            taskName = getTaskName("buildDockerImage", config.targetName),
             dockerfileDir = config.dockerfileDir,
             namespace = config.namespace,
             repository = config.repository,
@@ -36,8 +35,6 @@ fun Project.createDockerTask(
         buildProviders.add(buildProvider)
 
         for (enums in config.stringEnums) {
-            val flavorBuildTaskName = getTaskName("buildFlavorDockerImage", config.targetName, enums)
-
             val flavorBuildProvider = createDockerBuildTask(
                 taskName = getTaskName("buildFlavorDockerImage", config.targetName, enums),
                 dockerfileDir = config.dockerfileDir,
@@ -59,7 +56,8 @@ fun Project.createDockerTask(
             }
 
             // 生成 tags
-            var versions = ArrayList<String>()
+            val tags = ArrayList<String>()
+            val versions = ArrayList<String>()
             if (!envVersion.isNullOrBlank()) {
                 versions.add(envVersion)
             } else {
@@ -67,16 +65,15 @@ fun Project.createDockerTask(
                 if (config.versionLatest) {
                     versions.add("latest")
                 }
+                // 如果 config 有 latest 标志，额外添加 "latest" 标签
+                if (config.latest) {
+                    tags.add("latest")
+                }
             }
-            var tags = ArrayList<String>()
             versions.forEach { ver ->
                 tags.add(buildDockerTag(ver, config.targetName, enums))
             }
-            // 如果 config 有 latest 标志，额外添加 "latest" 标签
-            if (config.latest) {
-                tags.add("latest")
-            }
-            val pushTaskName = getTaskName("pushMultiArchFlavorDockerImage", config.targetName, enums)
+
             val pushProvider = createDockerPublishMultiArchTask(
                 taskName = getTaskName("pushMultiArchFlavorDockerImage", config.targetName, enums),
                 dockerfileDir = config.dockerfileDir,
