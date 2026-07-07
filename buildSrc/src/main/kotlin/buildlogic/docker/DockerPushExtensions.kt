@@ -2,6 +2,7 @@ package buildlogic.docker
 
 import buildlogic.flavors.StringEnum
 import org.gradle.api.Project
+import org.gradle.api.tasks.TaskProvider
 import java.io.File
 
 /**
@@ -31,11 +32,11 @@ internal fun Project.createDockerPublishMultiArchTask(
     targetRepositories: List<String>,   // 完整的仓库前缀，如 "docker.io/myuser/app"
     tags: List<String>,
     platforms: List<String>
-) {
+): TaskProvider<DockerPublishMultiArchTask> {
     val gradlew = if (File(rootProject.projectDir, "gradlew.bat").exists()) "gradlew.bat" else "gradlew"
 
-    tasks.register(taskName, DockerPublishMultiArchTask::class.java) {
-        group = "docker-publish"
+    return tasks.register(taskName, DockerPublishMultiArchTask::class.java) {
+        group = "docker-publish-arch"
         description =
             "Build multi-arch Docker image and push to ${targetRepositories.size} repositories × ${tags.size} tags"
 

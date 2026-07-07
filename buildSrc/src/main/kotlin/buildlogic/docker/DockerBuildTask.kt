@@ -67,12 +67,14 @@ internal abstract class DockerBuildTask @Inject constructor(
 
         // 2. 执行 docker build（使用公共函数）
         val (_, dockerCommand) = buildDockerCommand(
+            projectDir = rootProjectDir.get(),
             dockerfileDir = dockerfileDir.get(),
             namespace = namespace.get(),
             repository = repository.get(),
             targetName = targetName.get(),
             imageVersion = imageVersion.get(),
-            envVars = envVars.getOrElse(emptyMap())
+            envVars = envVars.get(),
+            stringEnums = stringEnums.get()
         )
         execOps.exec {
             workingDir = rootProjectDir.get()

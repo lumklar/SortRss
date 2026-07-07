@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
 import buildlogic.flavors.StringEnum
 import buildlogic.release.DockerBuildTask
+import org.gradle.api.tasks.TaskProvider
 import java.io.File
 import kotlin.String
 
@@ -19,9 +20,10 @@ internal fun Project.createDockerBuildTask(
     imageVersion: String,
     envVars: Map<String, String> = emptyMap(),
     dependencies: List<Pair<String, String>> = emptyList()
-){
+): TaskProvider<Exec> {
     val dir = project.file(dockerfileDir)
     val (fullImageName, dockerCommand) = buildDockerCommand(
+        projectDir = rootProject.projectDir,
         dockerfileDir = dir,
         namespace = namespace,
         repository = repository,
@@ -30,7 +32,7 @@ internal fun Project.createDockerBuildTask(
         envVars = envVars
     )
 
-    tasks.register(taskName, Exec::class.java) {
+    return tasks.register(taskName, Exec::class.java) {
         group = "docker-build"
         description = "Build Docker image '$fullImageName' from $dir"
         commandLine = dockerCommand
@@ -53,9 +55,9 @@ internal fun Project.createDockerBuildTask(
     envVars: Map<String, String> = emptyMap(),
     dependencies: List<Pair<String, String>> = emptyList(),
     stringEnums: List<StringEnum> = emptyList()
-) {
+): TaskProvider<DockerBuildTask> {
     val gradlew = if (File(rootProject.projectDir, "gradlew.bat").exists()) "gradlew.bat" else "gradlew"
-    tasks.register(taskName, DockerBuildTask::class.java) {
+    return tasks.register(taskName, DockerBuildTask::class.java) {
         val dir = project.file(dockerfileDir)
         group = "docker-build-flavor"
         description = "Build Docker flavor image from $dir"

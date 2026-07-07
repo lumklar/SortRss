@@ -9,6 +9,7 @@ import java.io.File
  * @return Pair<镜像全名, 命令列表>
  */
 internal fun buildDockerCommand(
+    projectDir: File,                // 新增参数
     dockerfileDir: File,
     namespace: String,
     repository: String,
@@ -17,8 +18,9 @@ internal fun buildDockerCommand(
     envVars: Map<String, String>,
     stringEnums: List<StringEnum> = emptyList()
 ): Pair<String, List<String>> {
-    if (!dockerfileDir.exists()) {
-        throw GradleException("Dockerfile directory does not exist: ${dockerfileDir.absolutePath}")
+    val dockerfile = File(dockerfileDir, "Dockerfile")
+    if (!dockerfile.exists()) {
+        throw GradleException("Dockerfile does not exist: ${dockerfile.absolutePath}")
     }
     val fullImageName = "$namespace/$repository:" + buildDockerTag(
         imageVersion = imageVersion,
@@ -31,12 +33,12 @@ internal fun buildDockerCommand(
         add("-t")
         add(fullImageName)
         add("-f")
-        add("${dockerfileDir.absolutePath}/Dockerfile")  // 假定 Dockerfile 直接位于该目录下
+        add(dockerfile.absolutePath)   // Dockerfile 用绝对路径指定
         envVars.forEach { (key, value) ->
             add("--build-arg")
             add("$key=$value")
         }
-        add(dockerfileDir.absolutePath)  // 上下文路径
+        add(projectDir.absolutePath)   // ★ 上下文改为项目根目录
     }
     return fullImageName to command
 }

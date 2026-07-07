@@ -3,6 +3,7 @@ package buildlogic.release
 import buildlogic.flavors.StringEnum
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.tasks.TaskProvider
 
 /**
  * 注册一个“发布产物”的 Gradle 任务。
@@ -27,7 +28,7 @@ private fun Project.registerReleaseTask(
     shouldPackage: Boolean = false,
     renameTo: String? = null,
     envVars: List<StringEnum> = emptyList()
-) {
+): TaskProvider<ReleasePublishTask> {
     // 获取目标模块的 Project 对象（配置阶段即可访问）
     val targetProject = project(moduleName)
 
@@ -38,7 +39,7 @@ private fun Project.registerReleaseTask(
     val destinationDir = project.layout.buildDirectory.dir("release").get().asFile
 
     // 注册任务
-    tasks.register(taskName, ReleasePublishTask::class.java) {
+    return tasks.register(taskName, ReleasePublishTask::class.java) {
         group = "release"
         description = "发布产物（$moduleName:$moduleTask）到 build/release"
 
@@ -130,6 +131,7 @@ fun Project.registerReleaseTasks(configs: List<ReleaseConfig>) {
         }
     }
 
+    //TODO 加锁之后是不是不需要这段逻辑了？
     moduleTasksMap.values.forEach { taskList ->
         if (taskList.size > 1) {
             // 按任务名称排序，确保顺序稳定
