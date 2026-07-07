@@ -71,7 +71,7 @@ jobs:
       - name: Build and Push Docker Images
         run: ./gradlew pushMultiArchFlavorDockerImage-jvmWasmJs-network
         env:
-          DOCKER_IMAGE_VERSION: nightly   # 指定需要构建的镜像版本名称
+          DOCKER_IMAGE_VERSION: dev   # 指定需要构建的镜像版本名称
           DOCKER_PLATFORMS: linux/amd64,linux/arm64
 
       # ------------------------------------------------------------
