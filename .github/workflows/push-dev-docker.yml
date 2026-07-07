@@ -81,4 +81,5 @@ jobs:
         uses: dataaxiom/ghcr-cleanup-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          name: sortrss
           keep-n-untagged: 5
