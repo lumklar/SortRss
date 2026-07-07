@@ -1,6 +1,7 @@
 package buildlogic.release
 
 import buildlogic.flavors.StringEnum
+import buildlogic.utils.gradlewPath
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
@@ -33,8 +34,6 @@ private fun Project.registerReleaseTask(
     val targetProject = project(moduleName)
 
     // 确定 gradlew 路径（根项目下）
-    val gradlew = if (System.getProperty("os.name").startsWith("Windows")) "gradlew.bat" else "gradlew"
-    val gradlewPath = rootProject.projectDir.resolve(gradlew).absolutePath
     val targetBuildDir = targetProject.layout.buildDirectory.get().asFile
     val destinationDir = project.layout.buildDirectory.dir("release").get().asFile
 
@@ -45,7 +44,7 @@ private fun Project.registerReleaseTask(
 
         // 将所有信息设置为任务属性（配置缓存安全）
         this.moduleTask.set(moduleTask)
-        this.gradlewPath.set(gradlewPath)
+        this.gradlewPath.set(gradlewPath())
         this.targetProjectDir.set(targetProject.projectDir)
         this.targetBuildDir.set(targetBuildDir)
         this.artifactRelativePath.set(artifactRelativePath)

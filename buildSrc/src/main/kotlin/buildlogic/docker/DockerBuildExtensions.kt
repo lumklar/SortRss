@@ -4,8 +4,8 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
 import buildlogic.flavors.StringEnum
 import buildlogic.release.DockerBuildTask
+import buildlogic.utils.gradlewPath
 import org.gradle.api.tasks.TaskProvider
-import java.io.File
 import kotlin.String
 
 /**
@@ -56,13 +56,12 @@ internal fun Project.createDockerBuildTask(
     dependencies: List<Pair<String, String>> = emptyList(),
     stringEnums: List<StringEnum> = emptyList()
 ): TaskProvider<DockerBuildTask> {
-    val gradlew = if (File(rootProject.projectDir, "gradlew.bat").exists()) "gradlew.bat" else "gradlew"
     return tasks.register(taskName, DockerBuildTask::class.java) {
         val dir = project.file(dockerfileDir)
         group = "docker-build-flavor"
         description = "Build Docker flavor image from $dir"
 
-        gradlewPath.set(rootProject.projectDir.resolve(gradlew).absolutePath)
+        gradlewPath.set(gradlewPath())
         rootProjectDir.set(rootProject.projectDir)
         this.dockerfileDir.set(project.file(dockerfileDir))
         this.namespace.set(namespace)

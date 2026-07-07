@@ -1,9 +1,9 @@
 package buildlogic.docker
 
 import buildlogic.flavors.StringEnum
+import buildlogic.utils.gradlewPath
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
-import java.io.File
 
 /**
  * 创建多架构 Docker 镜像发布任务（使用 `docker buildx` 构建并推送）。
@@ -33,14 +33,12 @@ internal fun Project.createDockerPublishMultiArchTask(
     tags: List<String>,
     platforms: List<String>
 ): TaskProvider<DockerPublishMultiArchTask> {
-    val gradlew = if (File(rootProject.projectDir, "gradlew.bat").exists()) "gradlew.bat" else "gradlew"
-
     return tasks.register(taskName, DockerPublishMultiArchTask::class.java) {
         group = "docker-publish-arch"
         description =
             "Build multi-arch Docker image and push to ${targetRepositories.size} repositories × ${tags.size} tags"
 
-        gradlewPath.set(rootProject.projectDir.resolve(gradlew).absolutePath)
+        gradlewPath.set(gradlewPath())
         rootProjectDir.set(rootProject.projectDir)
         this.dockerfileDir.set(project.file(dockerfileDir))
         this.imageVersion.set(imageVersion)
