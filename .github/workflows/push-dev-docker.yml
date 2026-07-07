@@ -69,7 +69,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build and Push Docker Images
-        run: ./gradlew pushMultiArchFlavorDockerImage-jvmWasmJs-network
+        run: ./gradlew pushMultiArchFlavorDockerImage-jvm-wasmjs-network
         env:
           DOCKER_IMAGE_VERSION: nightly   # 指定需要构建的镜像版本名称
           DOCKER_PLATFORMS: linux/amd64,linux/arm64
