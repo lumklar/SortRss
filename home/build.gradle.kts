@@ -19,7 +19,7 @@ tasks.register<com.github.gradle.node.npm.task.NpmTask>("convertFavicon") {
     dependsOn("npmInstall")               // 确保依赖已安装
     args.set(listOf("run", "convert-favicon"))
     inputs.file("src/favicon.svg")         // 增量构建：当 SVG 变化时才执行
-    outputs.file(layout.buildDirectory.file("compressed/favicon.ico")) // 输出位置
+    outputs.file(layout.buildDirectory.file("dist/favicon.ico")) // 输出位置
 }
 
 // -------- 压缩前端资源 ----------
@@ -35,11 +35,18 @@ val prepareDistribution = tasks.register<Sync>("prepareDistribution") {
     dependsOn(
         "compressFrontend",
         "convertFavicon",
+        project(":docs").tasks.named("assemble"),
         project(":app:webApp").tasks.named("wasmJsBrowserDistribution")
     )
 
     val distDir = layout.buildDirectory.dir("dist").get().asFile
     into(distDir)
+
+    // docs 产物
+    from(project(":docs").layout.buildDirectory.dir("dist")) {
+        into("docs")
+        include("**/*")
+    }
 
     // demo 产物
     from(project(":app:webApp").layout.buildDirectory.dir("dist/wasmJs/productionExecutable")) {

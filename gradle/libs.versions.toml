@@ -20,6 +20,8 @@ dependency-check-jvm = "12.1.9"
 dependency-update = "0.51.0"
 dependency-unused = "0"
 dependency-conflict = "0"
+use-python = "4.1.0"
+mkdocs = "4.0.1"
 
 # 工具库版本
 therapi = "0.15.0"
@@ -135,8 +137,19 @@ dependency-check-jvm = { id = "org.owasp.dependencycheck", version.ref = "depend
 dependency-update = { id = "com.github.ben-manes.versions", version.ref = "dependency-update" }
 
 # ==============================================
+# 🔧 构建工具插件
+# ==============================================
+use-python = { id = "ru.vyarus.use-python", version.ref = "use-python" }
+
+# ==============================================
 # 🔧 Spring 生态插件
 # ==============================================
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "dependency-management" }
 graalvm-native = { id = "org.graalvm.buildtools.native", version.ref = "graalvm" }
+
+# ==============================================
+# 🔧 文档插件
+# ==============================================
+mkdocs-build = { id = "ru.vyarus.mkdocs-build", version.ref = "mkdocs" }
+

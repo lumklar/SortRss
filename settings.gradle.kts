@@ -63,6 +63,8 @@ include(":common:api")
 include(":common:domain")
 include(":common:infrastructure")
 include(":common:shared")
-include(":home")
+
 include(":server")
+
+include(":home")
 include(":docs")
