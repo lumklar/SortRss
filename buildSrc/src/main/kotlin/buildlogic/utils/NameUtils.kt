@@ -29,8 +29,9 @@ internal object NameUtils {
     private fun splitToLowerCaseWords(input: String): List<String> {
         require(input.isNotEmpty()) { "Input string must not be empty" }
 
-        val allowed = input.all { it.isLetter() || it == '.' || it == '-' || it == '_' }
-        require(allowed) { "Input($input) contains invalid characters. Only letters, '.', '-', '_' are allowed." }
+        // 允许字母或数字，以及分隔符 . - _
+        val allowed = input.all { it.isLetterOrDigit() || it == '.' || it == '-' || it == '_' }
+        require(allowed) { "Input($input) contains invalid characters. Only letters, digits, '.', '-', '_' are allowed." }
 
         val parts = input.split(DELIMITER_REGEX).filter { it.isNotEmpty() }
         val result = mutableListOf<String>()
@@ -39,8 +40,9 @@ internal object NameUtils {
             val words = splitByCamelCase(part)
             for (word in words) {
                 require(word.isNotEmpty()) { "${input}:Unexpected empty word" }
-                require(word.all { it.isLetter() }) {
-                    "Word '$word' contains non-letter characters"
+                // 修改2：单词内允许数字
+                require(word.all { it.isLetterOrDigit() }) {
+                    "Word '$word' contains non-letter-or-digit characters"
                 }
                 result.add(word.lowercase())
             }
