@@ -83,8 +83,9 @@ jobs:
         uses: snok/container-retention-policy@v2
         with:
           image-names: sortrss  # 你的镜像名
-          cut-off: A week ago UTC     # 删除超过1周的
+          cut-off: 7d     # 删除超过1周的
           keep-at-least: 10           # 但至少保留10个最新版本
           filter-tags: "dev-*"        # 只处理 dev- 开头的标签
           account-type: personal      # 个人或 org
           token: ${{ secrets.GITHUB_TOKEN }}
+          token-type: github-token
