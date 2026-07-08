@@ -30,7 +30,7 @@ internal object NameUtils {
         require(input.isNotEmpty()) { "Input string must not be empty" }
 
         val allowed = input.all { it.isLetter() || it == '.' || it == '-' || it == '_' }
-        require(allowed) { "Input contains invalid characters. Only letters, '.', '-', '_' are allowed." }
+        require(allowed) { "Input($input) contains invalid characters. Only letters, '.', '-', '_' are allowed." }
 
         val parts = input.split(DELIMITER_REGEX).filter { it.isNotEmpty() }
         val result = mutableListOf<String>()
@@ -38,7 +38,7 @@ internal object NameUtils {
         for (part in parts) {
             val words = splitByCamelCase(part)
             for (word in words) {
-                require(word.isNotEmpty()) { "Unexpected empty word" }
+                require(word.isNotEmpty()) { "${input}:Unexpected empty word" }
                 require(word.all { it.isLetter() }) {
                     "Word '$word' contains non-letter characters"
                 }
