@@ -69,9 +69,9 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build and Push Docker Images
+        # 指定需要构建的镜像版本名称
         run: |
           SHORT_SHA=$(git rev-parse --short HEAD)
-        # 指定需要构建的镜像版本名称
           DOCKER_IMAGE_VERSION="dev,dev-$SHORT_SHA" ./gradlew pushMultiArchFlavorDockerImageJvmWasmJsNetwork
         env:
           DOCKER_PLATFORMS: linux/amd64,linux/arm64
