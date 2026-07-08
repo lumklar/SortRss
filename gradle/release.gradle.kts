@@ -1,7 +1,6 @@
 import buildlogic.release.*
 import buildlogic.flavors.*
 
-//TODO 增加github/workflows/release.yml
 //FIXME 支持mac和linux，排查问题
 
 val version = project.version.toString()

@@ -1,4 +1,4 @@
-name: Nightly Docker Image
+name: Branch Dev Docker Image
 
 on:
   push:
@@ -69,17 +69,22 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build and Push Docker Images
-        run: ./gradlew pushMultiArchFlavorDockerImage-jvmWasmJs-network
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)
+        # 指定需要构建的镜像版本名称
+          DOCKER_IMAGE_VERSION="dev,dev-$SHORT_SHA" ./gradlew pushMultiArchFlavorDockerImageJvmWasmJsNetwork
         env:
-          DOCKER_IMAGE_VERSION: dev   # 指定需要构建的镜像版本名称
           DOCKER_PLATFORMS: linux/amd64,linux/arm64
 
       # ------------------------------------------------------------
-      # 5. 删除所有悬空镜像
+      # 5. 删除老旧的dev docker镜像
       # ------------------------------------------------------------
-      - name: ghcr.io cleanup action
-        uses: dataaxiom/ghcr-cleanup-action@v1
+      - name: Cleanup Dev Docker Images
+        uses: snok/container-retention-policy@v2
         with:
+          image-names: sortrss  # 你的镜像名
+          cut-off: A week ago UTC     # 删除超过1周的
+          keep-at-least: 10           # 但至少保留10个最新版本
+          filter-tags: "dev-*"        # 只处理 dev- 开头的标签
+          account-type: personal      # 个人或 org
           token: ${{ secrets.GITHUB_TOKEN }}
-          package: sortrss
-          keep-n-untagged: 5

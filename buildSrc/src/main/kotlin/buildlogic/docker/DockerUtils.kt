@@ -1,7 +1,9 @@
 package buildlogic.docker
 
 import buildlogic.flavors.StringEnum
+import buildlogic.utils.NameUtils
 import org.gradle.api.GradleException
+import org.gradle.internal.impldep.org.eclipse.jgit.lib.ObjectChecker.tag
 import java.io.File
 
 /**
@@ -48,5 +50,8 @@ internal fun buildDockerTag(
     targetName: String,
     stringEnums: List<StringEnum> = emptyList()
 ): String {
-    return imageVersion + "-" + targetName + stringEnums.joinToString(separator = "") { "-${it.value.lowercase()}" }
+    var tagSuffix =
+        NameUtils.toKebabCase(targetName + stringEnums.joinToString(separator = "") { "-${it.value.lowercase()}" })
+    //TODO version有两种一种是常规的，一种是环境变量引入的，两种校验方式不一致
+    return imageVersion + "-" + tagSuffix
 }

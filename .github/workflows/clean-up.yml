@@ -1,0 +1,21 @@
+name: Cleanup Old Docker Images
+on:
+  schedule:
+    - cron: "0 3 * * *"  # 每天凌晨3点运行
+  workflow_dispatch:     # 支持手动触发
+
+jobs:
+  clean-ghcr:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      # ------------------------------------------------------------
+      # 1. 删除所有悬空镜像
+      # ------------------------------------------------------------
+      - name: ghcr.io cleanup action
+        uses: dataaxiom/ghcr-cleanup-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          package: sortrss
+          keep-n-untagged: 5

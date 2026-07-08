@@ -2,13 +2,14 @@ package buildlogic.docker
 
 import buildlogic.constant.EnvConstant
 import buildlogic.flavors.StringEnum
+import buildlogic.utils.NameUtils
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.internal.impldep.org.bouncycastle.asn1.x509.Target.targetName
 
 fun Project.createDockerTask(
     configs: List<DockerConfig> = emptyList()
 ) {
+    //TODO 支持额外的标签开头：版本号-hash
     //TODO 把环境变量改为运行时获取
     //TODO 如果同名配置很多，说明不同架构dockerfile不一致，需要处理
     //TODO 多任务，子模块加文件锁防冲突，使用公共的方法
@@ -17,7 +18,9 @@ fun Project.createDockerTask(
     val flavorBuildProviders = mutableListOf<TaskProvider<*>>()
     val pushProviders = mutableListOf<TaskProvider<*>>()
 
-    val version = project.version.toString()
+    val projectVersion = project.version.toString()
+    NameUtils.validateVersion(projectVersion)
+    val version = projectVersion.lowercase()
     val envVersion = System.getenv(EnvConstant.DOCKER_IMAGE_VERSION)
     val envPlatforms = System.getenv(EnvConstant.DOCKER_PLATFORMS)
 
@@ -59,7 +62,14 @@ fun Project.createDockerTask(
             val tags = ArrayList<String>()
             val versions = ArrayList<String>()
             if (!envVersion.isNullOrBlank()) {
-                versions.add(envVersion)
+                versions.addAll(
+                    envVersion.split(',')
+                        .map {
+                            val trim = it.trim()
+                            NameUtils.toKebabCase(it)
+                        }
+                        .filter { it.isNotBlank() }
+                )
             } else {
                 versions.add(version);
                 if (config.versionLatest) {
@@ -129,5 +139,6 @@ fun getTaskName(
     targetName: String,
     stringEnums: List<StringEnum> = emptyList()
 ): String {
-    return namePrefix + "-" + targetName + stringEnums.joinToString("") { "-" + it.value }
+    var name = namePrefix + "-" + targetName + stringEnums.joinToString("") { "-" + it.value }
+    return NameUtils.toLowerCamelCase(name)
 }
