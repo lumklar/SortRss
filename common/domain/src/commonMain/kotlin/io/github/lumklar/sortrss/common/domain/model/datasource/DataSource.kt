@@ -12,9 +12,13 @@ class DataSource private constructor(
     val type: DataSourceType,
     val name: DataSourceName,
     val connectionDetails: DataSourceConnectionDetails,
-    initialLastSyncTime: Instant? = null
+    initialLastSyncTime: Instant? = null,
+    initialLastAllReadAt: Instant? = null   // 新增：用户全部已读时间戳
 ) {
     var lastSyncTime: Instant? = initialLastSyncTime
+        private set
+
+    var lastAllReadAt: Instant? = initialLastAllReadAt   // 新增字段，私有 set
         private set
 
     companion object {
@@ -34,11 +38,9 @@ class DataSource private constructor(
                 DataSourceType.LOCAL_OPML -> require(connectionDetails is DataSourceConnectionDetails.LocalOpml) {
                     "Local OPML source must use LocalOpml connection details"
                 }
-
                 DataSourceType.FEVER_API -> require(connectionDetails is DataSourceConnectionDetails.FeverApi) {
                     "Fever API source requires FeverApi details"
                 }
-
                 DataSourceType.GOOGLE_READER_API -> require(connectionDetails is DataSourceConnectionDetails.GoogleReaderApi) {
                     "Google Reader API source requires GoogleReaderApi details"
                 }
@@ -49,13 +51,15 @@ class DataSource private constructor(
                 type = type,
                 name = datasourceName,
                 connectionDetails = connectionDetails,
-                initialLastSyncTime = null   // 新数据源明确置为 null
+                initialLastSyncTime = null,
+                initialLastAllReadAt = null   // 新数据源明确置为 null
             )
         }
 
         /**
          * 从持久化数据重建数据源（包含已有的订阅关联）。
          * @param lastSyncTime 从数据库读取的最后同步时间，若无则为 null
+         * @param lastAllReadAt 从数据库读取的用户全部已读时间，若无则为 null（新增）
          */
         fun reconstruct(
             id: DataSourceId,
@@ -63,7 +67,8 @@ class DataSource private constructor(
             type: DataSourceType,
             name: String,
             connectionDetails: DataSourceConnectionDetails,
-            lastSyncTime: Instant? = null   // 新增参数，默认为 null 保持兼容
+            lastSyncTime: Instant? = null,
+            lastAllReadAt: Instant? = null   // 新增参数
         ): DataSource {
             val datasourceName = DataSourceName.fromString(name)
             return DataSource(
@@ -72,21 +77,27 @@ class DataSource private constructor(
                 type = type,
                 name = datasourceName,
                 connectionDetails = connectionDetails,
-                initialLastSyncTime = lastSyncTime
+                initialLastSyncTime = lastSyncTime,
+                initialLastAllReadAt = lastAllReadAt
             )
         }
     }
 
-    // 提供一个更新方法，用于同步成功后更新该时间
     /**
      * 同步完成后调用，更新最后同步时间。
      */
     fun markSyncCompleted(syncTime: Instant) {
-        // 可选业务校验：新时间不能早于旧时间（防止时钟回拨或乱序更新）
-//        require(syncTime >= (lastSyncTime ?: Instant.MIN)) {
-//            "New sync time cannot be earlier than last sync time"
-//        }
-        // 因为 setter 是 private，外部必须通过这个方法修改
+        // 可选的校验已注释（防止时钟回拨）
+        // require(syncTime >= (lastSyncTime ?: Instant.MIN)) { ... }
         this.lastSyncTime = syncTime
+    }
+
+    /**
+     * 用户将数据源下所有文章标记为已读时调用，更新全部已读时间戳。
+     */
+    fun markAllRead(readTime: Instant) {
+        // 可选：确保新时间不早于旧时间（如需要可放开注释）
+        // require(readTime >= (lastAllReadAt ?: Instant.MIN)) { "New all-read time cannot be earlier than previous" }
+        this.lastAllReadAt = readTime
     }
 }

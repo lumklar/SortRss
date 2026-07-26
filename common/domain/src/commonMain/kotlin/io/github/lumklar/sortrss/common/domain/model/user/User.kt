@@ -1,6 +1,7 @@
 package io.github.lumklar.sortrss.common.domain.model.user
 
 import io.github.lumklar.sortrss.common.domain.shared.ability.PasswordEncoder
+import kotlin.uuid.Uuid
 
 class User private constructor(
     val id: UserId,
@@ -20,7 +21,7 @@ class User private constructor(
             return User(id, uname, pwd)
         }
 
-        fun reconstruct(id: Long, username: String, hash: String): User {
+        fun reconstruct(id: Uuid, username: String, hash: String): User {
             val uname = Username.fromString(username)
             return User(UserId(id), uname, Password.fromHash(hash))
         }

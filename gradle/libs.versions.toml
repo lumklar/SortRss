@@ -32,6 +32,7 @@ rome = "2.1.0"
 sqlite = "3.53.1.0"
 sqlite-jpa = "7.4.3.Final"
 commons-compress = "1.28.0"
+fastjson2 = "2.0.62"
 
 [libraries]
 # Compose 核心
@@ -77,12 +78,13 @@ kotlin-logging-wasm-js = { group = "io.github.oshai", name = "kotlin-logging-was
 # kotlin 测试
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
-kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "json"}
+kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "json" }
 
 # ==============================================
 # 🌱 Spring Boot 官方 Starter（BOM 管理）
 # ==============================================
 spring-boot-starter = { group = "org.springframework.boot", name = "spring-boot-starter" }
+spring-boot-starter-json = { group = "org.springframework.boot", name = "spring-boot-starter-json" }
 spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web" }
 spring-boot-starter-data-jpa = { group = "org.springframework.boot", name = "spring-boot-starter-data-jpa" }
 spring-boot-starter-cache = { group = "org.springframework.boot", name = "spring-boot-starter-cache" }
@@ -116,6 +118,7 @@ jbcrypt = { group = "org.mindrot", name = "jbcrypt", version.ref = "jbcrypt" }
 rome = { group = "com.rometools", name = "rome", version.ref = "rome" }
 rome-modules = { group = "com.rometools", name = "rome-modules", version.ref = "rome" }
 commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "commons-compress" }
+fastjson2 = { group = "com.alibaba.fastjson2", name = "fastjson2", version.ref = "fastjson2" }
 
 [plugins]
 # ==============================================
@@ -129,7 +132,7 @@ kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose" }
-serialization = {id="org.jetbrains.kotlin.plugin.serialization",version.ref="kotlin"}
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 # ==============================================
 # 🔧 通用插件

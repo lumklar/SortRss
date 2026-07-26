@@ -12,7 +12,8 @@ class Article private constructor(
     val content: String?,
     val link: String,
     val publishedAt: Long,      // 发布时间戳（毫秒）
-    val updatedAt: Long?       // 最后更新时间戳（毫秒）
+    val updatedAt: Long?,       // 最后更新时间戳（毫秒）
+    val guid: String? = null    // 新增：源端全局唯一标识符
 ) {
     companion object {
         /**
@@ -28,7 +29,8 @@ class Article private constructor(
             content: String? = null,
             link: String,
             publishedAt: Long,
-            updatedAt: Long? = null
+            updatedAt: Long? = null,
+            guid: String? = null       // 新增参数
         ): Article {
             require(title.isNotBlank()) { throw ArticleTitleEmptyException() }
             require(link.isNotBlank()) { throw ArticleLinkEmptyException() }
@@ -40,7 +42,8 @@ class Article private constructor(
                 content = content?.trim(),
                 link = link.trim(),
                 publishedAt = publishedAt,
-                updatedAt = updatedAt
+                updatedAt = updatedAt,
+                guid = guid?.trim()
             )
         }
 
@@ -55,9 +58,10 @@ class Article private constructor(
             content: String?,
             link: String,
             publishedAt: Long,
-            updatedAt: Long?
+            updatedAt: Long?,
+            guid: String? = null       // 新增参数
         ): Article {
-            return Article(id, title, author, summary, content, link, publishedAt, updatedAt)
+            return Article(id, title, author, summary, content, link, publishedAt, updatedAt, guid)
         }
     }
 
@@ -70,7 +74,8 @@ class Article private constructor(
         newSummary: String? = null,
         newContent: String? = null,
         newLink: String? = null,
-        newUpdatedAt: Long? = null
+        newUpdatedAt: Long? = null,
+        newGuid: String? = null        // 新增参数
     ): Article {
         return copy(
             title = newTitle?.trim() ?: title,
@@ -78,20 +83,19 @@ class Article private constructor(
             summary = newSummary?.trim() ?: summary,
             content = newContent?.trim() ?: content,
             link = newLink?.trim() ?: link,
-            updatedAt = newUpdatedAt ?: updatedAt
+            updatedAt = newUpdatedAt ?: updatedAt,
+            guid = newGuid?.trim() ?: guid
         )
     }
 
-    // 利用 data class 特性生成 copy，将 Article 改为 data class 会便利一些，
-    // 但当前为普通类，我们可提供一个私有 copy 方法或直接暴露一个内部修改方法。
-    // 为了简洁，这里将 Article 声明改为 data class 是合理的（值对象偏向）。
-    // 若坚持充血模型不暴露 data class，可保留下面的实现：
+    // 私有 copy 方法，用于 update 内部构造新实例
     private fun copy(
         title: String,
         author: String?,
         summary: String?,
         content: String?,
         link: String,
-        updatedAt: Long?
-    ): Article = Article(id, title, author, summary, content, link, publishedAt, updatedAt)
+        updatedAt: Long?,
+        guid: String?
+    ): Article = Article(id, title, author, summary, content, link, publishedAt, updatedAt, guid)
 }

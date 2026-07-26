@@ -9,6 +9,4 @@ import io.github.lumklar.sortrss.common.domain.model.article.ArticleId
 data class FeedArticle(
     val feedId: FeedId,
     val articleId: ArticleId,
-    val guid: String? = null,           // 文章在该订阅源中的唯一标识符
-    val sortOrder: Int = 0              // 该文章在订阅源中的排序权重（可选）
 )

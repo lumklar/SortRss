@@ -43,6 +43,7 @@ dependencies {
 
     // spring boot
     implementation(libs.spring.boot.starter)
+//    implementation(libs.spring.boot.starter.json)
 
     // 缓存
     implementation(libs.spring.boot.starter.cache)
@@ -63,6 +64,7 @@ dependencies {
 
     // 加密
     implementation(libs.jbcrypt)
+    implementation(libs.fastjson2)
 
     // 测试
     testImplementation(libs.spring.boot.starter.test)
