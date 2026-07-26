@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.common.domain.shared.exception.code
+package io.github.lumklar.sortrss.common.domain.shared.error
 
 /**
  * 领域层业务错误码（DDD 核心）

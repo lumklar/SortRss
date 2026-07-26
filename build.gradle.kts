@@ -43,6 +43,8 @@ plugins {
     alias(libs.plugins.spring.dependency.management) apply false
     alias(libs.plugins.graalvm.native) apply false
     alias(libs.plugins.dependency.check.jvm) apply false
+
+//    id("com.dorongold.task-tree") version "2.1.1"
 }
 
 //TODO 写一个脚本+配置统一管理，防止泄露删除

@@ -1,8 +1,13 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
+    id("base")
 }
+
+base {
+    archivesName = "common-foundation"
+}
+
 
 java {
     toolchain {
@@ -11,6 +16,7 @@ java {
 }
 
 kotlin {
+    jvmToolchain(21)
     jvm {
 
     }
@@ -26,16 +32,16 @@ kotlin {
 
     // 配置源集（source sets）
     sourceSets {
-        // 公共代码（所有平台共享）
+        val commonMain = getByName("commonMain") {
+            dependencies {
+                implementation(project(":common:domain"))
+//                implementation(libs.kotlin.logging)
+            }
+        }
         val commonTest = getByName("commonTest") {
             dependencies {
                 implementation(libs.kotlin.test)
-                implementation(libs.kotlin.serialization)
             }
         }
     }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
 }

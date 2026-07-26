@@ -1,58 +1,36 @@
 package io.github.lumklar.sortrss.common.shared.utils
 
 /**
- * 异常堆栈格式化工具（最终版：数组格式，无\r\n）
+ * 异常堆栈格式化工具（纯 Kotlin Common，使用标准库 API）
  */
 object ExceptionStackTraceUtil {
 
-    // 过滤框架/系统包，只保留业务代码
-    private val EXCLUDE_PACKAGES = listOf<String>(
-//        "java.", "javax.", "sun.", "jdk.",
-//        "kotlin.", "kotlinx.",
-//        "org.springframework.", "org.apache.", "org.hibernate.",
-//        "com.sun.", "net.sf.", "io.netty.",
-//        "java.lang.reflect.", "jdk.internal."
-    )
-
     /**
-     * 🔥 核心：返回 List<String> 数组，每行一个堆栈，无任何换行符
+     * 返回 List<String>，包含异常类型、消息和堆栈跟踪行（最多 maxFrames 行）。
+     * 使用 [Throwable.stackTraceToString] 获取原生堆栈字符串，再按行拆分。
+     * 不进行包过滤，因为 Common 中无法解析堆栈元素。
      */
     fun formatStackTrace(throwable: Throwable?, maxFrames: Int = 15): List<String> {
-        val lines = mutableListOf<String>()
         if (throwable == null) {
-            lines.add("无异常堆栈")
-            return lines
+            return listOf("无异常堆栈")
         }
 
-        // 1. 基础信息
-        lines.add("【异常类型】: ${throwable.javaClass.simpleName}")
+        val lines = mutableListOf<String>()
+        lines.add("【异常类型】: ${throwable::class.simpleName}")
         lines.add("【异常信息】: ${throwable.message ?: "无消息"}")
-        lines.add("【业务堆栈】: ")
+        lines.add("【堆栈跟踪】:")
 
-        // 2. 过滤并添加业务栈帧
-        val validFrames = throwable.stackTrace
-            .filterNot { frame -> EXCLUDE_PACKAGES.any { frame.className.startsWith(it) } }
+        // 获取完整堆栈字符串，按换行分割，过滤空行，取前 maxFrames 行
+        val fullStack = throwable.stackTraceToString()
+        val stackLines = fullStack
+            .split("\n")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
             .take(maxFrames)
 
-        validFrames.forEachIndexed { index, frame ->
-            lines.add(
-                "  ${index + 1}. ${frame.className.substringAfterLast(".")}#${frame.methodName} (行号: ${frame.lineNumber})"
-            )
-        }
+        lines.addAll(stackLines)
 
-        // 3. 根因异常（Caused by）
-        throwable.cause?.let { cause ->
-            lines.add("【根因异常】: ${cause.javaClass.simpleName} - ${cause.message ?: "无消息"}")
-            cause.stackTrace
-                .filterNot { frame -> EXCLUDE_PACKAGES.any { frame.className.startsWith(it) } }
-                .take(3)
-                .forEachIndexed { index, frame ->
-                    lines.add(
-                        "  ${index + 1}. ${frame.className.substringAfterLast(".")}#${frame.methodName} (行号: ${frame.lineNumber})"
-                    )
-                }
-        }
-
+        // 注意：stackTraceToString 已经包含了 cause 信息，无需单独处理
         return lines
     }
 }

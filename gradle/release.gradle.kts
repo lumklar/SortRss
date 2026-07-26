@@ -10,7 +10,7 @@ registerReleaseTasks(
     listOf(
         ReleaseConfig(
             target = "backend",
-            moduleName = ":server",
+            moduleName = ":server:bootstrap",
             moduleTask = "bootJar",
             artifactRelativePath = "libs/server-$version.jar",
             shouldPackage = false,
