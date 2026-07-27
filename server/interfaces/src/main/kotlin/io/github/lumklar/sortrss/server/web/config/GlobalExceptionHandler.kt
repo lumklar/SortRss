@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.server.infrastructure.config.web
+package io.github.lumklar.sortrss.server.web.config
 
 import io.github.lumklar.sortrss.common.api.dto.ApiExtra
 import io.github.lumklar.sortrss.common.api.dto.ApiResult
@@ -6,7 +6,6 @@ import io.github.lumklar.sortrss.common.api.dto.ApiResultCode
 import io.github.lumklar.sortrss.common.api.dto.ErrorSource
 import io.github.lumklar.sortrss.common.domain.shared.exception.DomainException
 import io.github.lumklar.sortrss.common.shared.utils.ExceptionStackTraceUtil
-import io.github.lumklar.sortrss.server.infrastructure.config.ApiResponseProperties
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler

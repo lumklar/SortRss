@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.server.infrastructure.config;
+package io.github.lumklar.sortrss.server.infrastructure.config.database
 
 /**
  * 数据库类型枚举

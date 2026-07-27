@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.server.infrastructure.config
+package io.github.lumklar.sortrss.server.infrastructure.config.database
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component

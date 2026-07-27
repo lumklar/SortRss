@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.server.infrastructure.config.web
+package io.github.lumklar.sortrss.server.web.config
 
 import io.github.lumklar.sortrss.common.api.annotation.ApiRoute
 import io.github.lumklar.sortrss.common.api.annotation.HttpMethod
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 import java.lang.reflect.Method
-import kotlin.jvm.java
 
 /**
  * 自动扫描并注册 [ApiRoute] 注解的路由配置

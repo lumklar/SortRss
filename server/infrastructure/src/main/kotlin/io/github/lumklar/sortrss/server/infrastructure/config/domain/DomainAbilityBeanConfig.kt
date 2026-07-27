@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.server.infrastructure.config
+package io.github.lumklar.sortrss.server.infrastructure.config.domain
 
 import io.github.lumklar.sortrss.common.domain.shared.ability.PasswordEncoder
 import io.github.lumklar.sortrss.server.infrastructure.security.BCryptPasswordEncoder

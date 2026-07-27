@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.server.infrastructure.config
+package io.github.lumklar.sortrss.server.infrastructure.config.database
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.jdbc.DataSourceBuilder

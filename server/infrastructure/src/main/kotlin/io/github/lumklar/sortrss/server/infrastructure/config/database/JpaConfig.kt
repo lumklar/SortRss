@@ -1,6 +1,6 @@
-package io.github.lumklar.sortrss.server.infrastructure.config
+package io.github.lumklar.sortrss.server.infrastructure.config.database
 
-import io.github.lumklar.sortrss.server.infrastructure.config.DatabaseTypeDetector.isSQLite
+import io.github.lumklar.sortrss.server.infrastructure.config.database.DatabaseTypeDetector.isSQLite
 import jakarta.persistence.EntityManagerFactory
 import org.springframework.boot.jpa.EntityManagerFactoryBuilder
 import org.springframework.boot.jpa.autoconfigure.JpaProperties
