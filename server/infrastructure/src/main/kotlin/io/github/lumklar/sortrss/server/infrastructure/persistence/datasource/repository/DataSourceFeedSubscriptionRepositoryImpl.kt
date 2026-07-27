@@ -6,7 +6,6 @@ import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceId
 import io.github.lumklar.sortrss.common.domain.model.feed.FeedId
 import io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.convert.toDomain
 import io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.convert.toPo
-import io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.entity.DataSourceFeedSubscriptionId
 import io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.repository.jpa.DataSourceFeedSubscriptionJpaRepository
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
@@ -30,16 +29,4 @@ class DataSourceFeedSubscriptionRepositoryImpl(
     override fun findByFeedId(feedId: FeedId): List<DataSourceFeedSubscription> =
         jpaRepository.findByFeedId(feedId.value.toJavaUuid()).map { it.toDomain() }
 
-    override fun findById(dataSourceId: DataSourceId, feedId: FeedId): DataSourceFeedSubscription? =
-        jpaRepository.findById(DataSourceFeedSubscriptionId(dataSourceId.value.toJavaUuid(), feedId.value.toJavaUuid()))
-            .orElse(null)?.toDomain()
-
-    override fun delete(subscription: DataSourceFeedSubscription) {
-        jpaRepository.deleteById(
-            DataSourceFeedSubscriptionId(
-                subscription.dataSourceId.value.toJavaUuid(),
-                subscription.feedId.value.toJavaUuid()
-            )
-        )
-    }
 }

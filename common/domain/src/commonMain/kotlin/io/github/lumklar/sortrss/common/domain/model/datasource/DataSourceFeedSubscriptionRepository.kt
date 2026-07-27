@@ -6,6 +6,4 @@ interface DataSourceFeedSubscriptionRepository {
     fun save(subscription: DataSourceFeedSubscription): DataSourceFeedSubscription
     fun findByDataSourceId(dataSourceId: DataSourceId): List<DataSourceFeedSubscription>
     fun findByFeedId(feedId: FeedId): List<DataSourceFeedSubscription>
-    fun findById(dataSourceId: DataSourceId, feedId: FeedId): DataSourceFeedSubscription?
-    fun delete(subscription: DataSourceFeedSubscription)
 }

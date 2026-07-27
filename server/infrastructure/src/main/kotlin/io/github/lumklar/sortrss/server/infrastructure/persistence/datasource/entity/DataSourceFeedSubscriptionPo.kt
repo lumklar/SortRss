@@ -9,8 +9,7 @@ import java.util.*
 class DataSourceFeedSubscriptionPo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // 如果此表有独立主键，可保留自增；若无，可改联合主键
-    var id: Long? = null   // 通常订阅表可自增主键
+    var id: UUID? = null   // 通常订阅表可自增主键
 
     @Column(name = "data_source_id", nullable = false, columnDefinition = "BINARY(16)")
     var dataSourceId: UUID? = null
