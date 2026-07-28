@@ -1,17 +1,20 @@
 package io.github.lumklar.sortrss.server.infrastructure.config.database
 
 import io.github.lumklar.sortrss.server.infrastructure.config.database.DatabaseTypeDetector.isSQLite
+import io.github.lumklar.sortrss.server.infrastructure.persistence.PersistenceAnchor
 import jakarta.persistence.EntityManagerFactory
 import org.springframework.boot.jpa.EntityManagerFactoryBuilder
 import org.springframework.boot.jpa.autoconfigure.JpaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter
 import javax.sql.DataSource
 
 @Configuration
+@EnableJpaRepositories(basePackageClasses = [PersistenceAnchor::class])
 class JpaConfig(
     private val dataSource: DataSource,
     private val jpaProperties: JpaProperties
@@ -40,7 +43,7 @@ class JpaConfig(
 
         return builder
             .dataSource(dataSource)
-            .packages("io.github.lumklar.sortrss.server.infrastructure.persistence.entity") // 替换为您的实体所在包
+            .packages(PersistenceAnchor::class.java)
             .properties(properties)
             .jta(false)
             .build()
