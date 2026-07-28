@@ -8,7 +8,7 @@ ARG DIST_ROOT
 WORKDIR /app
 
 # 复制后端 JAR 包
-COPY server/build/libs/bootstrap-${VERSION}.jar app.jar
+COPY server/bootstrap/build/libs/bootstrap-${VERSION}.jar app.jar
 
 # 复制前端静态资源（Wasm 产物）到 ./static 目录
 COPY app/webApp/build/dist/${DIST_ROOT} ./static
