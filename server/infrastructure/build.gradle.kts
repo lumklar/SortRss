@@ -43,7 +43,8 @@ dependencies {
 
     // spring boot
     implementation(libs.spring.boot.starter)
-//    implementation(libs.spring.boot.starter.json)
+    implementation(libs.jackson.core)
+    implementation(libs.jackson.module)
 
     // 缓存
     implementation(libs.spring.boot.starter.cache)

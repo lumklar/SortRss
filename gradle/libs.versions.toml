@@ -98,6 +98,8 @@ spring-boot-starter-actuator = { group = "org.springframework.boot", name = "spr
 # 📦 Spring Boot BOM 管理的第三方依赖
 # ==============================================
 caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine" }
+jackson-core = { group = "com.fasterxml.jackson.core", name = "jackson-databind" }
+jackson-module = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin" }
 
 # ==============================================
 # 🗄️ 数据库驱动
