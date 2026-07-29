@@ -12,7 +12,7 @@ kotlin-wrappers = "2026.6.1"
 kotlin-insert = "4.2.1"
 
 # 插件版本
-ksp = "2.3.9"
+ksp = "2.3.10"
 graalvm = "0.11.5"
 dependency-management = "1.1.7"
 # TODO 漏洞检查，版本检查，冲突检查，未使用检查
