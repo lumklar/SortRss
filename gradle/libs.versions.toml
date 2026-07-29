@@ -9,7 +9,7 @@ material3 = "1.11.0-alpha07"
 androidx-lifecycle = "2.10.0"
 androidx-navigation = "2.9.2"
 kotlin-wrappers = "2026.6.1"
-kotlin-insert = "4.2.1"
+kotlin-insert = "4.2.2"
 
 # 插件版本
 ksp = "2.3.9"
