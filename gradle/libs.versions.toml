@@ -22,6 +22,7 @@ dependency-unused = "0"
 dependency-conflict = "0"
 use-python = "4.1.0"
 mkdocs = "4.0.1"
+node = "7.1.0"
 
 # 工具库版本
 therapi = "0.15.0"
@@ -77,7 +78,7 @@ kotlin-logging-wasm-js = { group = "io.github.oshai", name = "kotlin-logging-was
 # kotlin 测试
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
-kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "json"}
+kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "json" }
 
 # ==============================================
 # 🌱 Spring Boot 官方 Starter（BOM 管理）
@@ -128,7 +129,7 @@ kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose" }
-serialization = {id="org.jetbrains.kotlin.plugin.serialization",version.ref="kotlin"}
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 # ==============================================
 # 🔧 通用插件
@@ -140,6 +141,7 @@ dependency-update = { id = "com.github.ben-manes.versions", version.ref = "depen
 # 🔧 构建工具插件
 # ==============================================
 use-python = { id = "ru.vyarus.use-python", version.ref = "use-python" }
+node = { id = "com.github.node-gradle.node", version.ref = "node" }
 
 # ==============================================
 # 🔧 Spring 生态插件

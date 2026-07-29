@@ -1,0 +1,47 @@
+name: Update CLA Version
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'CLA.md'
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute new hash and timestamp
+        id: cla_info
+        run: |
+          HASH=$(sha256sum CLA.md | cut -d' ' -f1)
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+
+      - name: Checkout signatures branch
+        run: |
+          git fetch origin cla-signatures || true
+          git checkout cla-signatures || git checkout --orphan cla-signatures
+          # 如果分支为空，初始化
+          if ! git ls-tree -r HEAD --name-only | grep -q .; then
+            echo "# CLA Signatures" > README.md
+            git add README.md
+            git commit -m "Initialize signatures branch"
+            git push origin cla-signatures
+          fi
+
+      - name: Update agreement-version.txt
+        run: |
+          echo "HASH=${{ steps.cla_info.outputs.hash }}" > agreement-version.txt
+          echo "UPDATED_AT=${{ steps.cla_info.outputs.timestamp }}" >> agreement-version.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add agreement-version.txt
+          git commit -m "Update CLA version to ${{ steps.cla_info.outputs.hash }}" || echo "No changes"
+          git push origin cla-signatures

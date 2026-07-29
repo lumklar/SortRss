@@ -1,0 +1,44 @@
+version: 2
+updates:
+  # 1. home 模块 (npm)
+  - package-ecosystem: "npm"
+    directory: "/home"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "npm"
+
+  # 2. 所有 Gradle 管理的模块
+  #    包括 server、所有 KMP 模块、docs（因为 docs 也使用 Gradle 插件）
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "gradle"
+    # 不需要 ignore，Dependabot 会扫描根目录及所有子项目的构建文件
+    # 它会自动识别版本目录（libs.versions.toml）中的依赖版本
+
+  # 3. （可选）如果 docs 有独立的 Python 依赖文件
+  #    例如你手动在 docs/ 下创建了 requirements.txt 用于 MkDocs 插件
+  #    如果没有，则可以删除此条目
+#  - package-ecosystem: "pip"
+#    directory: "/docs"
+#    schedule:
+#      interval: "weekly"
+#    labels:
+#      - "dependencies"
+#      - "python"
+#      - "mkdocs"
+    # 注意：只有真正存在 requirements.txt 或 pyproject.toml 时才会生效
+
+  # 4. （推荐）更新 GitHub Actions 工作流
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"
+      - "github_actions"

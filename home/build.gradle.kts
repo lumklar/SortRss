@@ -1,11 +1,10 @@
 import org.codehaus.groovy.ast.tools.GeneralUtils.args
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.Sync
-import org.gradle.internal.logging.progress.ResourceOperation
 
 plugins {
     id("base")
-    id("com.github.node-gradle.node") version "7.1.0"
+    alias(libs.plugins.node)
 }
 
 // -------- Node 配置 ----------
