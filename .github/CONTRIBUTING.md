@@ -4,7 +4,7 @@ We welcome contributions! Please follow these steps to ensure a smooth process.
 
 ## CLA (Contributor License Agreement)
 
-By contributing to this project, you agree to the terms of our [Contributor License Agreement](CLA.md). **All contributors must sign the CLA before their pull requests can be merged.**
+By contributing to this project, you agree to the terms of our [Contributor License Agreement](../CLA.md). **All contributors must sign the CLA before their pull requests can be merged.**
 
 ### How to sign
 
