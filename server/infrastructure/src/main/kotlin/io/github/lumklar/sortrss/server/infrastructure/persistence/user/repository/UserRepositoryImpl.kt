@@ -1,10 +1,10 @@
-package io.github.lumklar.sortrss.server.infrastructure.persistence.user.entity.repository
+package io.github.lumklar.sortrss.server.infrastructure.persistence.user.repository
 
 import io.github.lumklar.sortrss.common.domain.model.user.User
 import io.github.lumklar.sortrss.common.domain.model.user.UserRepository
 import io.github.lumklar.sortrss.server.infrastructure.persistence.user.convert.toDomain   // 导入扩展函数
 import io.github.lumklar.sortrss.server.infrastructure.persistence.user.convert.toPO
-import io.github.lumklar.sortrss.server.infrastructure.persistence.user.entity.repository.jpa.UserJpaRepository
+import io.github.lumklar.sortrss.server.infrastructure.persistence.user.repository.jpa.UserJpaRepository
 import org.springframework.stereotype.Repository
 import kotlin.uuid.Uuid
 import kotlin.uuid.toJavaUuid

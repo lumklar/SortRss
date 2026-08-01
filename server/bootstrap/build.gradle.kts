@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     // Kotlin 核心插件
     alias(libs.plugins.kotlin.jvm)
@@ -8,6 +10,20 @@ plugins {
     //其他插件
     alias(libs.plugins.graalvm.native)
     alias(libs.plugins.dependency.check.jvm)
+}
+
+tasks.processResources {
+    // 声明一个输入属性，便于缓存自动重新构建
+    val versionInput = project.version.toString()
+    inputs.property("appVersion", versionInput)
+
+    filesMatching("application.yml") {
+        filter<ReplaceTokens>(
+            "tokens" to mapOf(
+                "version" to versionInput
+            )
+        )
+    }
 }
 
 java {
@@ -39,7 +55,6 @@ dependencyCheck {
         )
     }
 }
-
 
 dependencies {
     implementation(project(":server:adaptor"))

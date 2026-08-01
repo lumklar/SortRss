@@ -1,0 +1,12 @@
+${AnsiColor.BRIGHT_BLACK}
+
+    _____            _   _____
+   / ____|          | | |  __ \
+  | (___   ___  _ __| |_| |__) |___ ___
+   \___ \ / _ \| '__| __|  _  // __/ __|
+   ____) | (_) | |  | |_| | \ \\__ \__ \
+  |_____/ \___/|_|   \__|_|  \_\___/___/
+
+${AnsiColor.BRIGHT_WHITE}
+应用版本：${spring.application.version}
+启动环境：${spring.profiles.active:default}
