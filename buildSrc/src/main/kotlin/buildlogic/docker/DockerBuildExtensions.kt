@@ -3,7 +3,6 @@ package buildlogic.docker
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
 import buildlogic.flavors.StringEnum
-import buildlogic.release.DockerBuildTask
 import buildlogic.utils.gradlewPath
 import org.gradle.api.tasks.TaskProvider
 import kotlin.String

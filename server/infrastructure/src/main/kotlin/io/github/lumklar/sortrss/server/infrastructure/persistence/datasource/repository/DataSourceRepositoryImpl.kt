@@ -5,7 +5,7 @@ import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceId
 import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceRepository
 import io.github.lumklar.sortrss.common.domain.model.user.UserId
 import io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.convert.toDomain
-import io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.convert.toPo
+import io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.convert.toPO
 import io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.repository.jpa.DataSourceJpaRepository
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
@@ -18,7 +18,7 @@ class DataSourceRepositoryImpl(
 ) : DataSourceRepository {
 
     override fun save(dataSource: DataSource): DataSource {
-        val po = dataSource.toPo()
+        val po = dataSource.toPO()
         val saved = jpaRepository.save(po)
         return saved.toDomain()
     }

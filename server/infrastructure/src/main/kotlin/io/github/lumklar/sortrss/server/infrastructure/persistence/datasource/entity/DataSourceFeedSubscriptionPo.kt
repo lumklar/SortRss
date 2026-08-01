@@ -1,28 +1,45 @@
-package io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.entity
+package io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.entity;
 
 import jakarta.persistence.*
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 import java.time.Instant
 import java.util.*
 
 @Entity
-@Table(name = "data_source_feed_subscription")
-class DataSourceFeedSubscriptionPo {
-
+@Table(
+    name = "data_source_feed_subscription",
+    uniqueConstraints = [UniqueConstraint(columnNames = ["dataSourceId", "feedId"])],
+    indexes = [
+        Index(name = "idx_ds_feed_sub_data_source_id", columnList = "dataSourceId"),
+        Index(name = "idx_ds_feed_sub_feed_id", columnList = "feedId")
+    ]
+)
+class DataSourceFeedSubscriptionPo(
     @Id
-    var id: UUID? = null   // 通常订阅表可自增主键
+    @Column(nullable = false)
+    var id: UUID? = null,
 
-    @Column(name = "data_source_id", nullable = false, columnDefinition = "BINARY(16)")
-    var dataSourceId: UUID? = null
+    @Column(name = "data_source_id", nullable = false)
+    var dataSourceId: UUID? = null,
 
-    @Column(name = "feed_id", nullable = false, columnDefinition = "BINARY(16)")
-    var feedId: UUID? = null
+    @Column(name = "feed_id", nullable = false)
+    var feedId: UUID? = null,
 
-    @Column(name = "custom_title")
-    var customTitle: String? = null
+    @Column(name = "custom_title", length = 255)
+    var customTitle: String? = null,
 
-    @Column(name = "remote_id")
-    var remoteId: String? = null
+    @Column(name = "remote_id", length = 255)
+    var remoteId: String? = null,
 
     @Column(name = "last_all_read_at")
-    var lastAllReadAt: Instant? = null
-}
+    var lastAllReadAt: Instant? = null,
+
+    @CreationTimestamp
+    @Column(name = "gmt_create", nullable = false, updatable = false)
+    var gmtCreate: Instant? = null,
+
+    @UpdateTimestamp
+    @Column(name = "gmt_modify", nullable = false)
+    var gmtModify: Instant? = null
+)

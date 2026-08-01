@@ -42,7 +42,8 @@ dependencyCheck {
 
 
 dependencies {
-    implementation(project(":server:interfaces"))
+    implementation(project(":server:adaptor"))
+    implementation(project(":server:application"))
     implementation(project(":server:infrastructure"))
 
     // Kotlin

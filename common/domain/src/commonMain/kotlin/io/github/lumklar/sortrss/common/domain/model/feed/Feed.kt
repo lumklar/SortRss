@@ -1,8 +1,9 @@
 package io.github.lumklar.sortrss.common.domain.model.feed
 
-import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceType
 import io.github.lumklar.sortrss.common.domain.model.user.UserId
+import io.github.lumklar.sortrss.common.domain.shared.enums.DataSourceType
 import kotlin.time.Clock
+import kotlin.time.Instant
 
 /**
  * 订阅源聚合根。
@@ -17,14 +18,35 @@ class Feed private constructor(
     val description: String?,
     val iconUrl: String?,
     val sourceType: DataSourceType,         // 该订阅源来源于哪种数据源
-    val lastSyncTimestamp: Long = 0L
+    initialLastSyncTime: Instant? = null    // 初始同步时间（可为空）
 ) {
+    /** 最后一次同步时间，外部只读，内部可修改 */
+    var lastSyncTime: Instant? = initialLastSyncTime
+        private set
+
     /** 该订阅源是否可以被编辑（重命名、移动等） */
     fun canEdit(): Boolean = sourceType == DataSourceType.LOCAL_OPML
 
+    /**
+     * 更新最后同步时间为当前时刻。
+     */
+    fun markSynced() {
+        markSyncCompleted(Clock.System.now())
+    }
+
+    /**
+     * 同步完成后调用，更新最后同步时间。
+     */
+    fun markSyncCompleted(syncTime: Instant) {
+        require(syncTime >= (lastSyncTime ?: syncTime)) {
+            "Sync time cannot be earlier than last sync time: $lastSyncTime"
+        }
+        this.lastSyncTime = syncTime
+    }
+
     companion object {
         /**
-         * 创建一个新的订阅源。
+         * 创建一个新地订阅源（初始同步时间为 null）。
          */
         fun create(
             id: FeedId,
@@ -45,12 +67,13 @@ class Feed private constructor(
                 siteUrl = siteUrl?.trim(),
                 description = description?.trim(),
                 iconUrl = iconUrl?.trim(),
-                sourceType = sourceType
+                sourceType = sourceType,
+                initialLastSyncTime = null   // 新建时无同步记录
             )
         }
 
         /**
-         * 从持久化数据重建（含已有文章关联）。
+         * 从持久化数据重建（含已有文章关联及初始同步时间）。
          */
         fun reconstruct(
             id: FeedId,
@@ -60,19 +83,18 @@ class Feed private constructor(
             description: String?,
             iconUrl: String?,
             sourceType: DataSourceType,
-            articles: List<FeedArticle>,
-            lastSyncTimestamp: Long = 0L
+            initialLastSyncTime: Instant? = null
         ): Feed {
-            return Feed(id,  feedUrl, title, siteUrl, description, iconUrl, sourceType,  lastSyncTimestamp)
-        }
-    }
-
-    /**
-     * 更新最后同步时间。
-     */
-    fun markSynced(timestamp: Long = Clock.System.now().toEpochMilliseconds()) {
-        (this as Feed).apply {
-            // 同 DataSource 一样，lastSyncTimestamp 需改为 private var
+            return Feed(
+                id = id,
+                feedUrl = feedUrl,
+                title = title,
+                siteUrl = siteUrl,
+                description = description,
+                iconUrl = iconUrl,
+                sourceType = sourceType,
+                initialLastSyncTime = initialLastSyncTime
+            )
         }
     }
 }

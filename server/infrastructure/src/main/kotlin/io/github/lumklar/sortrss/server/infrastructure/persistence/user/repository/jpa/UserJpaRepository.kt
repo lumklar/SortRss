@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.server.infrastructure.persistence.user.repository.jpa
+package io.github.lumklar.sortrss.server.infrastructure.persistence.user.entity.repository.jpa
 
 import io.github.lumklar.sortrss.server.infrastructure.persistence.user.entity.UserPO
 import org.springframework.data.jpa.repository.JpaRepository

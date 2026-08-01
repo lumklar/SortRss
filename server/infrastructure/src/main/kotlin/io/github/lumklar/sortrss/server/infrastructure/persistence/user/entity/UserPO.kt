@@ -1,20 +1,32 @@
-package io.github.lumklar.sortrss.server.infrastructure.persistence.user.entity
+package io.github.lumklar.sortrss.server.infrastructure.persistence.user.entity;
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
+import java.time.Instant
 import java.util.*
 
 @Entity
-@Table(name = "users")
-final class UserPO {
+@Table(
+    name = "users",
+    uniqueConstraints = [UniqueConstraint(columnNames = ["username"])]
+)
+class UserPO(
     @Id
-    var id: UUID? = null
-
-    @Column(nullable = false, unique = true, length = 20)
-    var username: String = ""
-
     @Column(nullable = false)
-    var password: String = ""
-}
+    var id: UUID? = null,
+
+    @Column(nullable = false, length = 255)
+    var username: String? = null,
+
+    @Column(nullable = false, length = 255)
+    var password: String? = null,
+
+    @CreationTimestamp
+    @Column(name = "gmt_create", nullable = false, updatable = false)
+    var gmtCreate: Instant? = null,
+
+    @UpdateTimestamp
+    @Column(name = "gmt_modify", nullable = false)
+    var gmtModify: Instant? = null
+)

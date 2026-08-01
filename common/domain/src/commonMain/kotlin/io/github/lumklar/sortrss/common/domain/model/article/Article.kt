@@ -1,5 +1,7 @@
 package io.github.lumklar.sortrss.common.domain.model.article
 
+import kotlin.time.Instant
+
 /**
  * 文章聚合根。
  * 代表一篇完整的文章内容，独立于任何订阅源存在（通过关联类 FeedArticle 建立与订阅源的关系）。
@@ -11,8 +13,8 @@ class Article private constructor(
     val summary: String?,
     val content: String?,
     val link: String,
-    val publishedAt: Long,      // 发布时间戳（毫秒）
-    val updatedAt: Long?,       // 最后更新时间戳（毫秒）
+    val publishedAt: Instant,      // 发布时间戳（毫秒）
+    val updatedAt: Instant?,       // 最后更新时间戳（毫秒）
     val guid: String? = null    // 新增：源端全局唯一标识符
 ) {
     companion object {
@@ -28,8 +30,8 @@ class Article private constructor(
             summary: String? = null,
             content: String? = null,
             link: String,
-            publishedAt: Long,
-            updatedAt: Long? = null,
+            publishedAt: Instant,
+            updatedAt: Instant? = null,
             guid: String? = null       // 新增参数
         ): Article {
             require(title.isNotBlank()) { throw ArticleTitleEmptyException() }
@@ -57,8 +59,8 @@ class Article private constructor(
             summary: String?,
             content: String?,
             link: String,
-            publishedAt: Long,
-            updatedAt: Long?,
+            publishedAt: Instant,
+            updatedAt: Instant?,
             guid: String? = null       // 新增参数
         ): Article {
             return Article(id, title, author, summary, content, link, publishedAt, updatedAt, guid)
@@ -74,7 +76,7 @@ class Article private constructor(
         newSummary: String? = null,
         newContent: String? = null,
         newLink: String? = null,
-        newUpdatedAt: Long? = null,
+        newUpdatedAt: Instant? = null,
         newGuid: String? = null        // 新增参数
     ): Article {
         return copy(
@@ -95,7 +97,7 @@ class Article private constructor(
         summary: String?,
         content: String?,
         link: String,
-        updatedAt: Long?,
+        updatedAt: Instant?,
         guid: String?
     ): Article = Article(id, title, author, summary, content, link, publishedAt, updatedAt, guid)
 }

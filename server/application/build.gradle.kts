@@ -31,6 +31,7 @@ dependencyCheck {
 
 dependencies {
     implementation(project(":common:domain"))
+    implementation(project(":common:foundation"))
 
     // Kotlin
     implementation(libs.kotlin.stdlib)
@@ -41,6 +42,9 @@ dependencies {
 
     // spring boot
     implementation(libs.spring.boot.starter)
+
+    //事务
+    implementation(libs.spring.tx)
 
     // 缓存
     implementation(libs.spring.boot.starter.cache)

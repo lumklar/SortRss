@@ -67,7 +67,7 @@ include(":common:shared")
 include(":server:application")
 include(":server:bootstrap")
 include(":server:infrastructure")
-include(":server:interfaces")
+include(":server:adaptor")
 
 include(":home")
 include(":docs")

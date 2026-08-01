@@ -70,7 +70,7 @@ private fun Project.registerReleaseTask(
  * @param configs 发布配置列表
  */
 fun Project.registerReleaseTasks(configs: List<ReleaseConfig>) {
-    // 获取当前 CPU 架构，并规范化为常见的命名形式
+    // 获取当前 CPU 架构，并规范化为常见地命名形式
     val arch = System.getProperty("os.arch").let { raw ->
         when (raw) {
             "x86_64", "amd64" -> "x64"

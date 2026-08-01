@@ -10,5 +10,6 @@ enum class UserErrorCode(
     PASSWORD_ERROR(2002, "密码错误"),
     USERNAME_EMPTY(2003, "用户名不能为空"),
     PASSWORD_POLICY_VIOLATION(2004, "密码不符合安全策略"),
-    OLD_PASSWORD_ERROR(2005, "原密码错误")
+    OLD_PASSWORD_ERROR(2005, "原密码错误"),
+    USERNAME_EXISTS(2006,"用户名已存在")
 }

@@ -2,7 +2,6 @@ package io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.c
 
 import io.github.lumklar.sortrss.common.domain.model.datasource.DataSource
 import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceId
-import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceType
 import io.github.lumklar.sortrss.common.domain.model.user.UserId
 import io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.entity.DataSourcePo
 import io.github.lumklar.sortrss.server.infrastructure.util.toJavaInstantOrNull
@@ -10,29 +9,37 @@ import io.github.lumklar.sortrss.server.infrastructure.util.toKotlinInstantOrNul
 import kotlin.uuid.toJavaUuid
 import kotlin.uuid.toKotlinUuid
 
-fun DataSource.toPo(): DataSourcePo = DataSourcePo().apply {
-    // 领域 id (Uuid) -> java.util.UUID
-    id = this@toPo.id.value.toJavaUuid()
-    userId = this@toPo.userId.value.toJavaUuid()
-    type = this@toPo.type.ordinal
-    name = this@toPo.name.value
-    connectionDetails = DataSourceConnectionDetailsConverter().convertToDatabaseColumn(this@toPo.connectionDetails)
-    lastSyncTime = this@toPo.lastSyncTime.toJavaInstantOrNull()
-    lastAllReadAt = this@toPo.lastAllReadAt.toJavaInstantOrNull()
+fun DataSource.toPO(): DataSourcePo {
+    return DataSourcePo(
+        id = this.id.value.toJavaUuid(),
+        userId = this.userId.value.toJavaUuid(),
+        type = this.type,
+        name = this.name.value,
+        connectionDetails = DataSourceConnectionDetailsConverter().convertToDatabaseColumn(this.connectionDetails),
+        lastSyncTime = this.lastSyncTime.toJavaInstantOrNull(),
+        lastAllReadAt = this.lastAllReadAt.toJavaInstantOrNull(),
+        gmtCreate = null,
+        gmtModify = null
+    )
 }
 
 fun DataSourcePo.toDomain(): DataSource {
+    val id = requireNotNull(this.id) { "DataSourcePo.id must not be null" }
+    val userId = requireNotNull(this.userId) { "DataSourcePo.userId must not be null" }
+    val type = requireNotNull(this.type) { "DataSourcePo.type must not be null" }
+    val name = requireNotNull(this.name) { "DataSourcePo.name must not be null" }
     val connectionDetails = this.connectionDetails
         ?.let { DataSourceConnectionDetailsConverter().convertToEntityAttribute(it) }
         ?: error("connectionDetails missing in database")
 
     return DataSource.reconstruct(
-        id = DataSourceId(this.id!!.toKotlinUuid()),
-        userId = UserId(this.userId!!.toKotlinUuid()),
-        type = DataSourceType.values()[this.type!!],
-        name = this.name!!,
+        id = DataSourceId(id.toKotlinUuid()),
+        userId = UserId(userId.toKotlinUuid()),
+        type = type,
+        name = name,
         connectionDetails = connectionDetails,
         lastSyncTime = this.lastSyncTime.toKotlinInstantOrNull(),
         lastAllReadAt = this.lastAllReadAt.toKotlinInstantOrNull()
     )
 }
+

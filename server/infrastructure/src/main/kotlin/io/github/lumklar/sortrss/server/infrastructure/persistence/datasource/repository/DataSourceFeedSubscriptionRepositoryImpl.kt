@@ -5,7 +5,7 @@ import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceFeedSu
 import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceId
 import io.github.lumklar.sortrss.common.domain.model.feed.FeedId
 import io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.convert.toDomain
-import io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.convert.toPo
+import io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.convert.toPO
 import io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.repository.jpa.DataSourceFeedSubscriptionJpaRepository
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
@@ -18,7 +18,7 @@ class DataSourceFeedSubscriptionRepositoryImpl(
 ) : DataSourceFeedSubscriptionRepository {
 
     override fun save(subscription: DataSourceFeedSubscription): DataSourceFeedSubscription {
-        val po = subscription.toPo()
+        val po = subscription.toPO()
         val saved = jpaRepository.save(po)
         return saved.toDomain()
     }

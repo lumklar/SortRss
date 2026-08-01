@@ -1,5 +1,7 @@
 package io.github.lumklar.sortrss.server.infrastructure.config.domain
 
+import io.github.lumklar.sortrss.common.domain.model.user.PasswordPolicy
+import io.github.lumklar.sortrss.common.domain.model.user.StandardPasswordPolicy
 import io.github.lumklar.sortrss.common.domain.shared.ability.PasswordEncoder
 import io.github.lumklar.sortrss.server.infrastructure.security.BCryptPasswordEncoder
 import org.springframework.context.annotation.Bean
@@ -10,5 +12,10 @@ class DomainAbilityBeanConfig {
     @Bean
     fun passwordEncoder(): PasswordEncoder {
         return BCryptPasswordEncoder()
+    }
+
+    @Bean
+    fun passwordPolicy(): PasswordPolicy{
+        return StandardPasswordPolicy()
     }
 }

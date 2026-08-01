@@ -5,17 +5,32 @@ import io.github.lumklar.sortrss.common.domain.shared.exception.DomainException
 /**
  * 用户不存在异常
  */
-class UserNotFoundException : DomainException(UserErrorCode.USER_NOT_EXIST)
+class UserNotFoundException(
+    message: String = UserErrorCode.USER_NOT_EXIST.msg,
+) : DomainException(
+    domainCode = UserErrorCode.USER_NOT_EXIST,
+    message = message
+)
 
 /**
  * 密码错误异常（一般用于登录认证）
  */
-class PasswordErrorException : DomainException(UserErrorCode.PASSWORD_ERROR)
+class PasswordErrorException(
+    message: String = UserErrorCode.PASSWORD_ERROR.msg,
+) : DomainException(
+    domainCode = UserErrorCode.PASSWORD_ERROR,
+    message = message
+)
 
 /**
  * 用户名为空异常
  */
-class UsernameEmptyException : DomainException(UserErrorCode.USERNAME_EMPTY)
+class UsernameEmptyException(
+    message: String = UserErrorCode.USERNAME_EMPTY.msg,
+) : DomainException(
+    domainCode = UserErrorCode.USERNAME_EMPTY,
+    message = message
+)
 
 /**
  * 密码不符合安全策略异常（由 PasswordPolicy 校验抛出）
@@ -30,4 +45,19 @@ class PasswordPolicyViolationException(
 /**
  * 原密码错误异常（用于修改密码时验证旧密码）
  */
-class OldPasswordMismatchException : DomainException(UserErrorCode.OLD_PASSWORD_ERROR)
+class OldPasswordMismatchException(
+    message: String = UserErrorCode.OLD_PASSWORD_ERROR.msg,
+) : DomainException(
+    domainCode = UserErrorCode.OLD_PASSWORD_ERROR,
+    message = message
+)
+
+/**
+ * 用户名已存在异常
+ */
+class UsernameAlreadyExistsException(
+    message: String = UserErrorCode.USERNAME_EXISTS.msg,
+) : DomainException(
+    domainCode = UserErrorCode.USERNAME_EXISTS,
+    message = message
+)

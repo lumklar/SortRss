@@ -1,6 +1,8 @@
 package io.github.lumklar.sortrss.common.domain.model.datasource
 
 import io.github.lumklar.sortrss.common.domain.model.user.UserId
+import io.github.lumklar.sortrss.common.domain.shared.enums.DataSourceType
+import kotlin.time.Clock
 import kotlin.time.Instant
 
 /**
@@ -84,11 +86,19 @@ class DataSource private constructor(
     }
 
     /**
+     * 更新最后同步时间为当前时刻。
+     */
+    fun markSynced() {
+        markSyncCompleted(Clock.System.now())
+    }
+
+    /**
      * 同步完成后调用，更新最后同步时间。
      */
     fun markSyncCompleted(syncTime: Instant) {
-        // 可选的校验已注释（防止时钟回拨）
-        // require(syncTime >= (lastSyncTime ?: Instant.MIN)) { ... }
+        require(syncTime >= (lastSyncTime ?: syncTime)) {
+            "Sync time cannot be earlier than last sync time: $lastSyncTime"
+        }
         this.lastSyncTime = syncTime
     }
 

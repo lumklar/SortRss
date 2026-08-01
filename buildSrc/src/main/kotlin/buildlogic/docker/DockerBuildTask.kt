@@ -1,4 +1,4 @@
-package buildlogic.release
+package buildlogic.docker
 
 import buildlogic.docker.buildDockerCommand
 import buildlogic.flavors.StringEnum

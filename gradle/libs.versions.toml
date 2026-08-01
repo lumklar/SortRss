@@ -95,8 +95,9 @@ spring-boot-starter-aop = { group = "org.springframework.boot", name = "spring-b
 spring-boot-starter-actuator = { group = "org.springframework.boot", name = "spring-boot-starter-actuator" }
 
 # ==============================================
-# 📦 Spring Boot BOM 管理的第三方依赖
+# 📦 Spring Boot BOM 管理的依赖
 # ==============================================
+spring-tx = { group = "org.springframework", name = "spring-tx" }
 caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine" }
 jackson-core = { group = "com.fasterxml.jackson.core", name = "jackson-databind" }
 jackson-module = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin" }

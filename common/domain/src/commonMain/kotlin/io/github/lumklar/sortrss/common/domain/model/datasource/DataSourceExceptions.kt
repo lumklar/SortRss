@@ -3,16 +3,41 @@ package io.github.lumklar.sortrss.common.domain.model.datasource
 import io.github.lumklar.sortrss.common.domain.shared.exception.DomainException
 
 /** 数据源不存在 */
-class DataSourceNotFoundException : DomainException(DataSourceErrorCode.DATASOURCE_NOT_FOUND)
+class DataSourceNotFoundException(
+    message: String = DataSourceErrorCode.DATASOURCE_NOT_FOUND.msg,
+) : DomainException(
+    domainCode = DataSourceErrorCode.DATASOURCE_NOT_FOUND,
+    message = message
+)
 
 /** 数据源已存在（例如重复添加） */
-class DataSourceAlreadyExistsException : DomainException(DataSourceErrorCode.DATASOURCE_ALREADY_EXISTS)
+class DataSourceAlreadyExistsException(
+    message: String = DataSourceErrorCode.DATASOURCE_ALREADY_EXISTS.msg,
+) : DomainException(
+    domainCode = DataSourceErrorCode.DATASOURCE_ALREADY_EXISTS,
+    message = message
+)
 
 /** 不支持的数据源类型 */
-class UnsupportedDataSourceTypeException : DomainException(DataSourceErrorCode.DATASOURCE_TYPE_UNSUPPORTED)
+class UnsupportedDataSourceTypeException(
+    message: String = DataSourceErrorCode.DATASOURCE_TYPE_UNSUPPORTED.msg,
+) : DomainException(
+    domainCode = DataSourceErrorCode.DATASOURCE_TYPE_UNSUPPORTED,
+    message = message
+)
 
 /** 订阅源已关联到此数据源 */
-class SubscriptionAlreadyExistsException : DomainException(DataSourceErrorCode.SUBSCRIPTION_ALREADY_EXISTS)
+class SubscriptionAlreadyExistsException(
+    message: String = DataSourceErrorCode.SUBSCRIPTION_ALREADY_EXISTS.msg,
+) : DomainException(
+    domainCode = DataSourceErrorCode.SUBSCRIPTION_ALREADY_EXISTS,
+    message = message
+)
 
 /** 订阅关联不存在 */
-class SubscriptionNotFoundException : DomainException(DataSourceErrorCode.SUBSCRIPTION_NOT_FOUND)
+class SubscriptionNotFoundException(
+    message: String = DataSourceErrorCode.SUBSCRIPTION_NOT_FOUND.msg,
+) : DomainException(
+    domainCode = DataSourceErrorCode.SUBSCRIPTION_NOT_FOUND,
+    message = message
+)
