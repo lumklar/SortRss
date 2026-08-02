@@ -17,7 +17,7 @@ tasks.processResources {
     val versionInput = project.version.toString()
     inputs.property("appVersion", versionInput)
 
-    filesMatching("application.yml") {
+    filesMatching("application*.yml") {
         filter<ReplaceTokens>(
             "tokens" to mapOf(
                 "app.version" to versionInput

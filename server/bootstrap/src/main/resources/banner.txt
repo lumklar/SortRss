@@ -8,5 +8,5 @@ ${AnsiColor.BRIGHT_BLACK}
   |_____/ \___/|_|   \__|_|  \_\___/___/
 
 ${AnsiColor.BRIGHT_WHITE}
-应用版本：${spring.application.version}
-启动环境：${spring.profiles.active:default}
+Application version:${spring.application.version}
+Active profile:${spring.profiles.active:default}

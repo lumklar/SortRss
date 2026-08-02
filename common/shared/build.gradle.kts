@@ -1,5 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -89,6 +89,6 @@ tasks.register("generateBuildInfo") {
 }
 
 // 让所有 Kotlin 编译任务依赖生成任务
-tasks.withType<KotlinCompile>().all {
+tasks.withType<AbstractKotlinCompileTool<*>>().configureEach {
     dependsOn("generateBuildInfo")
 }
