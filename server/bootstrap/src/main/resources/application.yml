@@ -3,7 +3,7 @@ server:
 spring:
   application:
     name: server
-    version: @version@
+    version: @app.version@
   profiles:
     active: dev
   jpa:

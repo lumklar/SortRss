@@ -20,7 +20,7 @@ tasks.processResources {
     filesMatching("application.yml") {
         filter<ReplaceTokens>(
             "tokens" to mapOf(
-                "version" to versionInput
+                "app.version" to versionInput
             )
         )
     }

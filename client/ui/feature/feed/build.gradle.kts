@@ -28,6 +28,7 @@ kotlin {
         // 公共代码（所有平台共享）
         val commonMain = getByName("commonMain") {
             dependencies {
+                implementation(project(":common:shared"))
                 implementation(project(":client:contract:all"))
                 implementation(project(":client:ui:components"))
                 implementation(libs.compose.runtime)
