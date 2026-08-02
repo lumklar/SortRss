@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -45,12 +46,17 @@ kotlin {
     }
 }
 
-tasks.register("generateVersionFile") {
-    val version = project.version.toString()
-    val outputDir = generatedKotlinDir.resolve("io/github/lumklar/sortrss/common/constants")
-    val outputFile = outputDir.resolve("Version.kt")
+// ---- 动态生成构建信息 ----
+tasks.register("generateBuildInfo") {
+    val buildInfoMap = mapOf(
+        "APP_VERSION" to project.version.toString(),
+        "BUILD_TIME" to System.currentTimeMillis().toString(),
+    )
 
-    inputs.property("version", version)
+    val outputDir = generatedKotlinDir.resolve("io/github/lumklar/sortrss/common/constants")
+    val outputFile = outputDir.resolve("BuildInfo.kt")
+
+    inputs.properties(buildInfoMap)
     outputs.file(outputFile)
 
     doLast {
@@ -59,17 +65,30 @@ tasks.register("generateVersionFile") {
             outputDir.deleteRecursively()
         }
         outputDir.mkdirs()
+
+        // 使用 buildString 精确控制缩进，每行统一缩进 4 个空格
+        val constantsCode = buildString {
+//            appendLine("object BuildInfo {")
+            buildInfoMap.entries.forEach { (key, value) ->
+                appendLine("    const val $key = \"$value\"")  // 4 个空格缩进
+            }
+//            append("}")
+        }
+
         outputFile.writeText(
             """
             package io.github.lumklar.sortrss.common.shared.constants
-
-            val APP_VERSION = "$version"
+            
+            object BuildInfo {
+            // 自动生成的构建常量，请勿手动修改
+            $constantsCode
+            }
             """.trimIndent()
         )
     }
 }
 
-// 让所有 Kotlin 编译任务依赖生成任务，确保生成代码在编译前完成
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
-    dependsOn("generateVersionFile")
+// 让所有 Kotlin 编译任务依赖生成任务
+tasks.withType<KotlinCompile>().all {
+    dependsOn("generateBuildInfo")
 }

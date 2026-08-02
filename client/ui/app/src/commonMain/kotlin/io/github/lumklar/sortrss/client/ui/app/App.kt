@@ -1,5 +1,6 @@
 package io.github.lumklar.sortrss.client.ui.app
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
@@ -19,7 +20,7 @@ fun App(
         AppNavHost(
             navController = navController,
             factory = factory,      // 传给 navigation
-            modifier = modifier
+            modifier = modifier.fillMaxSize()
         )
     }
 }

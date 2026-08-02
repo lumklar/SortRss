@@ -12,7 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.lumklar.sortrss.common.shared.constants.APP_VERSION
+import io.github.lumklar.sortrss.common.shared.constants.BuildInfo
 import kotlinx.coroutines.launch
 
 @Composable
@@ -59,7 +59,7 @@ fun HomeScreen(
         AlertDialog(
             onDismissRequest = { showVersionDialog = false },
             title = { Text("Version") },
-            text = { Text(APP_VERSION) },
+            text = { Text(BuildInfo.APP_VERSION) },
             confirmButton = {
                 Button(onClick = { showVersionDialog = false }) {
                     Text("OK")

@@ -5,5 +5,7 @@ import io.github.lumklar.sortrss.client.ui.app.App
 
 @Composable
 fun CLIENT() {
-    App(factory = FlavorAllContractFactory )
+    App(
+        factory = FlavorAllContractFactory
+    )
 }
