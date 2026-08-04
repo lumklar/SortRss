@@ -47,9 +47,10 @@ kotlin {
 }
 
 // ---- 动态生成构建信息 ----
-tasks.register("generateBuildInfo") {
+val generateBuildInfo = tasks.register("generateBuildInfo") {
     val buildInfoMap = mapOf(
         "APP_VERSION" to project.version.toString(),
+        "APP_NAME" to project.name,
         "BUILD_TIME" to System.currentTimeMillis().toString(),
     )
 
@@ -90,5 +91,5 @@ tasks.register("generateBuildInfo") {
 
 // 让所有 Kotlin 编译任务依赖生成任务
 tasks.withType<AbstractKotlinCompileTool<*>>().configureEach {
-    dependsOn("generateBuildInfo")
+    dependsOn(generateBuildInfo)
 }

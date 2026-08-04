@@ -1,40 +1,45 @@
 [versions]
+
 # 核心框架版本
-kotlin = "2.4.0"
+kotlin = "2.4.10"
 spring-boot = "4.1.0"
 json = "1.11.0"
 coroutines = "1.11.0"
 compose = "1.11.1"
 material3 = "1.11.0-alpha07"
-androidx-lifecycle = "2.10.0"
+androidx-lifecycle = "2.11.0"
 androidx-navigation = "2.9.2"
-kotlin-wrappers = "2026.6.1"
-kotlin-insert = "4.2.1"
+kotlin-wrappers = "2026.7.7"
+kotlin-insert = "4.2.2"
 
 # 插件版本
 ksp = "2.3.9"
-graalvm = "0.11.5"
+graalvm = "1.1.7"
 dependency-management = "1.1.7"
 # TODO 漏洞检查，版本检查，冲突检查，未使用检查
-dependency-check-jvm = "12.1.9"
+dependency-check-jvm = "13.0.0"
 dependency-update = "0.51.0"
 dependency-unused = "0"
 dependency-conflict = "0"
 use-python = "4.1.0"
 mkdocs = "4.0.1"
+node = "7.1.0"
+refresh-versions = "0.60.6"
+ben-manes-versions = "0.59.0"
 
 # 工具库版本
 therapi = "0.15.0"
-kotlinLogging = "8.0.02"
-springdoc = "3.0.3"
+kotlinLogging = "8.0.4"
+springdoc = "3.1.0"
 jbcrypt = "0.4"
 rome = "2.1.0"
-sqlite = "3.53.1.0"
-sqlite-jpa = "7.4.3.Final"
+sqlite = "3.53.2.1"
+sqlite-jpa = "7.4.5.Final"
 commons-compress = "1.28.0"
-fastjson2 = "2.0.62"
+fastjson2 = "2.0.64"
 
 [libraries]
+
 # Compose 核心
 compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "compose" }
 compose-foundation = { group = "org.jetbrains.compose.foundation", name = "foundation", version.ref = "compose" }
@@ -124,6 +129,7 @@ commons-compress = { group = "org.apache.commons", name = "commons-compress", ve
 fastjson2 = { group = "com.alibaba.fastjson2", name = "fastjson2", version.ref = "fastjson2" }
 
 [plugins]
+
 # ==============================================
 # 🔧 Kotlin 插件
 # ==============================================
@@ -141,12 +147,14 @@ serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref 
 # 🔧 通用插件
 # ==============================================
 dependency-check-jvm = { id = "org.owasp.dependencycheck", version.ref = "dependency-check-jvm" }
-dependency-update = { id = "com.github.ben-manes.versions", version.ref = "dependency-update" }
+refresh-versions = { id = "de.fayard.refreshVersions", version.ref = "refresh-versions" }
+ben-manes-versions = { id = "io.github.ben-manes.versions", version.ref = "ben-manes-versions" }
 
 # ==============================================
 # 🔧 构建工具插件
 # ==============================================
 use-python = { id = "ru.vyarus.use-python", version.ref = "use-python" }
+node = { id = "com.github.node-gradle.node", version.ref = "node" }
 
 # ==============================================
 # 🔧 Spring 生态插件

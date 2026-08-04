@@ -40,6 +40,7 @@ replay_pid*
 
 ### gradle ###
 .gradle/
+versions.properties
 
 ### Runtime ###
 /data/

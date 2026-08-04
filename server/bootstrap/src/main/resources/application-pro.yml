@@ -13,3 +13,6 @@ springdoc:
 api:
   response:
     exclude-extra: true
+logging:
+  charset:
+    console: ${LOG_CHARSET:UTF-8}

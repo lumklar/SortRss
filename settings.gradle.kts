@@ -40,6 +40,12 @@ pluginManagement {
 // 根项目名称
 rootProject.name = "sortrss"
 
+// settings.gradle.kts
+plugins {
+    id("de.fayard.refreshVersions") version "0.60.6"
+//    id("com.github.ben-manes.versions") version "0.59.0"
+}
+
 // 包含子模块
 //include(":app")
 include(":app:webApp")
