@@ -39,6 +39,12 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+// 配置 Spring Boot AOT 处理，提前声明所有 Profile
+tasks.withType<org.springframework.boot.gradle.tasks.aot.ProcessAot> {
+    // 将 dev, test, pro 全部声明，这样它们的 Bean 才会被包含在镜像中
+    args("--spring.profiles.active=dev,test,pro")
+}
+
 graalvmNative {
     binaries {
         named("main") {

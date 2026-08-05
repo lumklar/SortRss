@@ -1,13 +1,18 @@
 package io.github.lumklar.sortrss.server.infrastructure.config.database
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.io.File
 import javax.sql.DataSource
 
+/**
+ * TODO 改成AutoConfiguration
+ */
 @Configuration
+@EnableConfigurationProperties(AppDatabaseProperties::class)
 class DataSourceConfig(
     private val appDatabaseProperties: AppDatabaseProperties,  // 自动注入
 ) {
