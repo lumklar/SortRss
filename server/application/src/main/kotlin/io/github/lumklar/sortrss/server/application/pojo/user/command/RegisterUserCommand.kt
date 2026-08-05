@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.server.application.pojo.command
+package io.github.lumklar.sortrss.server.application.pojo.user.command
 
 data class RegisterUserCommand(
     val username: String,

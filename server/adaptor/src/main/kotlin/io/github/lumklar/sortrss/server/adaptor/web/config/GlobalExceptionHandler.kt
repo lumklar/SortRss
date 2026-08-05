@@ -6,6 +6,8 @@ import io.github.lumklar.sortrss.common.api.dto.ApiResultCode
 import io.github.lumklar.sortrss.common.api.dto.ErrorSource
 import io.github.lumklar.sortrss.common.domain.shared.exception.DomainException
 import io.github.lumklar.sortrss.common.shared.utils.ExceptionStackTraceUtil
+import jakarta.servlet.http.HttpServletRequest
+import org.slf4j.LoggerFactory
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -21,11 +23,13 @@ import org.springframework.web.servlet.resource.NoResourceFoundException
 class GlobalExceptionHandler(
     private val apiResponseProperties: ApiResponseProperties
 ) {
+    private val log = LoggerFactory.getLogger(javaClass)
 
     // ====================== 1. 自定义业务异常（核心） ======================
     @ExceptionHandler(DomainException::class)
     fun handleBusinessException(e: DomainException): ApiResult<Nothing> {
         val domainCode = e.domainCode
+        log.warn("Business exception: code=${e.domainCode.code}, msg=${e.domainCode.msg}", e)
         // 根据配置决定是否构建 ApiExtra
         val extra = buildExtra(
             source = ErrorSource.DOMAIN,
@@ -43,6 +47,7 @@ class GlobalExceptionHandler(
         val errors = e.bindingResult.fieldErrors.joinToString(";") {
             "${it.field}: ${it.defaultMessage}"
         }
+        log.warn("Parameter validation failed: $errors")
         val extra = buildExtra(source = ErrorSource.WEB, errorMsg = errors)
         return ApiResult.failure(ApiResultCode.PARAM_ERROR, extra)
     }
@@ -51,6 +56,7 @@ class GlobalExceptionHandler(
     @ExceptionHandler(MissingServletRequestParameterException::class)
     fun handleMissingParamException(e: MissingServletRequestParameterException): ApiResult<Nothing> {
         val msg = "缺失参数：${e.parameterName}"
+        log.warn("Missing request parameter: ${e.parameterName}")
         val extra = buildExtra(source = ErrorSource.WEB, errorMsg = msg)
         return ApiResult.failure(ApiResultCode.PARAM_ERROR, extra)
     }
@@ -58,14 +64,17 @@ class GlobalExceptionHandler(
     // ====================== 3. 权限/资源异常 ======================
     // 无权限
     @ExceptionHandler(AccessDeniedException::class)
-    fun handleAccessDeniedException(e: AccessDeniedException): ApiResult<Nothing> {
+    fun handleAccessDeniedException(e: AccessDeniedException , request: HttpServletRequest): ApiResult<Nothing> {
+        log.warn("Access denied for URI: ${request.requestURI}", e)
         val extra = buildExtra(source = ErrorSource.WEB, throwable = e)
         return ApiResult.failure(ApiResultCode.NOT_FOUND, extra)
     }
 
     // 404 资源不存在
     @ExceptionHandler(NoResourceFoundException::class)
-    fun handleNotFoundException(e: NoResourceFoundException): ApiResult<Nothing> {
+    fun handleNotFoundException(e: NoResourceFoundException , request: HttpServletRequest): ApiResult<Nothing> {
+        log.info("Resource not found: uri=${request.requestURI}, method=${request.method}", e)
+
         val extra = buildExtra(source = ErrorSource.WEB, throwable = e)
         return ApiResult.failure(ApiResultCode.NOT_FOUND, extra)
     }
@@ -79,7 +88,9 @@ class GlobalExceptionHandler(
 
     // ====================== 5. 系统兜底异常 ======================
     @ExceptionHandler(Exception::class)
-    fun handleGlobalException(e: Exception): ApiResult<Nothing> {
+    fun handleGlobalException(e: Exception , request: HttpServletRequest): ApiResult<Nothing> {
+        log.error("Unhandled system exception: uri=${request.requestURI}, method=${request.method}, params=${request.parameterMap}", e)
+
         val extra = buildExtra(source = ErrorSource.SYSTEM, throwable = e)
         return ApiResult.failure(ApiResultCode.SERVER_ERROR, extra)
     }

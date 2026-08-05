@@ -4,8 +4,9 @@ import io.github.lumklar.sortrss.common.domain.model.user.*
 import io.github.lumklar.sortrss.common.domain.shared.ability.PasswordEncoder
 import io.github.lumklar.sortrss.common.infrastructure.validation.password.UUIDGenerator
 import io.github.lumklar.sortrss.server.application.assembler.toDto
-import io.github.lumklar.sortrss.server.application.pojo.command.RegisterUserCommand
-import io.github.lumklar.sortrss.server.application.pojo.command.UserDto
+import io.github.lumklar.sortrss.server.application.pojo.user.command.RegisterUserCommand
+import io.github.lumklar.sortrss.server.application.pojo.user.dto.UserDto
+import io.github.lumklar.sortrss.server.application.pojo.user.query.UserQuery
 import io.github.lumklar.sortrss.server.application.service.UserService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -48,5 +49,16 @@ class UserServiceImpl(
 
         // 5. 转换为 DTO 返回
         return savedUser.toDto()
+    }
+
+    @Transactional(readOnly = true)
+    override fun queryUser(query: UserQuery): UserDto {
+        // 当前仅使用 username 查询，校验非空
+        val username = query.username ?: throw UsernameEmptyException("Username must not be null")
+
+        val user = userRepository.findByUsername(username)
+            ?: throw UserNotFoundException("User with username '$username' not found")
+
+        return user.toDto()
     }
 }
