@@ -8,6 +8,7 @@ import io.github.lumklar.sortrss.common.domain.shared.exception.DomainException
 import io.github.lumklar.sortrss.common.shared.utils.ExceptionStackTraceUtil
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -17,8 +18,12 @@ import org.springframework.web.servlet.resource.NoResourceFoundException
 /**
  * Spring Boot 4 全局异常处理器
  * 统一封装返回 ApiResult，根据配置控制是否暴露 ApiExtra
- * TODO 支持native
+ * TODO 异常打印支持native
+ * TODO 去掉RegisterReflectionForBinding支持native
  */
+@RegisterReflectionForBinding(
+    ApiExtra::class,
+)
 @RestControllerAdvice
 class GlobalExceptionHandler(
     private val apiResponseProperties: ApiResponseProperties

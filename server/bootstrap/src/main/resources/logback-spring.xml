@@ -21,6 +21,7 @@
         <encoder>
             <!-- 使用 Spring Boot 默认的控制台输出格式（会自动应用你定义的 logging.pattern.console） -->
             <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <!-- TODO graalvm不支持gbk了，环境变量不知道有什么污染，得去掉才能跑native-->
             <charset>${CONSOLE_CHARSET:-UTF-8}</charset>
         </encoder>
     </appender>

@@ -2,24 +2,27 @@ package io.github.lumklar.sortrss.server.infrastructure.config.database
 
 import io.github.lumklar.sortrss.server.infrastructure.config.database.DatabaseTypeDetector.isSQLite
 import io.github.lumklar.sortrss.server.infrastructure.persistence.PersistenceAnchor
-import jakarta.persistence.EntityManagerFactory
 import org.springframework.boot.jpa.EntityManagerFactoryBuilder
 import org.springframework.boot.jpa.autoconfigure.JpaProperties
+import org.springframework.boot.persistence.autoconfigure.EntityScan
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
-import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter
 import javax.sql.DataSource
 
 @Configuration
+@EntityScan(basePackageClasses = [PersistenceAnchor::class])
 @EnableJpaRepositories(basePackageClasses = [PersistenceAnchor::class])
 class JpaConfig(
     private val dataSource: DataSource,
     private val jpaProperties: JpaProperties
 ) {
 
+    /**
+     * FIXME native下不生效
+     */
     @Bean
     fun entityManagerFactory(builder: EntityManagerFactoryBuilder): LocalContainerEntityManagerFactoryBean {
         val vendorAdapter = HibernateJpaVendorAdapter().apply {
@@ -49,8 +52,8 @@ class JpaConfig(
             .build()
     }
 
-    @Bean
-    fun transactionManager(entityManagerFactory: EntityManagerFactory): JpaTransactionManager {
-        return JpaTransactionManager(entityManagerFactory)
-    }
+//    @Bean
+//    fun transactionManager(entityManagerFactory: EntityManagerFactory): JpaTransactionManager {
+//        return JpaTransactionManager(entityManagerFactory)
+//    }
 }
