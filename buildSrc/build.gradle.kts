@@ -1,12 +1,3 @@
-plugins {
-    `kotlin-dsl`
-}
-
-dependencies {
-    implementation(gradleApi())
-    implementation(libs.commons.compress)
-}
-
 repositories {
     val isCI = providers.environmentVariable("CI").map { it.toBoolean() }.getOrElse(false)
     mavenLocal()
@@ -23,4 +14,23 @@ repositories {
         gradlePluginPortal()
         google()
     }
+}
+
+plugins {
+    `kotlin-dsl`
+    alias(libs.plugins.ben.manes.versions)
+}
+
+dependencies {
+    implementation(gradleApi())
+    implementation(libs.commons.compress)
+
+    // 按需添加可选压缩库（只添加你实际会用到的）
+    implementation(libs.xz)           // XZ / LZMA
+    implementation(libs.zstd.jni)     // Zstandard
+}
+
+tasks.named<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>("dependencyUpdates") {
+    revision = "release"          // 仅检查稳定版（正式发布版）
+    outputFormatter = "html"      // 输出 HTML 格式报告（仅生成 HTML）
 }

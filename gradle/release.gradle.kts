@@ -13,7 +13,6 @@ registerReleaseTasks(
             moduleName = ":server:bootstrap",
             moduleTask = "bootJar",
             artifactRelativePath = "libs/bootstrap-$version.jar",
-            shouldPackage = false,
             envVarsCombinations = listOf(
                 emptyList()
             ),
@@ -25,7 +24,7 @@ registerReleaseTasks(
             moduleName = ":app:webApp",
             moduleTask = "wasmJsBrowserDistribution",
             artifactRelativePath = "dist/wasmJs/productionExecutable",
-            shouldPackage = true,
+            compression = CompressionMode.GZIP,
             envVarsCombinations = listOf(
                 listOf(
                     DataFlavor.NETWORK
@@ -39,7 +38,7 @@ registerReleaseTasks(
             moduleName = ":app:webApp",
             moduleTask = "jsBrowserDistribution",
             artifactRelativePath = "dist/js/productionExecutable",
-            shouldPackage = true,
+            compression = CompressionMode.GZIP,
             envVarsCombinations = listOf(
                 listOf(
                     DataFlavor.NETWORK
@@ -54,7 +53,6 @@ registerReleaseTasks(
 //            moduleName = ":app:desktopApp",
 //            moduleTask = "packageReleaseDmg",
 //            artifactRelativePath = "compose/binaries/main-release/dmg/SortRSS-$releaseVersion.dmg",
-//            shouldPackage = false,
 //            envVarsCombinations = listOf(
 //                listOf(
 //                    DataFlavor.NETWORK
@@ -67,7 +65,6 @@ registerReleaseTasks(
 //            moduleName = ":app:desktopApp",
 //            moduleTask = "packageReleasePkg",
 //            artifactRelativePath = "compose/binaries/main-release/pkg/SortRSS-$releaseVersion.pkg",
-//            shouldPackage = false,
 //            envVarsCombinations = listOf(
 //                listOf(
 //                    DataFlavor.NETWORK
@@ -81,7 +78,6 @@ registerReleaseTasks(
             moduleName = ":app:desktopApp",
             moduleTask = "packageReleaseExe",
             artifactRelativePath = "compose/binaries/main-release/exe/SortRSS-$releaseVersion.exe",
-            shouldPackage = false,
             envVarsCombinations = listOf(
                 listOf(
                     DataFlavor.NETWORK
@@ -94,7 +90,6 @@ registerReleaseTasks(
             moduleName = ":app:desktopApp",
             moduleTask = "packageReleaseMsi",
             artifactRelativePath = "compose/binaries/main-release/msi/SortRSS-$releaseVersion.msi",
-            shouldPackage = false,
             envVarsCombinations = listOf(
                 listOf(
                     DataFlavor.NETWORK
@@ -108,7 +103,6 @@ registerReleaseTasks(
 //            moduleName = ":app:desktopApp",
 //            moduleTask = "packageReleaseDeb",
 //            artifactRelativePath = "compose/binaries/main-release/deb/sortrss_${releaseVersion}-1_amd64.deb",
-//            shouldPackage = false,
 //            envVarsCombinations = listOf(
 //                listOf(
 //                    DataFlavor.NETWORK
@@ -121,7 +115,6 @@ registerReleaseTasks(
 //            moduleName = ":app:desktopApp",
 //            moduleTask = "packageReleaseRpm",
 //            artifactRelativePath = "compose/binaries/main-release/rpm/sortrss-${releaseVersion}-1.x86_64.rpm",
-//            shouldPackage = false,
 //            envVarsCombinations = listOf(
 //                listOf(
 //                    DataFlavor.NETWORK
@@ -134,7 +127,6 @@ registerReleaseTasks(
 //            moduleName = ":app:desktopApp",
 //            moduleTask = "packageReleaseAppImage",
 //            artifactRelativePath = "compose/binaries/main-release/appimage/SortRSS-$releaseVersion.AppImage",
-//            shouldPackage = false,
 //            envVarsCombinations = listOf(
 //                listOf(
 //                    DataFlavor.NETWORK

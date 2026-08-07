@@ -19,7 +19,7 @@ data class ReleaseConfig(
     val moduleName: String,
     val moduleTask: String,
     val artifactRelativePath: String,
-    val shouldPackage: Boolean = false,
+    val compression: CompressionMode = CompressionMode.NONE,
     val envVarsCombinations: List<List<StringEnum>>,
     val group: String,
     val architectureIndependent: Boolean = false

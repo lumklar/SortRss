@@ -5,6 +5,7 @@ import buildlogic.utils.gradlewPath
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
+import java.io.File
 
 /**
  * 注册一个“发布产物”的 Gradle 任务。
@@ -17,7 +18,7 @@ import org.gradle.api.tasks.TaskProvider
  * @param moduleName 目标模块的名称（如 ":app"），必须在当前构建中存在
  * @param moduleTask 目标模块中需要执行的任务名（如 "build"）
  * @param artifactRelativePath 产物相对目标模块 build 目录的路径（如 "libs/app.jar"）
- * @param shouldPackage 是否打包为 tar.gz（true 打包，false 仅复制）
+ * @param compression 压缩方式
  * @param renameTo 重命名（不含后缀，打包时自动加 .tar.gz）
  * @param envVars 需要传递给子任务的环境变量列表（实现 StringEnum）
  */
@@ -26,7 +27,7 @@ private fun Project.registerReleaseTask(
     moduleName: String,
     moduleTask: String,
     artifactRelativePath: String,
-    shouldPackage: Boolean = false,
+    compression: CompressionMode = CompressionMode.NONE,
     renameTo: String? = null,
     envVars: List<StringEnum> = emptyList()
 ): TaskProvider<ReleasePublishTask> {
@@ -49,7 +50,7 @@ private fun Project.registerReleaseTask(
         this.targetBuildDir.set(targetBuildDir)
         this.artifactRelativePath.set(artifactRelativePath)
         this.renameTo.set(renameTo)
-        this.shouldPackage.set(shouldPackage)
+        this.compression.set(compression)
         this.envVars.set(envVars)
         // 输出目录固定为当前项目的 build/release
         this.destinationDir.set(destinationDir)
@@ -101,23 +102,14 @@ fun Project.registerReleaseTasks(configs: List<ReleaseConfig>) {
             val archSuffix = if (config.architectureIndependent) "" else "-$arch"
             val baseName = "sortrss-${config.target}$archSuffix$envSuffix-$version"
 
-            // 构造 renameTo（遵循原有约定：打包时不含后缀，非打包时包含扩展名）
-            val renameTo = if (config.shouldPackage) {
-                baseName // 不含后缀，ReleasePublishTask 会自动添加 .tar.gz
-            } else {
-                // 提取 artifactRelativePath 的扩展名（如 ".jar"）
-                val ext = config.artifactRelativePath.substringAfterLast('.', "")
-                if (ext.isNotEmpty()) "$baseName.$ext" else baseName
-            }
-
             // 调用原有的注册函数
             registerReleaseTask(
                 taskName = taskName,
                 moduleName = config.moduleName,
                 moduleTask = config.moduleTask,
                 artifactRelativePath = config.artifactRelativePath,
-                shouldPackage = config.shouldPackage,
-                renameTo = renameTo,
+                compression = config.compression,
+                renameTo = baseName,
                 envVars = envVarsList
             )
 
