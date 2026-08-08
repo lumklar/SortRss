@@ -2,8 +2,11 @@
 
 # 核心框架版本
 kotlin = "2.4.10"
+ktor = "3.5.2"
 spring-boot = "4.1.0"
-json = "1.11.0"
+serialization = "1.11.0"
+crypto = "0.2.0"
+md = "0.8.0"
 coroutines = "1.11.0"
 compose = "1.11.1"
 material3 = "1.11.0-alpha07"
@@ -82,8 +85,25 @@ kotlin-logging-wasm-js = { group = "io.github.oshai", name = "kotlin-logging-was
 
 # kotlin 测试
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlin-test-common = { group = "org.jetbrains.kotlin", name = "kotlin-test-common", version.ref = "kotlin" }
+kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
 
-kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "json" }
+#序列化
+kotlin-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "serialization" }
+kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
+
+# 加密
+kotlin-crypto = { group = "org.jetbrains.kotlinx", name = "kotlinx-crypto-cipher", version.ref = "crypto" }
+md = { group = "org.kotlincrypto.hash", name = "md", version.ref = "md" }
+
+# ktor 网络
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-oci = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
+ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
+ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.ref = "ktor" }
 
 # ==============================================
 # 🌱 Spring Boot 官方 Starter（BOM 管理）
@@ -125,6 +145,7 @@ springdoc-openapi-webmvc = { group = "org.springdoc", name = "springdoc-openapi-
 jbcrypt = { group = "org.mindrot", name = "jbcrypt", version.ref = "jbcrypt" }
 rome = { group = "com.rometools", name = "rome", version.ref = "rome" }
 rome-modules = { group = "com.rometools", name = "rome-modules", version.ref = "rome" }
+rome-utils = { group = "com.rometools", name = "rome-utils", version.ref = "rome" }
 commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "commons-compress" }
 fastjson2 = { group = "com.alibaba.fastjson2", name = "fastjson2", version.ref = "fastjson2" }
 

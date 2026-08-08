@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.common.infrastructure.shared.ability
+package io.github.lumklar.sortrss.common.infrastructure.shared.ability.id
 
 import io.github.lumklar.sortrss.common.domain.model.folder.FolderMembershipId
 import io.github.lumklar.sortrss.common.domain.shared.ability.IdGenerator

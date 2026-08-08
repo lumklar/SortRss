@@ -53,6 +53,7 @@ dependencies {
     // RSS
     implementation(libs.rome)
     implementation(libs.rome.modules)
+    implementation(libs.rome.utils)
 
     // 测试
     testImplementation(libs.spring.boot.starter.test)

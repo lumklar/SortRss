@@ -9,7 +9,7 @@ import buildlogic.flavors.StringEnum
  * @property moduleName 目标模块名称（如 ":app"）
  * @property moduleTask 目标模块中需要执行的任务名（如 "build"）
  * @property artifactRelativePath 产物相对目标模块 build 目录的路径（如 "libs/app.jar"）
- * @property shouldPackage 是否打包为 tar.gz（true 打包，false 仅复制）
+ * @property compression 压缩方式
  * @property envVarsCombinations 环境变量组合列表，每个组合为一个 List<StringEnum>
  * @property group 分组名称，用于创建聚合任务
  * @property architectureIndependent 该发布任务是否与 CPU 架构无关。
