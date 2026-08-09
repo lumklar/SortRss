@@ -6,10 +6,11 @@ on:
     types: [opened, synchronize, reopened]
 
 permissions:
-  actions: write
-  contents: read       # 签名分支读取用只读，推送由官方 Action 完成
-  pull-requests: write
-  statuses: write      # 必须，用于创建 Check
+  actions: write        # 可选，保留
+  contents: write       # ★ 从 read 改为 write
+  pull-requests: write  # 必需，用于评论和 PR 操作
+  statuses: write       # 可选，如果使用 commit status API，保留
+  checks: write         # ★ 新增，用于创建检查运行
 
 jobs:
   CLA:
