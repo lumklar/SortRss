@@ -14,6 +14,7 @@ fun FeedArticle.toPO(): FeedArticlePo {
             feedId = this.feedId.value.toJavaUuid(),
             articleId = this.articleId.value.toJavaUuid()
         ),
+        sourceArticleId = this.sourceArticleId,   // 映射新字段
         gmtCreate = null,
         gmtModify = null
     )
@@ -23,6 +24,7 @@ fun FeedArticlePo.toDomain(): FeedArticle {
     val pk = requireNotNull(this.id) { "FeedArticlePo.id must not be null" }
     return FeedArticle(
         feedId = FeedId(pk.feedId.toKotlinUuid()),
-        articleId = ArticleId(pk.articleId.toKotlinUuid())
+        articleId = ArticleId(pk.articleId.toKotlinUuid()),
+        sourceArticleId = this.sourceArticleId    // 映射新字段
     )
 }

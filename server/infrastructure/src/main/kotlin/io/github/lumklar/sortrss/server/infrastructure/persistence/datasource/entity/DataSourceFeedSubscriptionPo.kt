@@ -29,8 +29,8 @@ class DataSourceFeedSubscriptionPo(
     @Column(name = "custom_title", length = 255)
     var customTitle: String? = null,
 
-    @Column(name = "remote_id", length = 255)
-    var remoteId: String? = null,
+    @Column(name = "source_feed_id", length = 255)
+    var sourceFeedId: String? = null,
 
     @Column(name = "last_all_read_at")
     var lastAllReadAt: Instant? = null,

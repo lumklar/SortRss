@@ -539,15 +539,13 @@ class FeverClientWireMockTest {
         assertEquals(listOf("101"), ids)
     }
 
-//    @Test
-//    fun testGetFavicons() = runBlocking {
-//        val favicons = client.getFavicons()
-//        assertNotNull(favicons)
-//        assertEquals(2, favicons?.size)
-//        favicons?.let {
-//            assertTrue(it.any { f -> f.id == "1001" && f.data.startsWith("iVBORw0KGgo") })
-//        }
-//    }
+    @Test
+    fun testGetFavicons() = runBlocking {
+        val favicons = client.getFavicons()
+        assertNotNull(favicons)
+        assertEquals(2, favicons?.size)
+        assertTrue(favicons?.any { f -> f.id == "1001" && f.data.startsWith("iVBORw0KGgo") } == true)
+    }
 
     @Test
     fun testMarkItemAsRead() = runBlocking {

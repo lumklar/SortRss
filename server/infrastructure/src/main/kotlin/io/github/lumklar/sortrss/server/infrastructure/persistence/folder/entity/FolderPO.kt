@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.server.infrastructure.persistence.folder.entity;
+package io.github.lumklar.sortrss.server.infrastructure.persistence.folder.entity
 
 import io.github.lumklar.sortrss.common.domain.shared.enums.DataSourceType
 import io.github.lumklar.sortrss.server.infrastructure.persistence.common.convert.DataSourceTypeConverter
@@ -33,6 +33,10 @@ class FolderPO(
     @Convert(converter = DataSourceTypeConverter::class)
     @Column(name = "data_source_type", nullable = false)
     var dataSourceType: DataSourceType? = null,
+
+    // 新增：数据源中的分组ID
+    @Column(name = "source_group_id", length = 255)
+    var sourceGroupId: String? = null,
 
     @CreationTimestamp
     @Column(name = "gmt_create", nullable = false, updatable = false)

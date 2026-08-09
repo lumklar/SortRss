@@ -9,4 +9,6 @@ import io.github.lumklar.sortrss.common.domain.model.article.ArticleId
 data class FeedArticle(
     val feedId: FeedId,
     val articleId: ArticleId,
+    // 业务字段：该文章在数据源中所属的分组ID
+    val sourceArticleId: String? = null
 )

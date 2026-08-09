@@ -7,7 +7,7 @@ class DataSourceFeedSubscription private constructor(
     val dataSourceId: DataSourceId,
     val feedId: FeedId,
     val customTitle: String?,
-    val remoteId: String?,
+    val sourceFeedId: String? = null,
     val lastAllReadAt: Instant? = null   // 新增：该订阅下用户全部已读时间戳
 ) {
     // 手动 copy，支持新字段
@@ -15,10 +15,10 @@ class DataSourceFeedSubscription private constructor(
         dataSourceId: DataSourceId = this.dataSourceId,
         feedId: FeedId = this.feedId,
         customTitle: String? = this.customTitle,
-        remoteId: String? = this.remoteId,
+        sourceFeedId: String? = this.sourceFeedId,
         lastAllReadAt: Instant? = this.lastAllReadAt
     ): DataSourceFeedSubscription =
-        createInternal(dataSourceId, feedId, customTitle, remoteId, lastAllReadAt)
+        createInternal(dataSourceId, feedId, customTitle, sourceFeedId, lastAllReadAt)
 
     // 业务方法：更改自定义标题
     fun changeCustomTitle(newTitle: String?): DataSourceFeedSubscription =
@@ -43,14 +43,14 @@ class DataSourceFeedSubscription private constructor(
             dataSourceId: DataSourceId,
             feedId: FeedId,
             customTitle: String?,
-            remoteId: String?,
+            sourceFeedId: String?,
             lastAllReadAt: Instant? = null   // 新增参数
         ): DataSourceFeedSubscription {
             return DataSourceFeedSubscription(
                 dataSourceId = dataSourceId,
                 feedId = feedId,
                 customTitle = customTitle?.trim(),
-                remoteId = remoteId,
+                sourceFeedId = sourceFeedId,
                 lastAllReadAt = lastAllReadAt
             )
         }

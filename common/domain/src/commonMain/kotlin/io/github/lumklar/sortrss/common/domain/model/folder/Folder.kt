@@ -8,8 +8,10 @@ class Folder private constructor(
     val dataSourceId: DataSourceId,
     initialName: FolderName,
     private val parentFolderId: FolderId?,
-    //冗余字段
-    val dataSourceType: DataSourceType
+    // 冗余字段
+    val dataSourceType: DataSourceType,
+    // 业务字段：该文件夹在数据源中的分组ID
+    val sourceGroupId: String? = null
 ) {
     var name: FolderName = initialName
         private set
@@ -23,9 +25,17 @@ class Folder private constructor(
             dataSourceId: DataSourceId,
             name: String,
             dataSourceType: DataSourceType,
-            parentFolderId: FolderId? = null
+            parentFolderId: FolderId? = null,
+            sourceGroupId: String? = null   // 新增业务参数
         ): Folder {
-            return Folder(id, dataSourceId, FolderName.from(name), parentFolderId, dataSourceType)
+            return Folder(
+                id,
+                dataSourceId,
+                FolderName.from(name),
+                parentFolderId,
+                dataSourceType,
+                sourceGroupId
+            )
         }
 
         fun reconstruct(
@@ -33,9 +43,17 @@ class Folder private constructor(
             dataSourceId: DataSourceId,
             name: String,
             parentFolderId: FolderId?,
-            dataSourceType: DataSourceType
+            dataSourceType: DataSourceType,
+            sourceGroupId: String? = null   // 新增业务参数
         ): Folder {
-            return Folder(id, dataSourceId, FolderName.from(name), parentFolderId, dataSourceType)
+            return Folder(
+                id,
+                dataSourceId,
+                FolderName.from(name),
+                parentFolderId,
+                dataSourceType,
+                sourceGroupId
+            )
         }
     }
 

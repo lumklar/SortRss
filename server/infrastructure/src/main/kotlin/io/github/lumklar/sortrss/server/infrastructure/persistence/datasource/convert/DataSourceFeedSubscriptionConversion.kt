@@ -16,7 +16,7 @@ fun DataSourceFeedSubscription.toPO(): DataSourceFeedSubscriptionPo {
         dataSourceId = this.dataSourceId.value.toJavaUuid(),
         feedId = this.feedId.value.toJavaUuid(),
         customTitle = this.customTitle,
-        remoteId = this.remoteId,
+        sourceFeedId = this.sourceFeedId,
         lastAllReadAt = this.lastAllReadAt.toJavaInstantOrNull(),
         gmtCreate = null,
         gmtModify = null
@@ -30,7 +30,7 @@ fun DataSourceFeedSubscriptionPo.toDomain(): DataSourceFeedSubscription {
     return DataSourceFeedSubscription.create(
         dataSourceId = DataSourceId(dataSourceId.toKotlinUuid()),
         feedId = FeedId(feedId.toKotlinUuid()),
-        remoteId = this.remoteId,
+        remoteId = this.sourceFeedId,
         customTitle = this.customTitle,
         lastAllReadAt = this.lastAllReadAt.toKotlinInstantOrNull()
     )

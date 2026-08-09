@@ -18,6 +18,7 @@ fun Folder.toPO(): FolderPO {
         name = this.name.value,
         parentFolderId = this.parentId?.value?.toJavaUuid(),
         dataSourceType = this.dataSourceType,
+        sourceGroupId = this.sourceGroupId,   // 映射新字段
         gmtCreate = null,
         gmtModify = null
     )
@@ -34,10 +35,12 @@ fun FolderPO.toDomain(): Folder {
         dataSourceId = DataSourceId(dataSourceId.toKotlinUuid()),
         name = name,
         parentFolderId = this.parentFolderId?.toKotlinUuid()?.let { FolderId(it) },
-        dataSourceType = dataSourceType
+        dataSourceType = dataSourceType,
+        sourceGroupId = this.sourceGroupId    // 映射新字段
     )
 }
 
+// FolderMembership 的转换保持不变（未涉及新字段）
 fun FolderMembership.toPO(): FolderMembershipPO {
     return FolderMembershipPO(
         id = this.id.value.toJavaUuid(),
