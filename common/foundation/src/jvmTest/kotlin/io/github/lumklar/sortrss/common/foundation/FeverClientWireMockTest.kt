@@ -225,12 +225,12 @@ class FeverClientWireMockTest {
                 )
         )
 
-        // 匹配 with_ids 为逗号分隔的多个数字（如 "100,101"），返回对应的 Item 列表
+        // 匹配 with_ids=100,101（精确，用于 testGetItemsWithIds）
         stubFor(
             post(urlPathEqualTo("/"))
                 .withQueryParam("api", equalTo(""))
                 .withQueryParam("items", equalTo(""))
-                .withQueryParam("with_ids", matching("\\d+(,\\d+)*"))
+                .withQueryParam("with_ids", equalTo("100,101"))
                 .willReturn(
                     aResponse()
                         .withStatus(200)
@@ -551,14 +551,14 @@ class FeverClientWireMockTest {
 
     @Test
     fun testMarkItemAsRead() = runBlocking {
-        // 初始为未读（默认 stub 已返回 is_read=0）
+        // 初始未读
         val before = client.getItems(withIds = listOf("100"))
         assertEquals(1, before.size)
         assertFalse(before[0].isRead)
 
         client.markItemAsRead("100")
 
-        // 添加 stub 返回已读状态（覆盖默认）
+        // 覆盖 stub 返回已读
         stubFor(
             post(urlPathEqualTo("/"))
                 .withQueryParam("api", equalTo(""))
