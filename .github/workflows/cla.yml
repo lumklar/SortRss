@@ -7,7 +7,7 @@ on:
 
 permissions:
   actions: write
-  contents: read       # 只需读权限（签名分支用只读）
+  contents: read       # 签名分支读取用只读，推送由官方 Action 完成
   pull-requests: write
   statuses: write      # 必须，用于创建 Check
 
@@ -29,12 +29,25 @@ jobs:
           HASH=$(sha256sum CLA.md | cut -d' ' -f1)
           echo "hash=$HASH" >> $GITHUB_OUTPUT
 
-      # 3. 检出独立分支（只读，获取版本信息）
-      - name: Fetch signatures branch
+      # 3. 确保 cla-signatures 分支存在（若不存在则初始化）
+      - name: Ensure signatures branch exists
         run: |
           git fetch origin cla-signatures || true
-          # 如果没有该分支，说明尚未有任何签名，后面会处理
-          if git show-ref --verify --quiet refs/remotes/origin/cla-signatures; then
+          if ! git show-ref --verify --quiet refs/remotes/origin/cla-signatures; then
+            echo "Creating cla-signatures branch"
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git checkout --orphan cla-signatures
+            git rm -rf .
+            echo "# CLA Signatures" > README.md
+            # 写入初始版本文件
+            echo "HASH=${{ steps.current_hash.outputs.hash }}" > agreement-version.txt
+            echo "UPDATED_AT=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> agreement-version.txt
+            git add README.md agreement-version.txt
+            git commit -m "Initialize cla-signatures branch with current CLA version"
+            git push origin cla-signatures
+          else
+            # 分支存在，尝试检出
             git checkout cla-signatures -- agreement-version.txt 2>/dev/null || true
           fi
 
@@ -58,8 +71,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           path-to-signatures: 'signatures/cla.json'
-          branch: 'cla-signatures'           # 签名记录存储分支
-          allowlist: dependabot[bot]
+          branch: 'cla-signatures'
+          allowlist: dependabot[bot]  # 在此添加所有豁免账号
           create-file-commit-message: 'docs: update CLA signatures'
           signed-commit-message: 'docs: add signature for $contributorName'
           custom-pr-sign-comment: 'I have read the CLA Document and I hereby sign the CLA'
@@ -77,19 +90,6 @@ jobs:
             const savedHash = '${{ steps.version.outputs.saved_hash }}';
             const updatedAt = '${{ steps.version.outputs.updated_at }}';
 
-            // 如果没有版本文件，说明是全新项目，直接放行
-            if (!savedHash) {
-              core.setOutput('require_re_sign', 'false');
-              return;
-            }
-
-            // 如果哈希一致，无需重新签署
-            if (currentHash === savedHash) {
-              core.setOutput('require_re_sign', 'false');
-              return;
-            }
-
-            // 哈希不一致，需要检查该用户是否已在更新后签署
             // 获取 PR 作者
             let prAuthor;
             if (context.payload.pull_request) {
@@ -102,8 +102,27 @@ jobs:
               return;
             }
 
-            // 由于我们没有克隆整个签名分支，无法直接读取 signatures/cla.json
-            // 改用 GitHub API 获取文件内容
+            // ★ 关键：跳过 allowlist 中的用户（与官方 Action 保持一致）
+            const allowlist = ['dependabot[bot]']; // 同步修改
+            if (allowlist.includes(prAuthor)) {
+              core.setOutput('require_re_sign', 'false');
+              core.info(`User ${prAuthor} is in allowlist, skipping version check`);
+              return;
+            }
+
+            // 如果没有版本文件，说明是全新项目，放行
+            if (!savedHash) {
+              core.setOutput('require_re_sign', 'false');
+              return;
+            }
+
+            // 如果哈希一致，无需重新签署
+            if (currentHash === savedHash) {
+              core.setOutput('require_re_sign', 'false');
+              return;
+            }
+
+            // 哈希不一致，需要检查该用户是否在更新后签署过
             let signatures = [];
             try {
               const { data } = await github.rest.repos.getContent({
@@ -116,19 +135,16 @@ jobs:
               const json = JSON.parse(content);
               signatures = json.signatures || [];
             } catch (err) {
-              // 文件不存在或解析失败，视为未签署
               core.setOutput('require_re_sign', 'true');
               return;
             }
 
-            // 查找该用户的所有签名，取时间戳最大的
             const userSignatures = signatures.filter(s => s.user === prAuthor);
             if (userSignatures.length === 0) {
               core.setOutput('require_re_sign', 'true');
               return;
             }
             const latest = userSignatures.reduce((a, b) => a.timestamp > b.timestamp ? a : b);
-            // 比较签署时间是否晚于协议更新时间
             if (latest.timestamp > updatedAt) {
               core.setOutput('require_re_sign', 'false');
             } else {
@@ -145,7 +161,6 @@ jobs:
             const conclusion = requireReSign ? 'failure' : 'success';
             const sha = context.payload.pull_request?.head.sha || context.sha;
             
-            // 创建/更新 Check
             await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -161,18 +176,11 @@ jobs:
               }
             });
             
-            // 如果要求重新签署，添加评论
             if (requireReSign && context.payload.pull_request) {
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.payload.pull_request.number,
-                body: `## ⚠️ CLA Updated – Please Re-sign
-            
-            The CLA has been updated. To continue with this contribution, please re-sign the new agreement by commenting with:
-            
-            > \`I have read the CLA Document and I hereby sign the CLA\`
-            
-            The bot will then record your new signature and update the check status.`
+                body: `## ⚠️ CLA Updated – Please Re-sign\n\nThe CLA has been updated. To continue with this contribution, please re-sign the new agreement by commenting with:\n\n> \`I have read the CLA Document and I hereby sign the CLA\`\n\nThe bot will then record your new signature and update the check status.`
               });
             }
