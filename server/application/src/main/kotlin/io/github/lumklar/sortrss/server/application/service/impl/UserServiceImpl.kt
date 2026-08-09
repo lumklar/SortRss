@@ -2,7 +2,7 @@ package io.github.lumklar.sortrss.server.application.service.impl
 
 import io.github.lumklar.sortrss.common.domain.model.user.*
 import io.github.lumklar.sortrss.common.domain.shared.ability.PasswordEncoder
-import io.github.lumklar.sortrss.common.infrastructure.validation.password.UUIDGenerator
+import io.github.lumklar.sortrss.common.foundation.validation.password.UUIDGenerator
 import io.github.lumklar.sortrss.server.application.assembler.toDto
 import io.github.lumklar.sortrss.server.application.pojo.user.command.RegisterUserCommand
 import io.github.lumklar.sortrss.server.application.pojo.user.dto.UserDto

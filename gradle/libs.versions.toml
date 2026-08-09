@@ -40,6 +40,7 @@ sqlite = "3.53.2.1"
 sqlite-jpa = "7.4.5.Final"
 commons-compress = "1.28.0"
 fastjson2 = "2.0.64"
+wiremock = "2.35.0"
 
 [libraries]
 
@@ -86,7 +87,8 @@ kotlin-logging-wasm-js = { group = "io.github.oshai", name = "kotlin-logging-was
 # kotlin 测试
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-common = { group = "org.jetbrains.kotlin", name = "kotlin-test-common", version.ref = "kotlin" }
-kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
+kotlin-test-junit4 = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
+kotlin-test-junit5 = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit5", version.ref = "kotlin" }
 
 #序列化
 kotlin-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "serialization" }
@@ -148,6 +150,7 @@ rome-modules = { group = "com.rometools", name = "rome-modules", version.ref = "
 rome-utils = { group = "com.rometools", name = "rome-utils", version.ref = "rome" }
 commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "commons-compress" }
 fastjson2 = { group = "com.alibaba.fastjson2", name = "fastjson2", version.ref = "fastjson2" }
+wiremock = { group = "com.github.tomakehurst", name = "wiremock-jre8", version.ref = "wiremock" }
 
 [plugins]
 

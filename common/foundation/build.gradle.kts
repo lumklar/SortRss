@@ -52,8 +52,8 @@ kotlin {
         }
         val commonTest = getByName("commonTest") {
             dependencies {
-                implementation(libs.kotlin.test)
-                implementation(libs.kotlin.test.common)
+//                implementation(libs.kotlin.test)
+//                implementation(libs.kotlin.test.common)
 //                implementation(libs.kotlinx.coroutines.core)
 //                implementation(libs.ktor.client.core)
             }
@@ -75,10 +75,15 @@ kotlin {
 //        }
         val jvmTest = getByName("jvmTest"){
             dependencies {
-                implementation(libs.kotlin.test.junit)
+                implementation(libs.wiremock)
+                implementation(libs.kotlin.test.junit5)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.ktor.client.okhttp)
             }
         }
     }
+}
+
+tasks.named("jvmTest", Test::class) {
+    useJUnitPlatform()
 }

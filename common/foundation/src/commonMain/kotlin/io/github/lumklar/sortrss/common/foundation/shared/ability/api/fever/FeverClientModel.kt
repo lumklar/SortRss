@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.common.infrastructure.shared.ability.api.fever
+package io.github.lumklar.sortrss.common.foundation.shared.ability.api.fever
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -3,7 +3,7 @@ package io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.c
 import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceFeedSubscription
 import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceId
 import io.github.lumklar.sortrss.common.domain.model.feed.FeedId
-import io.github.lumklar.sortrss.common.infrastructure.validation.password.UUIDGenerator
+import io.github.lumklar.sortrss.common.foundation.validation.password.UUIDGenerator
 import io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.entity.DataSourceFeedSubscriptionPo
 import io.github.lumklar.sortrss.server.infrastructure.util.toJavaInstantOrNull
 import io.github.lumklar.sortrss.server.infrastructure.util.toKotlinInstantOrNull

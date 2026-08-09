@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.common.infrastructure.validation.password
+package io.github.lumklar.sortrss.common.foundation.validation.password
 
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid

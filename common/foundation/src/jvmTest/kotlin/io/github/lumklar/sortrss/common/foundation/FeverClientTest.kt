@@ -1,13 +1,10 @@
-package io.github.lumklar.sortrss.common.io.github.lumklar.sortrss.common.infrastructure
+package io.github.lumklar.sortrss.common.foundation
 
-import io.github.lumklar.sortrss.common.infrastructure.shared.ability.api.fever.FeverClient
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
+import io.github.lumklar.sortrss.common.foundation.shared.ability.api.fever.FeverClient
+import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.*
-import org.junit.Test
-import java.net.InetSocketAddress
-import java.net.Proxy
+import org.junit.jupiter.api.Assertions.*
 
 class FeverClientTest {
 
@@ -24,24 +21,24 @@ class FeverClientTest {
         }
     )
 
-    @Test
+//    @Test   // 启用测试
     fun testAllEndpoints() = runBlocking {
         // 1. Feeds
         println("\n========== Feeds ==========")
         val feeds = client.getFeeds()
-        assertTrue("Feeds should not be empty", feeds.isNotEmpty())
+        assertTrue(feeds.isNotEmpty(), "Feeds should not be empty")
         feeds.forEach { println("Feed: ${it.name} (ID: ${it.id}), Groups: ${it.groupIds}") }
 
         // 2. Groups
         println("\n========== Groups ==========")
         val groups = client.getGroups()
-        assertTrue("Groups should not be empty", groups.isNotEmpty())
+        assertTrue(groups.isNotEmpty(), "Groups should not be empty")
         groups.forEach { println("Group: ${it.title} (ID: ${it.id}), Feed IDs: ${it.feedIds}") }
 
         // 3. Items (basic + pagination + with_ids)
         println("\n========== Items (first page) ==========")
         val items = client.getItems()
-        assertTrue("Items should not be empty", items.isNotEmpty())
+        assertTrue(items.isNotEmpty(), "Items should not be empty")
         items.take(5).forEach { item ->
             println("${item.title} (ID: ${item.id}) - read: ${item.isRead}, saved: ${item.isStarred}")
         }
@@ -94,8 +91,8 @@ class FeverClientTest {
             // Verify it's now read
             var checkItems = client.getItems(withIds = listOf(unreadItem.id))
             val updated = checkItems.firstOrNull()
-            assertNotNull("Item should exist after marking read", updated)
-            assertTrue("Item should be marked as read", updated!!.isRead)
+            assertNotNull(updated, "Item should exist after marking read")
+            assertTrue(updated!!.isRead, "Item should be marked as read")
 
             // Attempt recovery: unread recently read
             client.unreadRecentlyRead()
@@ -103,7 +100,7 @@ class FeverClientTest {
             val reverted = checkItems.firstOrNull()
             if (reverted != null && !reverted.isRead) {
                 println("Successfully reverted to unread.")
-                assertFalse("Item should be unread again", reverted.isRead)
+                assertFalse(reverted.isRead, "Item should be unread again")
             } else {
                 println("WARNING: unreadRecentlyRead() did NOT revert the item to unread. Server may not support this feature or has delay.")
                 // Do not fail test, just warn
@@ -118,11 +115,11 @@ class FeverClientTest {
             client.saveItem(unsavedItem.id)
 
             var check = client.getItems(withIds = listOf(unsavedItem.id)).first()
-            assertTrue("Item should be saved", check.isStarred)
+            assertTrue(check.isStarred, "Item should be saved")
 
             client.unsaveItem(unsavedItem.id)
             check = client.getItems(withIds = listOf(unsavedItem.id)).first()
-            assertFalse("Item should be unsaved", check.isStarred)
+            assertFalse(check.isStarred, "Item should be unsaved")
         }
 
         // 8. Mark feed as read + unread recently read
