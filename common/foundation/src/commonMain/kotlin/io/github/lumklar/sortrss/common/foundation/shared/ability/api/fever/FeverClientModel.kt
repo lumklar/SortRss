@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class FeverFeed(
-    val id: Int?,
+    val id: Long?,
     @SerialName("title") val title: String?,
-    @SerialName("favicon_id") val faviconId: Int?,
+    @SerialName("favicon_id") val faviconId: Long?,
     @SerialName("url") val url: String?,
     @SerialName("site_url") val siteUrl: String?,
     @SerialName("is_spark") val isSpark: Int?,
@@ -16,20 +16,20 @@ internal data class FeverFeed(
 
 @Serializable
 internal data class FeverGroup(
-    val id: Int?,
+    val id: Long?,
     val title: String?
 )
 
 @Serializable
 internal data class FeverFavicon(
-    val id: Int?,
+    val id: Long?,
     val data: String?  // base64 encoded, prefixed with image type
 )
 
 @Serializable
 internal data class FeverItem(
-    val id: Int?,
-    @SerialName("feed_id") val feedId: Int?,
+    val id: Long?,
+    @SerialName("feed_id") val feedId: Long?,
     val title: String,
     val author: String?,
     val html: String?,
@@ -41,15 +41,15 @@ internal data class FeverItem(
 
 @Serializable
 internal data class FeverFeedsGroup(
-    @SerialName("group_id") val groupId: Int,
+    @SerialName("group_id") val groupId: Long,
     @SerialName("feed_ids") val feedIds: String  // comma-separated list
 )
 
 @Serializable
 internal data class FeverLink(
     val id: Int,
-    @SerialName("feed_id") val feedId: Int? = null,
-    @SerialName("item_id") val itemId: Int? = null,
+    @SerialName("feed_id") val feedId: Long? = null,
+    @SerialName("item_id") val itemId: Long? = null,
     val temperature: Float,
     @SerialName("is_item") val isItem: Int,
     @SerialName("is_local") val isLocal: Int,
