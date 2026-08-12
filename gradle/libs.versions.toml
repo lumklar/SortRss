@@ -26,7 +26,7 @@ node = "7.1.0"
 
 # 工具库版本
 therapi = "0.15.0"
-kotlinLogging = "8.0.02"
+kotlinLogging = "8.0.4"
 springdoc = "3.0.3"
 jbcrypt = "0.4"
 rome = "2.1.0"
