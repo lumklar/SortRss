@@ -66,11 +66,11 @@ jobs:
       #    产物路径: home/build/dist
       # ------------------------------------------------------------
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./home/build/dist
           publish_branch: gh-pages    # 目标分支，GitHub Pages 默认读取这个分支
-          force_orphan: true          # 强制清空历史记录，保持分支干净（推荐）
+#          force_orphan: true          # 强制清空历史记录，保持分支干净（推荐）。V4不支持该参数
           # 可选：保留已部署文件的版本历史，如果想保留，设为 false
           # keep_files: false
