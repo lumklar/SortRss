@@ -40,10 +40,9 @@ replay_pid*
 versions.properties
 
 ### Runtime ###
-/data/
 logs/
 *.log
-/rss.db
+rss.db
 
 ### node ###
 node_modules/

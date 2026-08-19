@@ -21,7 +21,7 @@ class JpaConfig(
 ) {
 
     /**
-     * FIXME native下不生效
+     * FIXME native下不生效，注释后才能正常扫描@Entity注解
      */
     @Bean
     fun entityManagerFactory(builder: EntityManagerFactoryBuilder): LocalContainerEntityManagerFactoryBean {
