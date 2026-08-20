@@ -37,7 +37,7 @@ class UserServiceImpl(
 
         // 3. 调用领域工厂创建用户
         val user = User.register(
-            username = command.username,
+            rawUsername = command.username,
             plainPassword = command.plainPassword,
             encoder = passwordEncoder,
             policy = passwordPolicy,

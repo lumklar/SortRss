@@ -12,13 +12,13 @@ import java.util.*
 @Table(
     name = "folder",
     indexes = [
-        Index(name = "idx_folder_data_source_id", columnList = "dataSourceId"),
-        Index(name = "idx_folder_parent_folder_id", columnList = "parentFolderId")
+        Index(name = "idx_folder_data_source_id", columnList = "data_source_id"),
+        Index(name = "idx_folder_parent_folder_id", columnList = "parent_folder_id")
     ]
 )
 class FolderPO(
     @Id
-    @Column(nullable = false)
+    @Column(name = "id", nullable = false)
     var id: UUID? = null,
 
     @Column(name = "data_source_id", nullable = false)

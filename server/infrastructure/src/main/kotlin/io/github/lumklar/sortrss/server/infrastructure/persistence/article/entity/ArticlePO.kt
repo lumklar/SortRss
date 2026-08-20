@@ -11,33 +11,33 @@ import java.util.*
     name = "article",
     uniqueConstraints = [UniqueConstraint(columnNames = ["guid"])],
     indexes = [
-        Index(name = "idx_article_published_at", columnList = "publishedAt")
+        Index(name = "idx_article_published_at", columnList = "published_at")
     ]
 )
 class ArticlePO(
     @Id
-    @Column(nullable = false)
+    @Column(name = "id", nullable = false)
     var id: UUID? = null,
 
-    @Column(nullable = false, length = 500)
+    @Column(name = "title", nullable = false, length = 500)
     var title: String? = null,
 
-    @Column(length = 255)
+    @Column(name = "author", length = 255)
     var author: String? = null,
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "summary", columnDefinition = "TEXT")
     var summary: String? = null,
 
-    @Column(columnDefinition = "MEDIUMTEXT")
+    @Column(name = "content", columnDefinition = "MEDIUMTEXT")
     var content: String? = null,
 
-    @Column(nullable = false, length = 2048)
+    @Column(name = "link", nullable = false, length = 2048)
     var link: String? = null,
 
-    @Column(nullable = false)
+    @Column(name = "published_at", nullable = false)
     var publishedAt: Instant? = null,
 
-    @Column(length = 512)
+    @Column(name = "guid", length = 512)
     var guid: String? = null,
 
     @Column(name = "content_modified_time")

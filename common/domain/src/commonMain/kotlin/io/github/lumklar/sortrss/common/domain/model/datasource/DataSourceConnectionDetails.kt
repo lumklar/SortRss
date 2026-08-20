@@ -9,7 +9,9 @@ import io.github.lumklar.sortrss.common.domain.shared.valueobjects.Url
 sealed class DataSourceConnectionDetails {
 
     /** 本地 OPML 导入源，无需任何连接参数 */
-    data object LocalOpml : DataSourceConnectionDetails()
+    data class LocalOpml(
+        val datasourceId: DataSourceId
+    ) : DataSourceConnectionDetails()
 
     /** Fever API 兼容源 */
     data class FeverApi(

@@ -9,15 +9,15 @@ import java.util.*
 @Entity
 @Table(
     name = "data_source_feed_subscription",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["dataSourceId", "feedId"])],
+    uniqueConstraints = [UniqueConstraint(columnNames = ["data_source_id", "feed_id"])],
     indexes = [
-        Index(name = "idx_ds_feed_sub_data_source_id", columnList = "dataSourceId"),
-        Index(name = "idx_ds_feed_sub_feed_id", columnList = "feedId")
+        Index(name = "idx_ds_feed_sub_data_source_id", columnList = "data_source_id"),
+        Index(name = "idx_ds_feed_sub_feed_id", columnList = "feed_id")
     ]
 )
 class DataSourceFeedSubscriptionPo(
     @Id
-    @Column(nullable = false)
+    @Column(name = "id", nullable = false)
     var id: UUID? = null,
 
     @Column(name = "data_source_id", nullable = false)

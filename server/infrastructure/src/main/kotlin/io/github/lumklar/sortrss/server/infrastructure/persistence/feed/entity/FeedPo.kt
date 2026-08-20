@@ -13,13 +13,13 @@ import java.util.UUID;
     name = "feeds",
     uniqueConstraints = [UniqueConstraint(columnNames = ["feed_url"])],
     indexes = [
-        Index(name = "idx_feeds_source_type", columnList = "sourceType"),
-        Index(name = "idx_feeds_last_sync_time", columnList = "lastSyncTime")
+        Index(name = "idx_feeds_source_type", columnList = "source_type"),
+        Index(name = "idx_feeds_last_sync_time", columnList = "last_sync_time")
     ]
 )
 class FeedPo(
     @Id
-    @Column(nullable = false, updatable = false)
+    @Column(name = "id", nullable = false, updatable = false)
     var id: UUID? = null,
 
     @Column(name = "feed_url", nullable = false, length = 2048)

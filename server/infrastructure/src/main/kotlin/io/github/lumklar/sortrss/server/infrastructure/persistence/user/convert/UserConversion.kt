@@ -1,5 +1,6 @@
 package io.github.lumklar.sortrss.server.infrastructure.persistence.user.convert
 
+import io.github.lumklar.sortrss.common.domain.model.user.RegistrationSource
 import io.github.lumklar.sortrss.common.domain.model.user.User
 import io.github.lumklar.sortrss.server.infrastructure.persistence.user.entity.UserPO
 import kotlin.uuid.toJavaUuid
@@ -21,7 +22,8 @@ fun UserPO.toDomain(): User {
     return User.reconstruct(
         id = uuid,
         username = username,
-        hash = password
+        passwordHash = password,
+        registrationSource = RegistrationSource.LOCAL
     )
 }
 

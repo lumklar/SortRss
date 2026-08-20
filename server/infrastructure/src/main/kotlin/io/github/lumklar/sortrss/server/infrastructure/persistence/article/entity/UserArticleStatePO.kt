@@ -8,16 +8,16 @@ import java.time.Instant;
 @Entity
 @Table(
     name = "user_article_state",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["userId", "articleId"])]
+    uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "article_id"])]
 )
 class UserArticleStatePO(
     @EmbeddedId
     var id: UserArticleStateId? = null,
 
-    @Column(nullable = true)
+    @Column(name = "read", nullable = true)
     var read: Boolean? = false,
 
-    @Column(nullable = false)
+    @Column(name = "starred", nullable = false)
     var starred: Boolean? = false,
 
     @CreationTimestamp

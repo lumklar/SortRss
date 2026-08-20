@@ -1,5 +1,7 @@
 package io.github.lumklar.sortrss.server.infrastructure.persistence.user.entity;
 
+import io.github.lumklar.sortrss.common.domain.model.user.RegistrationSource
+import io.github.lumklar.sortrss.server.infrastructure.persistence.user.convert.RegistrationSourceConverter
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -13,14 +15,19 @@ import java.util.*
 )
 class UserPO(
     @Id
-    @Column(nullable = false)
+    @Column(name = "id", nullable = false)
     var id: UUID? = null,
 
-    @Column(nullable = false, length = 255)
+    @Column(name = "username", nullable = false, length = 255)
     var username: String? = null,
 
-    @Column(nullable = false, length = 255)
+    @Column(name = "password", nullable = true, length = 255)
     var password: String? = null,
+
+    // 注册来源：使用枚举 + 转换器
+    @Convert(converter = RegistrationSourceConverter::class)
+    @Column(name = "registration_source", nullable = false, length = 32)
+    var registrationSource: RegistrationSource? = null,
 
     @CreationTimestamp
     @Column(name = "gmt_create", nullable = false, updatable = false)

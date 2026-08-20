@@ -1,22 +1,22 @@
 package io.github.lumklar.sortrss.server.infrastructure.persistence.folder.entity;
 
-import io.github.lumklar.sortrss.common.domain.shared.enums.DataSourceType;
-import io.github.lumklar.sortrss.server.infrastructure.persistence.common.convert.DataSourceTypeConverter;
-import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import java.time.Instant;
-import java.util.UUID;
+import io.github.lumklar.sortrss.common.domain.shared.enums.DataSourceType
+import io.github.lumklar.sortrss.server.infrastructure.persistence.common.convert.DataSourceTypeConverter
+import jakarta.persistence.*
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
+import java.time.Instant
+import java.util.*
 
 @Entity
 @Table(
     name = "folder_membership",
     uniqueConstraints = [UniqueConstraint(columnNames = ["feed_id"])],
-    indexes = [Index(name = "idx_folder_membership_folder_id", columnList = "folderId")]
+    indexes = [Index(name = "idx_folder_membership_folder_id", columnList = "folder_id")]
 )
 class FolderMembershipPO(
     @Id
-    @Column(nullable = false)
+    @Column(name = "id", nullable = false)
     var id: UUID? = null,
 
     @Column(name = "folder_id", nullable = false)

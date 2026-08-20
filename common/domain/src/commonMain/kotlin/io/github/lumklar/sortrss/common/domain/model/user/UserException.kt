@@ -61,3 +61,10 @@ class UsernameAlreadyExistsException(
     domainCode = UserErrorCode.USERNAME_EXISTS,
     message = message
 )
+
+class UserHasNoPasswordException(
+    message: String = UserErrorCode.OLD_PASSWORD_MISS.msg,
+) : DomainException(
+    domainCode = UserErrorCode.OLD_PASSWORD_MISS,
+    message = message
+)

@@ -5,27 +5,30 @@ import jakarta.persistence.Converter
 import org.springframework.stereotype.Component
 
 @Converter(autoApply = true)
-@Component
-class DataSourceTypeConverter : AttributeConverter<DataSourceType, Int> {
+class DataSourceTypeConverter : AttributeConverter<DataSourceType, String> {
 
-    override fun convertToDatabaseColumn(attribute: DataSourceType?): Int? {
-        // 显式列出所有枚举值，不加 else → 新增枚举时此处编译错误（未覆盖）
+    private companion object {
+        const val LOCAL_OPML = "LOCAL_OPML"
+        const val FEVER_API = "FEVER_API"
+        const val GOOGLE_READER_API = "GOOGLE_READER_API"
+    }
+
+    override fun convertToDatabaseColumn(attribute: DataSourceType?): String? {
         return when (attribute) {
-            DataSourceType.LOCAL_OPML -> 0
-            DataSourceType.FEVER_API -> 1
-            DataSourceType.GOOGLE_READER_API -> 2
+            DataSourceType.LOCAL_OPML -> LOCAL_OPML
+            DataSourceType.FEVER_API -> FEVER_API
+            DataSourceType.GOOGLE_READER_API -> GOOGLE_READER_API
             null -> null
         }
     }
 
-    override fun convertToEntityAttribute(dbData: Int?): DataSourceType? {
-        // 从数据库整数还原为枚举，同样显式列出所有已知映射
+    override fun convertToEntityAttribute(dbData: String?): DataSourceType? {
         return when (dbData) {
-            0 -> DataSourceType.LOCAL_OPML
-            1 -> DataSourceType.FEVER_API
-            2 -> DataSourceType.GOOGLE_READER_API
+            LOCAL_OPML -> DataSourceType.LOCAL_OPML
+            FEVER_API -> DataSourceType.FEVER_API
+            GOOGLE_READER_API -> DataSourceType.GOOGLE_READER_API
             null -> null
-            else -> throw IllegalArgumentException("Unknown data source type code: $dbData")
+            else -> throw IllegalArgumentException("Unknown data source type: $dbData")
         }
     }
 }
