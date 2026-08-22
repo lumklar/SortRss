@@ -1,0 +1,187 @@
+name: "CLA Assistant"
+on:
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  actions: write        # 可选，保留
+  contents: write       # ★ 从 read 改为 write
+  pull-requests: write  # 必需，用于评论和 PR 操作
+  statuses: write       # 可选，如果使用 commit status API，保留
+  checks: write         # ★ 新增，用于创建检查运行
+
+jobs:
+  CLA:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 检出当前代码（包含 CLA.md）
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      # 2. 计算当前 CLA.md 的哈希
+      - name: Compute current CLA hash
+        id: current_hash
+        run: |
+          HASH=$(sha256sum CLA.md | cut -d' ' -f1)
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+
+      # 3. 确保 cla-signatures 分支存在（若不存在则初始化）
+      - name: Ensure signatures branch exists
+        run: |
+          git fetch origin cla-signatures || true
+          if ! git show-ref --verify --quiet refs/remotes/origin/cla-signatures; then
+            echo "Creating cla-signatures branch"
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git checkout --orphan cla-signatures
+            git rm -rf .
+            echo "# CLA Signatures" > README.md
+            # 写入初始版本文件
+            echo "HASH=${{ steps.current_hash.outputs.hash }}" > agreement-version.txt
+            echo "UPDATED_AT=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> agreement-version.txt
+            git add README.md agreement-version.txt
+            git commit -m "Initialize cla-signatures branch with current CLA version"
+            git push origin cla-signatures
+          else
+            # 分支存在，尝试检出
+            git checkout cla-signatures -- agreement-version.txt 2>/dev/null || true
+          fi
+
+      # 4. 读取版本文件（如果存在）
+      - name: Read agreement version
+        id: version
+        run: |
+          if [ -f agreement-version.txt ]; then
+            source agreement-version.txt
+            echo "saved_hash=$HASH" >> $GITHUB_OUTPUT
+            echo "updated_at=$UPDATED_AT" >> $GITHUB_OUTPUT
+          else
+            echo "saved_hash=" >> $GITHUB_OUTPUT
+            echo "updated_at=" >> $GITHUB_OUTPUT
+          fi
+
+      # 5. 运行官方 CLA Assistant Action
+      - name: CLA Assistant (official)
+        uses: contributor-assistant/github-action@v2.6.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          path-to-signatures: 'signatures/cla.json'
+          branch: 'cla-signatures'
+          allowlist: dependabot[bot]  # 在此添加所有豁免账号
+          create-file-commit-message: 'docs: update CLA signatures'
+          signed-commit-message: 'docs: add signature for $contributorName'
+          custom-pr-sign-comment: 'I have read the CLA Document and I hereby sign the CLA'
+
+      # 6. 检查版本一致性（精确到用户）
+      - name: Check CLA version and user signature timestamp
+        id: check
+        if: always() && (github.event_name == 'pull_request_target' || (github.event_name == 'issue_comment' && github.event.issue.pull_request))
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+            const currentHash = '${{ steps.current_hash.outputs.hash }}';
+            const savedHash = '${{ steps.version.outputs.saved_hash }}';
+            const updatedAt = '${{ steps.version.outputs.updated_at }}';
+
+            // 获取 PR 作者
+            let prAuthor;
+            if (context.payload.pull_request) {
+              prAuthor = context.payload.pull_request.user.login;
+            } else if (context.payload.issue) {
+              prAuthor = context.payload.issue.user.login;
+            } else {
+              core.setOutput('require_re_sign', 'true');
+              core.setFailed('Unable to determine PR author');
+              return;
+            }
+
+            // ★ 关键：跳过 allowlist 中的用户（与官方 Action 保持一致）
+            const allowlist = ['dependabot[bot]']; // 同步修改
+            if (allowlist.includes(prAuthor)) {
+              core.setOutput('require_re_sign', 'false');
+              core.info(`User ${prAuthor} is in allowlist, skipping version check`);
+              return;
+            }
+
+            // 如果没有版本文件，说明是全新项目，放行
+            if (!savedHash) {
+              core.setOutput('require_re_sign', 'false');
+              return;
+            }
+
+            // 如果哈希一致，无需重新签署
+            if (currentHash === savedHash) {
+              core.setOutput('require_re_sign', 'false');
+              return;
+            }
+
+            // 哈希不一致，需要检查该用户是否在更新后签署过
+            let signatures = [];
+            try {
+              const { data } = await github.rest.repos.getContent({
+                owner,
+                repo,
+                path: 'signatures/cla.json',
+                ref: 'cla-signatures'
+              });
+              const content = Buffer.from(data.content, 'base64').toString('utf8');
+              const json = JSON.parse(content);
+              signatures = json.signatures || [];
+            } catch (err) {
+              core.setOutput('require_re_sign', 'true');
+              return;
+            }
+
+            const userSignatures = signatures.filter(s => s.user === prAuthor);
+            if (userSignatures.length === 0) {
+              core.setOutput('require_re_sign', 'true');
+              return;
+            }
+            const latest = userSignatures.reduce((a, b) => a.timestamp > b.timestamp ? a : b);
+            if (latest.timestamp > updatedAt) {
+              core.setOutput('require_re_sign', 'false');
+            } else {
+              core.setOutput('require_re_sign', 'true');
+            }
+
+      # 7. 根据检查结果创建/更新 Check 状态
+      - name: Set CLA version check status
+        if: always() && (github.event_name == 'pull_request_target' || (github.event_name == 'issue_comment' && github.event.issue.pull_request))
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const requireReSign = '${{ steps.check.outputs.require_re_sign }}' === 'true';
+            const conclusion = requireReSign ? 'failure' : 'success';
+            const sha = context.payload.pull_request?.head.sha || context.sha;
+            
+            await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'CLA Agreement Version',
+              head_sha: sha,
+              status: 'completed',
+              conclusion: conclusion,
+              output: {
+                title: requireReSign ? '⚠️ CLA has changed – please re-sign' : '✅ CLA version up-to-date',
+                summary: requireReSign
+                  ? 'The Contributor License Agreement has been updated since your last signature. Please re-sign by commenting on this PR with the exact phrase:\n> `I have read the CLA Document and I hereby sign the CLA`\n\nThe bot will automatically record your new signature.'
+                  : 'Your signature covers the latest version of the CLA.'
+              }
+            });
+            
+            if (requireReSign && context.payload.pull_request) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: `## ⚠️ CLA Updated – Please Re-sign\n\nThe CLA has been updated. To continue with this contribution, please re-sign the new agreement by commenting with:\n\n> \`I have read the CLA Document and I hereby sign the CLA\`\n\nThe bot will then record your new signature and update the check status.`
+              });
+            }

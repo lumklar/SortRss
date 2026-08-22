@@ -1,0 +1,26 @@
+name: Auto‑Create Labels
+on:
+  workflow_dispatch:
+
+jobs:
+  create-labels:
+    runs-on: ubuntu‑latest
+    steps:
+      - name: Create repository labels
+        uses: micnncim/action‑labeler@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          labels: |
+            dependencies
+              color: 0366d6
+              description: Dependency version bump PRs from Dependabot
+            gradle
+              color: 8c44eb
+              description: Gradle, Kotlin & JVM library updates
+            npm
+              color: cb3837
+              description: NPM / Javascript frontend dependencies
+            github_actions
+              color: 2088ff
+              description: GitHub‑Actions workflow version updates
