@@ -62,9 +62,32 @@ class UsernameAlreadyExistsException(
     message = message
 )
 
+/**
+ * 用户未设置密码
+ */
 class UserHasNoPasswordException(
     message: String = UserErrorCode.OLD_PASSWORD_MISS.msg,
 ) : DomainException(
     domainCode = UserErrorCode.OLD_PASSWORD_MISS,
+    message = message
+)
+
+/**
+ * 匿名用户不允许增加数据源
+ */
+class AnonymousUserDataSourceLimitException(
+    message: String = UserErrorCode.ANONYMOUS_USER_DATA_SOURCE_LIMIT.msg,
+) : DomainException(
+    domainCode = UserErrorCode.ANONYMOUS_USER_DATA_SOURCE_LIMIT,
+    message = message
+)
+
+/**
+ * 非匿名用户不允许通过数据源登录
+ */
+class DataSourceAccessDeniedException(
+    message: String = UserErrorCode.DATA_SOURCE_ACCESS_DENIED.msg,
+) : DomainException(
+    domainCode = UserErrorCode.DATA_SOURCE_ACCESS_DENIED,
     message = message
 )

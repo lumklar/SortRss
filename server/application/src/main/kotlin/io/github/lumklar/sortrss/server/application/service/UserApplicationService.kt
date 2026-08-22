@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
  * 用户应用服务，提供用户注册等用例。
  */
 @Service
-interface UserService {
+interface UserApplicationService {
     fun register(command: RegisterUserCommand): UserDto
     /**
      * 根据查询条件查询用户信息。

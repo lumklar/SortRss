@@ -13,4 +13,6 @@ enum class UserErrorCode(
     OLD_PASSWORD_ERROR(2005, "原密码错误"),
     USERNAME_EXISTS(2006,"用户名已存在"),
     OLD_PASSWORD_MISS(2007, "原密码不存在"),
+    ANONYMOUS_USER_DATA_SOURCE_LIMIT(2008, "匿名用户不得添加数据源"),
+    DATA_SOURCE_ACCESS_DENIED(2009,"非匿名用户不允许通过远程数据源连接详情直接登录"),
 }

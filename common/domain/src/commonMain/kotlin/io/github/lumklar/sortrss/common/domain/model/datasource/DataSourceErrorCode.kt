@@ -10,5 +10,6 @@ enum class DataSourceErrorCode(
     DATASOURCE_ALREADY_EXISTS(3002, "数据源已存在"),
     DATASOURCE_TYPE_UNSUPPORTED(3003, "不支持的数据源类型"),
     SUBSCRIPTION_ALREADY_EXISTS(3004, "该订阅源已在此数据源中"),
-    SUBSCRIPTION_NOT_FOUND(3005, "订阅关联不存在")
+    SUBSCRIPTION_NOT_FOUND(3005, "订阅关联不存在"),
+    DATA_SOURCE_CONNECTION_EXCEPTION(3006,"订阅源连接异常")
 }

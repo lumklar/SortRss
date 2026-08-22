@@ -8,7 +8,8 @@ import io.github.lumklar.sortrss.common.domain.shared.error.DomainErrorCode
  */
 open class DomainException(
     val domainCode: DomainErrorCode,
-    message: String = domainCode.msg
-) : RuntimeException(message) {
+    message: String = domainCode.msg,
+    cause: Throwable? = null,
+) : RuntimeException(message, cause) {
 
 }

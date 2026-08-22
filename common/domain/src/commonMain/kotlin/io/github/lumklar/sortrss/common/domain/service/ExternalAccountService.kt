@@ -27,18 +27,28 @@ class ExternalAccountService(
         subject: String,
         currentUserId: UserId? = null
     ): AuthResult {
-        // 1. 检查该第三方身份是否已被绑定
+        // 1. 检查第三方身份是否已绑定
         val existing = externalIdentityRepository.findByProviderAndSubject(provider, subject)
         if (existing != null) {
             return AuthResult(existing.userId, isNewUser = false)
         }
 
-        // 2. 已登录用户执行绑定操作
+        // 2. 已登录用户绑定操作
         if (currentUserId != null) {
+            // 获取用户，若为匿名则升级
+            val user = userRepository.findById(currentUserId)
+                ?: throw UserNotFoundException()
+
             // 检查是否已绑定同 provider 的其他账号
             val userIdentities = externalIdentityRepository.findByUserId(currentUserId)
             require(userIdentities.none { it.provider == provider }) {
                 "该用户已绑定 ${provider} 账号"
+            }
+
+            // 若用户是匿名，升级为 EXTERNAL
+            if (user.registrationSource == RegistrationSource.ANONYMOUS) {
+                user.upgradeFromAnonymousToExternal()
+                userRepository.save(user)  // 注意需要持久化
             }
 
             val identity = ExternalIdentity.create(
@@ -51,11 +61,9 @@ class ExternalAccountService(
             return AuthResult(currentUserId, isNewUser = false)
         }
 
-        // 3. 未登录且第三方身份未绑定：创建新用户
+        // 3. 未登录且第三方身份未绑定：创建新用户（EXTERNAL）
         val newUserId = userIdGenerator.next()
-        val user = User.registerExternal(
-            id = newUserId
-        )
+        val user = User.registerExternal(id = newUserId)
         userRepository.save(user)
 
         val identity = ExternalIdentity.create(
@@ -69,11 +77,8 @@ class ExternalAccountService(
         return AuthResult(newUserId, isNewUser = true)
     }
 
-    /**
-     * 解绑第三方身份，至少保留一种登录方式（密码或其他外部身份）。
-     */
     fun unbind(userId: UserId, provider: ExternalProvider) {
-        val user = userRepository.findById(userId.value)
+        val user = userRepository.findById(userId)
             ?: throw UserNotFoundException()
 
         val identities = externalIdentityRepository.findByUserId(userId)

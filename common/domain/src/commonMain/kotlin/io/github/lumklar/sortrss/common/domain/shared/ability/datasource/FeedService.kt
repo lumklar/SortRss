@@ -2,6 +2,12 @@ package io.github.lumklar.sortrss.common.domain.shared.ability.datasource
 
 
 interface FeedService {
+    /**
+     * 验证当前连接是否有效（认证成功）。
+     * 对于 Fever API，可通过调用轻量级认证端点实现。
+     * 若连接无效，应抛出异常。
+     */
+    suspend fun validateConnection()
     suspend fun getFeeds(): List<Feed>
     suspend fun getGroups(): List<Group>
     suspend fun getItems(

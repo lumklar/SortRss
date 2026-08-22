@@ -1,4 +1,4 @@
-package io.github.lumklar.sortrss.common.foundation.shared.ability.api.fever
+package io.github.lumklar.sortrss.common.foundation.shared.ability.datasource.fever
 
 import io.github.lumklar.sortrss.common.domain.shared.ability.datasource.Feed
 import io.github.lumklar.sortrss.common.domain.shared.ability.datasource.Group

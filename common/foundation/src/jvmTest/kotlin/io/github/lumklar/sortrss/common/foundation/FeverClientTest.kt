@@ -1,6 +1,6 @@
 package io.github.lumklar.sortrss.common.foundation
 
-import io.github.lumklar.sortrss.common.foundation.shared.ability.api.fever.FeverClient
+import io.github.lumklar.sortrss.common.foundation.shared.ability.datasource.fever.FeverClient
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import kotlinx.coroutines.runBlocking

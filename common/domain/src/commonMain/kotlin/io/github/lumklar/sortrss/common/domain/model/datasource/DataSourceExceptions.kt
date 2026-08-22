@@ -41,3 +41,13 @@ class SubscriptionNotFoundException(
     domainCode = DataSourceErrorCode.SUBSCRIPTION_NOT_FOUND,
     message = message
 )
+
+/** 订阅连接失败 */
+class DataSourceConnectionException(
+    message: String = DataSourceErrorCode.DATA_SOURCE_CONNECTION_EXCEPTION.msg,
+    cause: Throwable? = null,
+) : DomainException(
+    domainCode = DataSourceErrorCode.DATA_SOURCE_CONNECTION_EXCEPTION,
+    message = message,
+    cause = cause,
+)

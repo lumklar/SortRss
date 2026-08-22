@@ -27,7 +27,7 @@ class DataSource private constructor(
         /**
          * 创建一个新的数据源（首次创建，尚未同步）。
          */
-        fun create(
+        internal fun create(
             id: DataSourceId,
             userId: UserId,
             type: DataSourceType,
@@ -35,18 +35,12 @@ class DataSource private constructor(
             connectionDetails: DataSourceConnectionDetails
         ): DataSource {
             val datasourceName = DataSourceName.fromString(name)
-            // 业务校验：类型与连接详情匹配
-            when (type) {
-                DataSourceType.LOCAL_OPML -> require(connectionDetails is DataSourceConnectionDetails.LocalOpml) {
-                    "Local OPML source must use LocalOpml connection details"
-                }
-                DataSourceType.FEVER_API -> require(connectionDetails is DataSourceConnectionDetails.FeverApi) {
-                    "Fever API source requires FeverApi details"
-                }
-                DataSourceType.GOOGLE_READER_API -> require(connectionDetails is DataSourceConnectionDetails.GoogleReaderApi) {
-                    "Google Reader API source requires GoogleReaderApi details"
-                }
+
+            // 类型匹配校验（由具体实现保证）
+            require(type == connectionDetails.type) {
+                "Data source type mismatch: expected ${type}, got ${connectionDetails.type}"
             }
+
             return DataSource(
                 id = id,
                 userId = userId,
@@ -70,7 +64,7 @@ class DataSource private constructor(
             name: String,
             connectionDetails: DataSourceConnectionDetails,
             lastSyncTime: Instant? = null,
-            lastAllReadAt: Instant? = null   // 新增参数
+            lastAllReadAt: Instant? = null
         ): DataSource {
             val datasourceName = DataSourceName.fromString(name)
             return DataSource(

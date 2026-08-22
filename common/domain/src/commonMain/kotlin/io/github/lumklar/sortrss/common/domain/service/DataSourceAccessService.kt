@@ -1,34 +1,42 @@
 package io.github.lumklar.sortrss.common.domain.service
 
-import io.github.lumklar.sortrss.common.domain.model.datasource.*
+import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceConnectionDetails
+import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceId
+import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceRepository
+import io.github.lumklar.sortrss.common.domain.model.datasource.ValidatedConnectionDetails
 import io.github.lumklar.sortrss.common.domain.model.user.*
 import io.github.lumklar.sortrss.common.domain.shared.ability.IdGenerator
 import io.github.lumklar.sortrss.common.domain.shared.enums.DataSourceType
 
 class DataSourceAccessService(
     private val userIdGenerator: IdGenerator<UserId>,
-    private val dataSourceIdGenerator: IdGenerator<DataSourceId>,
     private val userRepository: UserRepository,
     private val dataSourceRepository: DataSourceRepository,
-    // 可以注入一个用于验证凭证的端口（如 OAuthClient 类似，但针对 Fever/GoogleReader）
-    // private val dataSourceValidator: DataSourceValidator
+    private val dataSourceManagementService: DataSourceManagementService
 ) {
-
     /**
-     * 根据远程数据源连接详情，获取或创建对应的用户（可能是匿名用户）。
-     * 返回用户 ID 和数据源 ID，供后续使用。
+     * 根据远程数据源连接详情，获取或创建对应的匿名用户。
      */
     fun getOrCreateUserForRemoteDataSource(
-        type: DataSourceType,
-        connectionDetails: DataSourceConnectionDetails
+        validatedConnectionDetails: ValidatedConnectionDetails
     ): DataSourceAccessResult {
-        // 1. 验证凭证有效性（基础设施层实现，可抛出异常）
-        // dataSourceValidator.validate(connectionDetails)
+        // 0. 防御性检查：仅允许远程数据源
+        val type = validatedConnectionDetails.type
+        require(type.isRemote()) { "仅支持远程数据源，当前类型: $type" }
 
-        // 2. 检查数据源是否已存在（仓储内部处理唯一性判断）
+        // 1. 检查数据源是否已存在
+        val connectionDetails = validatedConnectionDetails.delegate
         val existingDataSource = dataSourceRepository.findByConnectionDetails(connectionDetails)
         if (existingDataSource != null) {
-            // 已存在，直接返回其归属用户
+
+            val existingUser = userRepository.findById(existingDataSource.userId)
+                ?: throw IllegalStateException("数据源关联的用户不存在: ${existingDataSource.userId}")
+
+            // 非匿名用户不允许通过远程数据源连接详情直接登录
+            if (existingUser.registrationSource != RegistrationSource.ANONYMOUS) {
+                throw DataSourceAccessDeniedException("该数据源已绑定非匿名用户，不允许通过远程数据源连接详情直接登录")
+            }
+
             return DataSourceAccessResult(
                 userId = existingDataSource.userId,
                 dataSourceId = existingDataSource.id,
@@ -42,20 +50,17 @@ class DataSourceAccessService(
         val user = User.registerAnonymous(newUserId)
         userRepository.save(user)
 
-        // 4. 创建数据源并关联到匿名用户
-        val newDataSourceId = dataSourceIdGenerator.next()
-        val dataSource = DataSource.create(
-            id = newDataSourceId,
+        // 3. 使用 DataSourceService 创建数据源（统一入口）
+        val dataSource = dataSourceManagementService.createDataSource(
             userId = newUserId,
             type = type,
-            name = generateDefaultName(type, connectionDetails), // 可自定义
-            connectionDetails = connectionDetails
+            name = generateDefaultName(type, connectionDetails),
+            validatedConnectionDetails = validatedConnectionDetails
         )
-        dataSourceRepository.save(dataSource)
 
         return DataSourceAccessResult(
             userId = newUserId,
-            dataSourceId = newDataSourceId,
+            dataSourceId = dataSource.id,
             isNewUser = true,
             isNewDataSource = true
         )
@@ -64,15 +69,8 @@ class DataSourceAccessService(
     private fun generateDefaultName(type: DataSourceType, details: DataSourceConnectionDetails): String {
         return when (type) {
             DataSourceType.LOCAL_OPML -> "本地订阅"
-            DataSourceType.FEVER_API -> {
-                val fever = details as DataSourceConnectionDetails.FeverApi
-                "Fever (${fever.endpoint.value})"
-            }
-
-            DataSourceType.GOOGLE_READER_API -> {
-                val gr = details as DataSourceConnectionDetails.GoogleReaderApi
-                "Google Reader (${gr.endpoint.value})"
-            }
+            DataSourceType.FEVER_API -> "Fever 订阅"
+            DataSourceType.GOOGLE_READER_API -> "Google Reader 订阅"
         }
     }
 }

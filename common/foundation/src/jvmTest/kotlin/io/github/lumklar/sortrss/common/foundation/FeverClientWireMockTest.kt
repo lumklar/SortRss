@@ -3,7 +3,7 @@ package io.github.lumklar.sortrss.common.foundation
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
-import io.github.lumklar.sortrss.common.foundation.shared.ability.api.fever.FeverClient
+import io.github.lumklar.sortrss.common.foundation.shared.ability.datasource.fever.FeverClient
 import io.ktor.client.*
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach

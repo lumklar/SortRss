@@ -1,7 +1,6 @@
 package io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.convert
 
 import io.github.lumklar.sortrss.common.domain.model.datasource.DataSource
-import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceConnectionDetails
 import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceId
 import io.github.lumklar.sortrss.common.domain.model.user.UserId
 import io.github.lumklar.sortrss.server.infrastructure.persistence.datasource.entity.DataSourcePo
@@ -17,6 +16,7 @@ fun DataSource.toPO(): DataSourcePo {
         type = this.type,
         name = this.name.value,
         connectionDetails = DataSourceConnectionDetailsConverter().convertToDatabaseColumn(this.connectionDetails),
+        uniqueKey = this.connectionDetails.identityKey,
         lastSyncTime = this.lastSyncTime.toJavaInstantOrNull(),
         lastAllReadAt = this.lastAllReadAt.toJavaInstantOrNull(),
         gmtCreate = null,
@@ -42,19 +42,4 @@ fun DataSourcePo.toDomain(): DataSource {
         lastSyncTime = this.lastSyncTime.toKotlinInstantOrNull(),
         lastAllReadAt = this.lastAllReadAt.toKotlinInstantOrNull()
     )
-}
-
-/**
- * 根据连接详情生成稳定唯一键，仅用于数据库优化。
- * 本地 OPML 没有稳定标识，返回随机 UUID 保证数据库列非空且唯一，
- * 但业务上不限制重复（existsByConnectionDetails 对 LocalOpml 应返回 false 或特殊处理）。
- */
-private fun generateUniqueKey(dataSourceId: DataSourceId, details: DataSourceConnectionDetails): String {
-    return when (details) {
-        is DataSourceConnectionDetails.LocalOpml -> dataSourceId.value.toJavaUuid().toString()
-        is DataSourceConnectionDetails.FeverApi ->
-            "fever:${details.endpoint.value.trimEnd('/')}:${details.username}"
-        is DataSourceConnectionDetails.GoogleReaderApi ->
-            "google-reader:${details.endpoint.value.trimEnd('/')}:${details.accessToken}"
-    }
 }

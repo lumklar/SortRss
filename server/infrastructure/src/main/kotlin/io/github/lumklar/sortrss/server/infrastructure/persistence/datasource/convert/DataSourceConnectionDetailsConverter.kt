@@ -7,6 +7,9 @@ import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceConnectionDetails
+import io.github.lumklar.sortrss.common.foundation.model.datasource.FeverApiConnectionDetails
+import io.github.lumklar.sortrss.common.foundation.model.datasource.GoogleReaderApiConnectionDetails
+import io.github.lumklar.sortrss.common.foundation.model.datasource.LocalOpmlConnectionDetails
 import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Converter
 import org.springframework.stereotype.Component
@@ -65,17 +68,8 @@ class DataSourceConnectionDetailsConverter :
     property = "type"
 )
 @JsonSubTypes(
-    JsonSubTypes.Type(
-        value = DataSourceConnectionDetails.LocalOpml::class,
-        name = "local-opml"
-    ),
-    JsonSubTypes.Type(
-        value = DataSourceConnectionDetails.FeverApi::class,
-        name = "fever-api"
-    ),
-    JsonSubTypes.Type(
-        value = DataSourceConnectionDetails.GoogleReaderApi::class,
-        name = "google-reader-api"
-    )
+    JsonSubTypes.Type(value = LocalOpmlConnectionDetails::class, name = "local-opml"),
+    JsonSubTypes.Type(value = FeverApiConnectionDetails::class, name = "fever-api"),
+    JsonSubTypes.Type(value = GoogleReaderApiConnectionDetails::class, name = "google-reader-api")
 )
 private abstract class DataSourceConnectionDetailsMixin

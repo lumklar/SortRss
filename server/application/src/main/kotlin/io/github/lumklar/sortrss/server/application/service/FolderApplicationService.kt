@@ -1,4 +1,4 @@
 package io.github.lumklar.sortrss.server.application.service
 
-interface ArticleService {
+interface FolderApplicationService {
 }

@@ -1,22 +1,23 @@
 package io.github.lumklar.sortrss.server.application.service.impl
 
 import io.github.lumklar.sortrss.common.domain.model.user.*
+import io.github.lumklar.sortrss.common.domain.shared.ability.IdGenerator
 import io.github.lumklar.sortrss.common.domain.shared.ability.PasswordEncoder
-import io.github.lumklar.sortrss.common.foundation.validation.password.UUIDGenerator
 import io.github.lumklar.sortrss.server.application.assembler.toDto
 import io.github.lumklar.sortrss.server.application.pojo.user.command.RegisterUserCommand
 import io.github.lumklar.sortrss.server.application.pojo.user.dto.UserDto
 import io.github.lumklar.sortrss.server.application.pojo.user.query.UserQuery
-import io.github.lumklar.sortrss.server.application.service.UserService
+import io.github.lumklar.sortrss.server.application.service.UserApplicationService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class UserServiceImpl(
+class UserApplicationServiceImpl(
+    private val userIdGenerator: IdGenerator<UserId>,
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
     private val passwordPolicy: PasswordPolicy
-) : UserService {
+) : UserApplicationService {
 
     /**
      * 注册新用户（命令模式）。
@@ -28,12 +29,12 @@ class UserServiceImpl(
     @Transactional
     override fun register(command: RegisterUserCommand): UserDto {
         // 1. 校验用户名唯一性
-        if (userRepository.existsByUsername(command.username)) {
+        if (userRepository.existsByUsername(Username.fromBusinessString(command.username))) {
             throw UsernameAlreadyExistsException("Username '${command.username}' already exists")
         }
 
         // 2. 生成用户ID
-        val userId = UserId(UUIDGenerator.generateUuid())
+        val userId = userIdGenerator.next()
 
         // 3. 调用领域工厂创建用户
         val user = User.register(
@@ -56,7 +57,7 @@ class UserServiceImpl(
         // 当前仅使用 username 查询，校验非空
         val username = query.username ?: throw UsernameEmptyException("Username must not be null")
 
-        val user = userRepository.findByUsername(username)
+        val user = userRepository.findByUsername(Username.fromBusinessString(username))
             ?: throw UserNotFoundException("User with username '$username' not found")
 
         return user.toDto()

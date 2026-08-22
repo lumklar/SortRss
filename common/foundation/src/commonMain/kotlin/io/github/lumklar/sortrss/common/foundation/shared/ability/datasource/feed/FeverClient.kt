@@ -1,19 +1,15 @@
-package io.github.lumklar.sortrss.common.foundation.shared.ability.api.fever
+package io.github.lumklar.sortrss.common.foundation.shared.ability.datasource.fever
 
-import io.github.lumklar.sortrss.common.domain.shared.ability.datasource.Favicon
-import io.github.lumklar.sortrss.common.domain.shared.ability.datasource.Feed
-import io.github.lumklar.sortrss.common.domain.shared.ability.datasource.FeedService
-import io.github.lumklar.sortrss.common.domain.shared.ability.datasource.Group
-import io.github.lumklar.sortrss.common.domain.shared.ability.datasource.Item
-import io.github.lumklar.sortrss.common.domain.shared.ability.datasource.Link
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceConnectionException
+import io.github.lumklar.sortrss.common.domain.shared.ability.datasource.*
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
-import io.ktor.client.request.forms.FormDataContent
-import io.ktor.client.statement.HttpResponse
+import io.ktor.client.request.forms.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.json
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import org.kotlincrypto.hash.md.MD5
@@ -114,6 +110,19 @@ class FeverClient(
     }
 
     // ------------------- 实现接口 -------------------
+    override suspend fun validateConnection() {
+        // Fever API 的认证测试端点：GET 或 POST ?api
+        // 使用现有的 getRequest，传入空 action，会构造 URL: ?api
+        // getRequest 内部已经检查 auth == 1，失败会抛出 IOException
+        try {
+            getRequest<FeverAuthResponse>("")
+        } catch (e: IOException) {
+            throw DataSourceConnectionException("Fever 连接验证失败", e)
+        } catch (e: Exception) {
+            throw DataSourceConnectionException("Fever 连接验证异常", e)
+        }
+    }
+
     override suspend fun getFeeds(): List<Feed> {
         val dto = getRequest<FeverFeedsResponse>("feeds")
         val feedGroupMap = FeverMapper.buildFeedGroupMap(dto.feedsGroups)
@@ -165,45 +174,55 @@ class FeverClient(
     }
 
     override suspend fun markItemAsRead(itemId: String) {
-        writeRequestNoResult(mapOf(
-            "mark" to "item",
-            "as" to "read",
-            "id" to itemId
-        ))
+        writeRequestNoResult(
+            mapOf(
+                "mark" to "item",
+                "as" to "read",
+                "id" to itemId
+            )
+        )
     }
 
     override suspend fun saveItem(itemId: String) {
-        writeRequestNoResult(mapOf(
-            "mark" to "item",
-            "as" to "saved",
-            "id" to itemId
-        ))
+        writeRequestNoResult(
+            mapOf(
+                "mark" to "item",
+                "as" to "saved",
+                "id" to itemId
+            )
+        )
     }
 
     override suspend fun unsaveItem(itemId: String) {
-        writeRequestNoResult(mapOf(
-            "mark" to "item",
-            "as" to "unsaved",
-            "id" to itemId
-        ))
+        writeRequestNoResult(
+            mapOf(
+                "mark" to "item",
+                "as" to "unsaved",
+                "id" to itemId
+            )
+        )
     }
 
     override suspend fun markFeedAsRead(feedId: String, before: Long) {
-        writeRequestNoResult(mapOf(
-            "mark" to "feed",
-            "as" to "read",
-            "id" to feedId,
-            "before" to before.toString()
-        ))
+        writeRequestNoResult(
+            mapOf(
+                "mark" to "feed",
+                "as" to "read",
+                "id" to feedId,
+                "before" to before.toString()
+            )
+        )
     }
 
     override suspend fun markGroupAsRead(groupId: String, before: Long) {
-        writeRequestNoResult(mapOf(
-            "mark" to "group",
-            "as" to "read",
-            "id" to groupId,
-            "before" to before.toString()
-        ))
+        writeRequestNoResult(
+            mapOf(
+                "mark" to "group",
+                "as" to "read",
+                "id" to groupId,
+                "before" to before.toString()
+            )
+        )
     }
 
     override suspend fun unreadRecentlyRead() {

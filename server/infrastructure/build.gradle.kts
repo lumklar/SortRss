@@ -32,7 +32,8 @@ dependencyCheck {
 
 dependencies {
     implementation(project(":common:domain"))
-    implementation(project(":common:foundation"))
+    api(project(":common:foundation"))
+    implementation(project(":server:application"))
 
     // Kotlin
     implementation(libs.kotlin.stdlib)

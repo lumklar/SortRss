@@ -23,7 +23,7 @@ value class Username private constructor(val value: String) {
          * - 长度 3~20
          * - 仅允许字母、数字、下划线
          */
-        internal fun fromBusinessString(raw: String): Username {
+        fun fromBusinessString(raw: String): Username {
             val trimmed = raw.trim()
             val username = Username(trimmed) // 先经过基础校验
             require(trimmed.length in 3..20) {

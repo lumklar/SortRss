@@ -19,9 +19,8 @@ kotlin-insert = "4.2.2"
 ksp = "2.3.11"
 graalvm = "1.1.7"
 dependency-management = "1.1.7"
-# TODO 漏洞检查，版本检查，冲突检查，未使用检查
+# TODO 冲突检查，未使用检查
 dependency-check-jvm = "13.0.0"
-dependency-update = "0.51.0"
 dependency-unused = "0"
 dependency-conflict = "0"
 use-python = "4.1.0"

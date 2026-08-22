@@ -7,10 +7,13 @@ class User private constructor(
     val id: UserId,
     username: Username,
     private var password: Password?,
-    val registrationSource: RegistrationSource
+    registrationSource: RegistrationSource
 ) {
     // 公开只读属性（外部可访问，但不能直接赋值）
     var username: Username = username
+        private set
+
+    var registrationSource: RegistrationSource = registrationSource
         private set
 
     companion object {
@@ -101,5 +104,37 @@ class User private constructor(
     // 修改用户名（唯一入口，执行严格验证）
     fun changeUsername(newUsername: String) {
         this.username = Username.fromBusinessString(newUsername)
+    }
+    /**
+     * 将匿名用户升级为外部来源（不涉及密码）。
+     * 用于第三方绑定场景。
+     */
+    internal fun upgradeFromAnonymousToExternal() {
+        ensureAnonymous()
+        this.registrationSource = RegistrationSource.EXTERNAL
+    }
+
+    /**
+     * 匿名用户通过设置密码升级为本地注册用户。
+     * 用于本地密码设置场景。
+     */
+    fun upgradeFromAnonymousWithPassword(
+        rawPassword: String,
+        encoder: PasswordEncoder,
+        policy: PasswordPolicy
+    ) {
+        ensureAnonymous()
+        // 先设置密码（如果失败会抛出异常，来源不会改变）
+        setPassword(rawPassword, encoder, policy)
+        this.registrationSource = RegistrationSource.LOCAL
+    }
+
+    /**
+     * 私有辅助方法：检查当前用户是否为匿名，否则抛出异常。
+     */
+    private fun ensureAnonymous() {
+        require(this.registrationSource == RegistrationSource.ANONYMOUS) {
+            "只有匿名用户可以执行此操作"
+        }
     }
 }
