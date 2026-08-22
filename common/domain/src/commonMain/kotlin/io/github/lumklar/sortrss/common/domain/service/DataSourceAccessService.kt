@@ -1,6 +1,5 @@
 package io.github.lumklar.sortrss.common.domain.service
 
-import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceConnectionDetails
 import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceId
 import io.github.lumklar.sortrss.common.domain.model.datasource.DataSourceRepository
 import io.github.lumklar.sortrss.common.domain.model.datasource.ValidatedConnectionDetails
@@ -54,7 +53,7 @@ class DataSourceAccessService(
         val dataSource = dataSourceManagementService.createDataSource(
             userId = newUserId,
             type = type,
-            name = generateDefaultName(type, connectionDetails),
+            name = generateDefaultName(type),
             validatedConnectionDetails = validatedConnectionDetails
         )
 
@@ -66,7 +65,7 @@ class DataSourceAccessService(
         )
     }
 
-    private fun generateDefaultName(type: DataSourceType, details: DataSourceConnectionDetails): String {
+    private fun generateDefaultName(type: DataSourceType): String {
         return when (type) {
             DataSourceType.LOCAL_OPML -> "本地订阅"
             DataSourceType.FEVER_API -> "Fever 订阅"

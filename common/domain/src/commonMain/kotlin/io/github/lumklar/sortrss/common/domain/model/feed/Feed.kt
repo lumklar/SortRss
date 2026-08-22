@@ -1,6 +1,5 @@
 package io.github.lumklar.sortrss.common.domain.model.feed
 
-import io.github.lumklar.sortrss.common.domain.model.user.UserId
 import io.github.lumklar.sortrss.common.domain.shared.enums.DataSourceType
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -50,7 +49,6 @@ class Feed private constructor(
          */
         fun create(
             id: FeedId,
-            userId: UserId,
             feedUrl: String,
             title: String,
             siteUrl: String? = null,

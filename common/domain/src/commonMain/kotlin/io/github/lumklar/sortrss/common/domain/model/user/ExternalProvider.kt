@@ -6,11 +6,3 @@ enum class ExternalProvider {
     WEIBO,
     GOOGLE
 }
-
-fun ExternalProvider.toRegistrationSource(): RegistrationSource = RegistrationSource.EXTERNAL
-//    when (this) {
-//        ExternalProvider.QQ -> RegistrationSource.EXTERNAL
-//        ExternalProvider.WECHAT -> RegistrationSource.EXTERNAL
-//        ExternalProvider.WEIBO -> RegistrationSource.EXTERNAL
-//        ExternalProvider.GOOGLE -> RegistrationSource.EXTERNAL
-//    }
