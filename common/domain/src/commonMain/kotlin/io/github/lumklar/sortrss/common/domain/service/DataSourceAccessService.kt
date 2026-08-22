@@ -36,6 +36,12 @@ class DataSourceAccessService(
                 throw DataSourceAccessDeniedException("该数据源已绑定非匿名用户，不允许通过远程数据源连接详情直接登录")
             }
 
+            // 如果连接详情不完全一致（如密码变化），则更新
+            if (!existingDataSource.connectionDetails.hasSameContentAs(connectionDetails)) {
+                existingDataSource.updateConnectionDetails(connectionDetails)
+                dataSourceRepository.save(existingDataSource)
+            }
+
             return DataSourceAccessResult(
                 userId = existingDataSource.userId,
                 dataSourceId = existingDataSource.id,

@@ -42,6 +42,7 @@ dependencies {
 
     // spring boot
     implementation(libs.spring.boot.starter)
+    implementation(libs.spring.boot.starter.aspectj)
 
     //事务
     implementation(libs.spring.tx)

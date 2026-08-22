@@ -2,7 +2,8 @@ package io.github.lumklar.sortrss.common.api.service
 
 import io.github.lumklar.sortrss.common.api.annotation.ApiRoute
 import io.github.lumklar.sortrss.common.api.annotation.HttpMethod
-import io.github.lumklar.sortrss.common.api.dto.feed.FeedRequest
+import io.github.lumklar.sortrss.common.api.dto.feed.FeverFeedRequest
+import io.github.lumklar.sortrss.common.api.dto.feed.GoogleFeedRequest
 import io.github.lumklar.sortrss.common.api.route.FeedRoute
 
 /**
@@ -10,10 +11,18 @@ import io.github.lumklar.sortrss.common.api.route.FeedRoute
  */
 interface FeedApi {
     /**
-     * 获取聚合rss信息
+     * 根据fever获取聚合rss信息
      * @param request 请求参数
      * @return 聚合rss xml
      */
-    @ApiRoute(FeedRoute.FEED_BASE, HttpMethod.GET)
-    fun feed(request: FeedRequest): String;
+    @ApiRoute(FeedRoute.FEED_FEVER, HttpMethod.GET)
+    suspend fun feverFeed(request: FeverFeedRequest): String
+
+    /**
+     * 根据google feed获取聚合rss信息
+     * @param request 请求参数
+     * @return 聚合rss xml
+     */
+    @ApiRoute(FeedRoute.FEED_GOOGLE, HttpMethod.GET)
+    suspend fun googleFeed(request: GoogleFeedRequest): String
 }

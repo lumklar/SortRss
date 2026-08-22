@@ -4,8 +4,8 @@ import io.github.lumklar.sortrss.common.api.dto.ApiExtra
 import io.github.lumklar.sortrss.common.api.dto.ApiResult
 import io.github.lumklar.sortrss.common.api.dto.ApiResultCode
 import io.github.lumklar.sortrss.common.api.dto.ErrorSource
-import io.github.lumklar.sortrss.common.domain.shared.exception.DomainException
 import io.github.lumklar.sortrss.common.shared.utils.ExceptionStackTraceUtil
+import io.github.lumklar.sortrss.server.application.exception.ApplicationException
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
@@ -31,15 +31,15 @@ class GlobalExceptionHandler(
     private val log = LoggerFactory.getLogger(javaClass)
 
     // ====================== 1. 自定义业务异常（核心） ======================
-    @ExceptionHandler(DomainException::class)
-    fun handleBusinessException(e: DomainException): ApiResult<Nothing> {
-        val domainCode = e.domainCode
-        log.warn("Business exception: code=${e.domainCode.code}, msg=${e.domainCode.msg}", e)
+    @ExceptionHandler(ApplicationException::class)
+    fun handleBusinessException(e: ApplicationException): ApiResult<Nothing> {
+        //TODO 区分异常来源
+        log.warn("Business exception: code=${e.code}, msg=${e.message}", e)
         // 根据配置决定是否构建 ApiExtra
         val extra = buildExtra(
             source = ErrorSource.DOMAIN,
-            errorCode = domainCode.code,
-            errorMsg = domainCode.msg,
+            errorCode = e.code,
+            errorMsg = e.message,
             throwable = e
         )
         return ApiResult.failure(ApiResultCode.BUSINESS_ERROR, extra)

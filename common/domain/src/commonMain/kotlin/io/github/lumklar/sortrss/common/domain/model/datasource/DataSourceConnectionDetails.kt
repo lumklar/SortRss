@@ -20,9 +20,17 @@ interface DataSourceConnectionDetails {
      * 判断两个连接详情是否代表同一数据源。
      * 默认实现基于 identityKey 比较，子类可按需覆盖。
      */
-    fun sameAs(other: DataSourceConnectionDetails): Boolean {
+    fun hasSameIdentityAs(other: DataSourceConnectionDetails): Boolean {
         val thisKey = identityKey
         val otherKey = other.identityKey
         return thisKey == otherKey
+    }
+
+    /**
+     * 判断两个连接详情是否完全一致（包括所有属性，如密码）。
+     * 默认实现基于 equals，子类如有特殊需求可覆盖。
+     */
+    fun hasSameContentAs(other: DataSourceConnectionDetails): Boolean {
+        return this == other
     }
 }

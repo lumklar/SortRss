@@ -13,14 +13,17 @@ class DataSource private constructor(
     val userId: UserId,
     val type: DataSourceType,
     val name: DataSourceName,
-    val connectionDetails: DataSourceConnectionDetails,
-    initialLastSyncTime: Instant? = null,
-    initialLastAllReadAt: Instant? = null   // 新增：用户全部已读时间戳
+    connectionDetails: DataSourceConnectionDetails,
+    lastSyncTime: Instant? = null,
+    lastAllReadAt: Instant? = null   // 新增：用户全部已读时间戳
 ) {
-    var lastSyncTime: Instant? = initialLastSyncTime
+    var connectionDetails: DataSourceConnectionDetails = connectionDetails
         private set
 
-    var lastAllReadAt: Instant? = initialLastAllReadAt   // 新增字段，私有 set
+    var lastSyncTime: Instant? = lastSyncTime
+        private set
+
+    var lastAllReadAt: Instant? = lastAllReadAt   // 新增字段，私有 set
         private set
 
     companion object {
@@ -47,8 +50,8 @@ class DataSource private constructor(
                 type = type,
                 name = datasourceName,
                 connectionDetails = connectionDetails,
-                initialLastSyncTime = null,
-                initialLastAllReadAt = null   // 新数据源明确置为 null
+                lastSyncTime = null,
+                lastAllReadAt = null   // 新数据源明确置为 null
             )
         }
 
@@ -73,10 +76,27 @@ class DataSource private constructor(
                 type = type,
                 name = datasourceName,
                 connectionDetails = connectionDetails,
-                initialLastSyncTime = lastSyncTime,
-                initialLastAllReadAt = lastAllReadAt
+                lastSyncTime = lastSyncTime,
+                lastAllReadAt = lastAllReadAt
             )
         }
+    }
+
+    /**
+     * 更新连接详情（通常用于密码等敏感信息变更）。
+     * 约束：
+     * - 类型必须匹配；
+     * - identityKey 不可变（即 endpoint 和 username 不能变，否则应视为新数据源）。
+     */
+    fun updateConnectionDetails(newDetails: DataSourceConnectionDetails) {
+        require(newDetails.type == type) {
+            "Data source type mismatch: expected $type, got ${newDetails.type}"
+        }
+        require(newDetails.hasSameIdentityAs(connectionDetails)) {
+            "Cannot change identity key: ${connectionDetails.identityKey} -> ${newDetails.identityKey}"
+        }
+
+        this.connectionDetails = newDetails
     }
 
     /**
@@ -90,8 +110,8 @@ class DataSource private constructor(
      * 同步完成后调用，更新最后同步时间。
      */
     fun markSyncCompleted(syncTime: Instant) {
-        require(syncTime >= (lastSyncTime ?: syncTime)) {
-            "Sync time cannot be earlier than last sync time: $lastSyncTime"
+        require(syncTime >= (this@DataSource.lastSyncTime ?: syncTime)) {
+            "Sync time cannot be earlier than last sync time: ${this@DataSource.lastSyncTime}"
         }
         this.lastSyncTime = syncTime
     }
@@ -104,4 +124,5 @@ class DataSource private constructor(
         // require(readTime >= (lastAllReadAt ?: Instant.MIN)) { "New all-read time cannot be earlier than previous" }
         this.lastAllReadAt = readTime
     }
+
 }

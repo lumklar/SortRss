@@ -34,7 +34,6 @@ dependencyCheck {
 dependencies {
     implementation(project(":common:api"))
     implementation(project(":common:shared"))
-    implementation(project(":common:domain"))
     implementation(project(":server:application"))
 
     // Kotlin

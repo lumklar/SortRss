@@ -7,15 +7,18 @@ import io.github.lumklar.sortrss.server.application.pojo.user.query.UserQuery
 import io.github.lumklar.sortrss.server.application.service.UserApplicationService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/users")
 class UserController(
     private val userApplicationService: UserApplicationService
 ) : UserApi {
-    @GetMapping("/username/{username}")
+    /**
+     * 根据用户名获取用户信息
+     * TODO 在userapi中定义
+     * @param username 用户名
+     */
+    @GetMapping("/api/users/username/{username}")
     fun getUserByUsername(@PathVariable username: String): ApiResult<UserDto> {
         val query = UserQuery(username = username)
         val user = userApplicationService.queryUser(query)
