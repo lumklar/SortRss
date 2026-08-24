@@ -15,24 +15,20 @@ fun Project.getConfigString(key: String): String? {
     var propertyKey = EnvPropertyConverter.envToProperty(key)
     gradle.startParameter.projectProperties[propertyKey]
         ?.takeIf { it.isNotBlank() }
-        ?.let { return it.lowercase() }
 
     // 2. 系统属性（新增来源，优先级介于环境变量和文件之间）
     System.getProperty(propertyKey)
         ?.takeIf { it.isNotBlank() }
-        ?.let { return it.lowercase() }
 
     // 3. 环境变量（次高优先级） - 修复 NPE 风险
     EnvPropertyConverter.propertyToEnv(propertyKey).let { envKey ->
         System.getenv(envKey)
             ?.takeIf { it.isNotBlank() }
-            ?.let { return it.lowercase() }
     }
 
     // 4. Gradle 属性文件（最低优先级） - 修复空字符串问题
     providers.gradleProperty(propertyKey).orNull
         ?.takeIf { it.isNotBlank() }
-        ?.let { return it.lowercase() }
 
     return null
 }

@@ -38,8 +38,8 @@ theme:
     - navigation.top
     - content.action.edit
 
-plugins:
-  - markdownextradata
+#plugins:
+#  - markdownextradata
 #  - search
 #    Required for variables support (https://github.com/rosscdh/mkdocs-markdownextradata-plugin)
 #  - markdownextradata
