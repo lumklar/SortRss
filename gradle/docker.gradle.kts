@@ -21,7 +21,7 @@ createDockerTask(
             namespace = dockerNamespace,
             repository = dockerRepository,
             registryList = listOf(dockerRegistry),
-            envVars = mapOf("VERSION" to projectVersion),
+            envVars = mapOf("VERSION" to projectVersion, "DIST_ROOT" to "wasmJs/productionExecutable/"),
             dependencies = listOf(":server:bootstrap" to "bootJar", ":app:webApp" to "wasmJsBrowserDistribution"),
             stringEnums = listOf(listOf(DataFlavor.NETWORK)),
             platforms = listOf("linux/amd64", "linux/arm64", "windows/amd64", "linux/ppc64le", "linux/s390x"),

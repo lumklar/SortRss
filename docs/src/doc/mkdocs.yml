@@ -1,14 +1,16 @@
+hooks:
+  - scripts/hooks.py
 site_name: docs
 
 # Meta tags (placed in header)
 site_description: "Sort-Rss multi-module project"
 site_author: Lumklar
 #TODO 动态配置路径
-site_url: https://lumklar.github.io/SortRss/docs/
+site_url:
 
 # Repository (add link to repository on each page)
 repo_name: SortRss
-repo_url: https://github.com/lumklar/SortRss
+repo_url:
 edit_uri: edit/dev/docs/src/doc/docs
 
 #Copyright (shown at the footer)
@@ -36,7 +38,8 @@ theme:
     - navigation.top
     - content.action.edit
 
-#plugins:
+plugins:
+  - markdownextradata
 #  - search
 #    Required for variables support (https://github.com/rosscdh/mkdocs-markdownextradata-plugin)
 #  - markdownextradata

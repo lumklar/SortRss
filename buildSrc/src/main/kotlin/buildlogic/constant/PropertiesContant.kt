@@ -12,4 +12,7 @@ object PropertiesContant {
     const val DOCKER_NAMESPACE = DOCKER_PREFIX + "namespace"
     const val DOCKER_REPOSITORY = DOCKER_PREFIX + "repository"
     const val DOCKER_TAG_SUFFIX = DOCKER_PREFIX + "tag.suffix"
+
+    const val SITE_URL = "site.url"
+    const val REPO_URL = "repo.url"
 }

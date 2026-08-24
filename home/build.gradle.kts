@@ -1,6 +1,7 @@
-import org.codehaus.groovy.ast.tools.GeneralUtils.args
-import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.tasks.Sync
+
+import buildlogic.constant.PropertiesContant
+import buildlogic.utils.getConfigString
+import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id("base")
@@ -9,7 +10,7 @@ plugins {
 
 // -------- Node 配置 ----------
 node {
-    version = "20.0.0"          // 直接赋值
+    version = "24.13.0"          // 直接赋值
     npmVersion = "10.5.0"       // 直接赋值
 }
 
@@ -53,9 +54,19 @@ val prepareDistribution = tasks.register<Sync>("prepareDistribution") {
         include("**/*")
     }
 
+    val repoUrl = getConfigString(PropertiesContant.REPO_URL, "https://github.com/lumklar/SortRss")
+    inputs.property("repoUrl", repoUrl)
+
     // 压缩后的前端资源
     from(layout.buildDirectory.dir("compressed")) {
         include("**/*")
+        filesMatching("index.html") {
+            filter<ReplaceTokens>(
+                "tokens" to mapOf(
+                    "REPO_URL" to repoUrl
+                )
+            )
+        }
     }
 
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
