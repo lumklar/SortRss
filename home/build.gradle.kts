@@ -35,7 +35,7 @@ val prepareDistribution = tasks.register<Sync>("prepareDistribution") {
     dependsOn(
         "compressFrontend",
         "convertFavicon",
-        project(":docs").tasks.named("assemble"),
+        project(":docs").tasks.named("moveDocs"),
         project(":app:webApp").tasks.named("wasmJsBrowserDistribution")
     )
 

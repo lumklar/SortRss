@@ -6,6 +6,7 @@ target/
 build/
 .kotlin/
 .intellijPlatform/
+venv/
 
 # Compiled class file
 *.class

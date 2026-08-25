@@ -1,4 +1,6 @@
 import buildlogic.constant.PropertiesContant
+import buildlogic.docs.MikeDeployConfig
+import buildlogic.docs.createMikeDeployTask
 import buildlogic.utils.getConfigString
 import ru.vyarus.gradle.plugin.mkdocs.task.MkdocsBuildTask
 
@@ -24,16 +26,26 @@ val siteUrl = getConfigString(PropertiesContant.SITE_URL, "https://lumklar.githu
 tasks.named<MkdocsBuildTask>("mkdocsBuild") {
     environment("REPO_URL", repoUrl)
     environment("SITE_URL", siteUrl + "/docs/")
+    environment("VERSION", project.version.toString())
 }
 
 // 注册一个 Sync 任务，将 mkdocs 产物从 build/mkdocs 移动到 build/dist
 val moveDocs = tasks.register<Sync>("moveDocs") {
-    //TODO 增加多版本文档
     //TODO 是否压缩html？
     dependsOn("mkdocsBuild")           // 确保先构建
     from("build/mkdocs")               // 源目录
     into("build/dist")                 // 目标目录
 }
+
+createMikeDeployTask(
+    MikeDeployConfig(
+        workingDir = "src/doc",
+        branch = "docs",
+        deployPrefix = "docs/",
+        versions = listOf(project.version.toString()),
+        defaultVersion = project.version.toString()
+    )
+)
 
 // 挂接到 assemble
 tasks.named("assemble") {

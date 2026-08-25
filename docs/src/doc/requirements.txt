@@ -1,0 +1,4 @@
+mike>=1.1.0
+mkdocs-material>=9.0.0
+# 如需要其他扩展，可一并添加
+# pymdown-extensions

@@ -10,4 +10,11 @@ def on_config(config):
     if site_url:
         config.site_url = site_url
 
+    version = os.environ.get('VERSION')
+    if version:
+        # 确保 extra 中有 version 键，且其值是一个字典
+        if 'version' not in config.extra:
+            config.extra['version'] = {}
+        config.extra['version']['default'] = version
+
     return config

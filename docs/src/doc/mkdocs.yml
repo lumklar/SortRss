@@ -1,11 +1,11 @@
 hooks:
   - scripts/hooks.py
 site_name: docs
+site_dir: ../../build/site
 
 # Meta tags (placed in header)
 site_description: "Sort-Rss multi-module project"
 site_author: Lumklar
-#TODO 动态配置路径
 site_url:
 
 # Repository (add link to repository on each page)
@@ -46,13 +46,14 @@ theme:
 #  - mkdocs-static-i18n:
 #      default_language: zh
 
-#extra:
+extra:
 #  palette:
 #    primary: 'indigo'
 #    accent: 'indigo'
 
-#  version:
-#    provider: mike
+  version:
+    provider: mike
+#    default: latest
 
 #  social:
 #    - icon: fontawesome/brands/GitHub

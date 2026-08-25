@@ -8,27 +8,31 @@ import org.gradle.api.Project
  * 2. 环境变量（大写，下划线分隔，如 `DATABASE_URL`）
  * 3. gradle.properties 文件中的属性（小写点分隔形式）
  *
- * 返回结果统一转换为小写；若所有来源均无值，则返回 null。
+ * 返回结果保持原有大小写；若所有来源均无值，则返回 null。
  */
 fun Project.getConfigString(key: String): String? {
     // 1. 命令行项目属性（最高优先级） - 修复空字符串问题
     var propertyKey = EnvPropertyConverter.envToProperty(key)
     gradle.startParameter.projectProperties[propertyKey]
         ?.takeIf { it.isNotBlank() }
+        ?.let { return it }
 
     // 2. 系统属性（新增来源，优先级介于环境变量和文件之间）
     System.getProperty(propertyKey)
         ?.takeIf { it.isNotBlank() }
+        ?.let { return it }
 
     // 3. 环境变量（次高优先级） - 修复 NPE 风险
     EnvPropertyConverter.propertyToEnv(propertyKey).let { envKey ->
         System.getenv(envKey)
             ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
     }
 
     // 4. Gradle 属性文件（最低优先级） - 修复空字符串问题
     providers.gradleProperty(propertyKey).orNull
         ?.takeIf { it.isNotBlank() }
+        ?.let { return it }
 
     return null
 }
