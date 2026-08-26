@@ -1,4 +1,6 @@
 name: Release Binary
+#TODO 支持网页上手动发布时执行ci/cd
+#TODO 发布前校验tag，commit，gradle.properties中版本是否一致
 
 on:
   push:
