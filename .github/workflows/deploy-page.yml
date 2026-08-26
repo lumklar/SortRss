@@ -73,15 +73,18 @@ jobs:
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           CURRENT_BRANCH=$(git branch --show-current)
-          if ! git ls-remote --heads origin docs | grep -q docs; then
+         # 检查远程是否存在 docs 分支
+          if git ls-remote --heads origin docs | grep -q docs; then
+            echo "docs branch exists, updating local docs branch to match remote..."
+            # 强制拉取远程 docs 到本地 docs（不切换分支）
+            git fetch origin +docs:docs
+          else
             echo "docs branch not found, creating empty orphan branch..."
             git checkout --orphan docs
             git rm -rf . > /dev/null 2>&1
             git commit --allow-empty -m "Initial empty docs branch"
             git push origin docs
             git checkout $CURRENT_BRANCH
-          else
-            echo "docs branch already exists, skipping creation."
           fi
 
       # ------------------------------------------------------------
