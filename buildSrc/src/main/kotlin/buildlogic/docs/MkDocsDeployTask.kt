@@ -35,6 +35,9 @@ internal abstract class MikeDeployTask @Inject constructor(
     @get:Input
     abstract val defaultVersion: Property<String>
 
+    @get:Input
+    abstract val push: Property<Boolean>
+
     @TaskAction
     fun deploy() {
         //TODO 推送到远端
@@ -43,6 +46,7 @@ internal abstract class MikeDeployTask @Inject constructor(
         val prefixVal = deployPrefix.get()
         val versionList = versions.get()
         val defaultVal = defaultVersion.get()
+        val doPush = push.get()
 
         require(workDir.exists()) { "Working directory '${workDir.absolutePath}' does not exist" }
         require(versionList.isNotEmpty()) { "Versions list must not be empty" }
@@ -52,24 +56,28 @@ internal abstract class MikeDeployTask @Inject constructor(
         versionList.forEach { version ->
             execOps.exec {
                 workingDir = workDir
-                commandLine(
+                val cmd = mutableListOf(
                     "mike", "deploy",
                     "-b", branchVal,
-                    "--deploy-prefix", prefixVal,
-                    version
+                    "--deploy-prefix", prefixVal
                 )
+                if (doPush) cmd.add("--push")
+                cmd.add(version)
+                commandLine(cmd)
             }
         }
 
         // 设置默认版本
         execOps.exec {
             workingDir = workDir
-            commandLine(
+            val cmd = mutableListOf(
                 "mike", "set-default",
                 "-b", branchVal,
-                "--deploy-prefix", prefixVal,
-                defaultVal
+                "--deploy-prefix", prefixVal
             )
+            if (doPush) cmd.add("--push")
+            cmd.add(defaultVal)
+            commandLine(cmd)
         }
     }
 }

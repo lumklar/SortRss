@@ -37,7 +37,7 @@ val moveDocs = tasks.register<Sync>("moveDocs") {
     into("build/dist")                 // 目标目录
 }
 
-createMikeDeployTask(
+val mikeTasks = createMikeDeployTask(
     MikeDeployConfig(
         workingDir = "src/doc",
         branch = "docs",
@@ -46,6 +46,16 @@ createMikeDeployTask(
         defaultVersion = project.version.toString()
     )
 )
+
+// 获取关键任务引用
+val unpackTask = mikeTasks.unpack                 // 单独的 GitArchiveUnpackTask
+
+// 新增：将 mike 解压产物复制到 build/dist
+val moveMikeDocs = tasks.register<Sync>("moveMikeDocs") {
+    dependsOn(unpackTask)                    // 确保解压完成
+    from("build/mike")     // 源目录：GitArchiveUnpackTask 的 unpackDir 输出
+    into("build/dist")                            // 目标目录
+}
 
 // 挂接到 assemble
 tasks.named("assemble") {

@@ -21,8 +21,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # ------------------------------------------------------------
+      # 0. 检出代码（获取全部分支历史，以便操作 docs 分支）
+      # ------------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0           # ★ 必须，才能查看远程分支
 
       # ------------------------------------------------------------
       # 1. 设置 JDK（Gradle 运行环境）
@@ -45,24 +50,56 @@ jobs:
         run: chmod +x gradlew
 
       # ------------------------------------------------------------
-      # 3. （新增）设置 Python 环境，并缓存 pip 依赖
+      # 3. 设置 Python 环境（mike 需要）
       # ------------------------------------------------------------
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'      # 可自行调整版本
+          python-version: '3.*'
           cache: 'pip'                # 自动缓存 ~/.cache/pip
 
       # ------------------------------------------------------------
-      # 4. 执行编译任务，并注入环境变量 FLAVOR_DATA=mock
+      # 4. 配置 Git 身份（用于创建/推送 docs 分支）
+      # ------------------------------------------------------------
+      - name: Configure Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # ------------------------------------------------------------
+      # 5. 确保 docs 分支存在（若不存在则创建空分支）
+      # ------------------------------------------------------------
+      - name: Ensure docs branch exists
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          CURRENT_BRANCH=$(git branch --show-current)
+          if ! git ls-remote --heads origin docs | grep -q docs; then
+            echo "docs branch not found, creating empty orphan branch..."
+            git checkout --orphan docs
+            git rm -rf . > /dev/null 2>&1
+            git commit --allow-empty -m "Initial empty docs branch"
+            git push origin docs
+            git checkout $CURRENT_BRANCH
+          else
+            echo "docs branch already exists, skipping creation."
+          fi
+
+      # ------------------------------------------------------------
+      # 6. 部署文档（latest 版本）到 docs 分支
+      # ------------------------------------------------------------
+      - name: Deploy documentation (mike latest)
+        run: ./gradlew mikeDeployLatest
+
+      # ------------------------------------------------------------
+      # 7. 构建 WASM JS 产物（原有任务）
       # ------------------------------------------------------------
       - name: Build WASM JS distribution
-        run: ./gradlew :home:prepareDistribution
+        run: ./gradlew :home:prepareDistributionWithMike
         env:
           FLAVOR_DATA: mock   # 这里注入，Gradle 中可通过 System.getenv("FLAVOR_DATA") 读取
 
       # ------------------------------------------------------------
-      # 5. 部署到 GitHub Pages（gh-pages 分支）
+      # 8. 部署到 GitHub Pages（推送到 gh-pages 分支）
       #    产物路径: home/build/dist
       # ------------------------------------------------------------
       - name: Deploy to GitHub Pages

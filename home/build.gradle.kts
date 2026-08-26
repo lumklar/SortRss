@@ -1,4 +1,3 @@
-
 import buildlogic.constant.PropertiesContant
 import buildlogic.utils.getConfigString
 import org.apache.tools.ant.filters.ReplaceTokens
@@ -30,47 +29,52 @@ tasks.register<com.github.gradle.node.npm.task.NpmTask>("compressFrontend") {
     outputs.dir(layout.buildDirectory.dir("compressed"))
 }
 
-// -------- 准备分发目录 ----------
-val prepareDistribution = tasks.register<Sync>("prepareDistribution") {
-    dependsOn(
-        "compressFrontend",
-        "convertFavicon",
-        project(":docs").tasks.named("moveDocs"),
-        project(":app:webApp").tasks.named("wasmJsBrowserDistribution")
-    )
+// -------- 公共函数：创建分发任务 ----------
+fun Project.createDistributionTask(taskName: String, docsTaskName: String): TaskProvider<Sync> {
+    return tasks.register<Sync>(taskName) {
+        dependsOn(
+            "compressFrontend",
+            "convertFavicon",
+            project(":docs").tasks.named(docsTaskName),
+            project(":app:webApp").tasks.named("wasmJsBrowserDistribution")
+        )
 
-    val distDir = layout.buildDirectory.dir("dist").get().asFile
-    into(distDir)
+        into(layout.buildDirectory.dir("dist"))
 
-    // docs 产物
-    from(project(":docs").layout.buildDirectory.dir("dist")) {
-        into("docs")
-        include("**/*")
-    }
-
-    // demo 产物
-    from(project(":app:webApp").layout.buildDirectory.dir("dist/wasmJs/productionExecutable")) {
-        into("demo")
-        include("**/*")
-    }
-
-    val repoUrl = getConfigString(PropertiesContant.REPO_URL, "https://github.com/lumklar/SortRss")
-    inputs.property("repoUrl", repoUrl)
-
-    // 压缩后的前端资源
-    from(layout.buildDirectory.dir("compressed")) {
-        include("**/*")
-        filesMatching("index.html") {
-            filter<ReplaceTokens>(
-                "tokens" to mapOf(
-                    "REPO_URL" to repoUrl
-                )
-            )
+        // docs 产物
+        from(project(":docs").layout.buildDirectory.dir("dist")) {
+            into("docs")
+            include("**/*")
         }
-    }
 
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        // demo 产物
+        from(project(":app:webApp").layout.buildDirectory.dir("dist/wasmJs/productionExecutable")) {
+            into("demo")
+            include("**/*")
+        }
+
+        val repoUrl = getConfigString(PropertiesContant.REPO_URL, "https://github.com/lumklar/SortRss")
+        inputs.property("repoUrl", repoUrl)
+
+        // 压缩后的前端资源
+        from(layout.buildDirectory.dir("compressed")) {
+            include("**/*")
+            filesMatching("index.html") {
+                filter<ReplaceTokens>(
+                    "tokens" to mapOf(
+                        "REPO_URL" to repoUrl
+                    )
+                )
+            }
+        }
+
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
 }
+
+// -------- 注册两个任务，共用逻辑 ----------
+val prepareDistribution = createDistributionTask("prepareDistribution", "moveDocs")
+val buildWithMike = createDistributionTask("prepareDistributionWithMike", "moveMikeDocs")
 
 // 挂接到 assemble
 tasks.named("assemble") {

@@ -1,0 +1,65 @@
+name: Deploy Docs on Version Branch
+
+on:
+  push:
+    branches:
+      - 'v*'                     # 匹配所有 v 开头的分支
+
+permissions:
+  contents: write
+
+# 并发控制，防止页面被覆盖
+concurrency:
+  group: "docs"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # 获取所有分支和提交历史，以便创建新分支
+          persist-credentials: true   # 保留 Git 凭证，便于后续推送
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'   # 使用最新 Python 3，mike 需要 Python 环境
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'      # 根据你的项目 JDK 版本调整
+
+      - name: Configure Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Ensure docs branch exists
+        run: |
+          # 设置远程 URL 使用 GITHUB_TOKEN 以便后续推送
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          
+          # 获取当前分支名
+          CURRENT_BRANCH=$(git branch --show-current)
+          
+          # 检查远程是否存在 docs 分支
+          if ! git ls-remote --heads origin docs | grep -q docs; then
+            echo "docs branch not found, creating empty orphan branch..."
+            git checkout --orphan docs
+            git rm -rf . > /dev/null 2>&1          # 清空工作区
+            git commit --allow-empty -m "Initial empty docs branch"
+            git push origin docs
+            # 切回原来的版本分支
+            git checkout $CURRENT_BRANCH
+          else
+            echo "docs branch already exists, skipping creation."
+          fi
+
+      - name: Run mikeDeployPush
+        run: ./gradlew mikeDeployPush   # 使用 Gradle Wrapper 执行任务
