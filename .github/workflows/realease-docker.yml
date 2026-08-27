@@ -61,7 +61,7 @@ jobs:
       # 4. 执行 Gradle 任务（带多平台环境变量）
       # ------------------------------------------------------------
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: wrapper
 

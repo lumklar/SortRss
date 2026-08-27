@@ -42,7 +42,7 @@ jobs:
       # 2. 配置 Gradle（自动开启缓存，加速构建）
       # ------------------------------------------------------------
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: wrapper
 
