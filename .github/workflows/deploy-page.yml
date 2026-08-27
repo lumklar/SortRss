@@ -25,7 +25,7 @@ jobs:
       # 0. 检出代码（获取全部分支历史，以便操作 docs 分支）
       # ------------------------------------------------------------
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0           # ★ 必须，才能查看远程分支
 
