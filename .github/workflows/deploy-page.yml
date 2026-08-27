@@ -53,7 +53,7 @@ jobs:
       # 3. 设置 Python 环境（mike 需要）
       # ------------------------------------------------------------
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.*'
           cache: 'pip'                # 自动缓存 ~/.cache/pip

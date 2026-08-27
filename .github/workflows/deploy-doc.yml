@@ -25,7 +25,7 @@ jobs:
           persist-credentials: true   # 保留 Git 凭证，便于后续推送
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.x'   # 使用最新 Python 3，mike 需要 Python 环境
 
