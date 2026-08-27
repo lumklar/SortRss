@@ -18,7 +18,7 @@ jobs:
     steps:
       # 1. 检出当前代码（包含 CLA.md）
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: main
           fetch-depth: 0
@@ -81,8 +81,7 @@ jobs:
       # 6. 检查版本一致性（精确到用户）
       - name: Check CLA version and user signature timestamp
         id: check
-        if: "always() && (github.event_name == 'pull_request_target' || \
-          (github.event_name == 'issue_comment' && github.event.issue.pull_request))"
+        if: always() && (github.event_name == 'pull_request_target' || (github.event_name == 'issue_comment' && github.event.issue.pull_request))
         uses: actions/github-script@v9
         with:
           script: |
@@ -155,8 +154,7 @@ jobs:
 
       # 7. 根据检查结果创建/更新 Check 状态
       - name: Set CLA version check status
-        if: "always() && (github.event_name == 'pull_request_target' || \
-          (github.event_name == 'issue_comment' && github.event.issue.pull_request))"
+        if: always() && (github.event_name == 'pull_request_target' || (github.event_name == 'issue_comment' && github.event.issue.pull_request))
         uses: actions/github-script@v9
         with:
           script: |
@@ -174,12 +172,7 @@ jobs:
               output: {
                 title: requireReSign ? '⚠️ CLA has changed – please re-sign' : '✅ CLA version up-to-date',
                 summary: requireReSign
-                  ? |-
-                      The Contributor License Agreement has been updated since your last signature.
-                      Please re-sign by commenting on this PR with the exact phrase:
-                      > `I have read the CLA Document and I hereby sign the CLA`
-
-                      The bot will automatically record your new signature.
+                  ? 'The Contributor License Agreement has been updated since your last signature. Please re-sign by commenting on this PR with the exact phrase:\n> `I have read the CLA Document and I hereby sign the CLA`\n\nThe bot will automatically record your new signature.'
                   : 'Your signature covers the latest version of the CLA.'
               }
             });
@@ -189,13 +182,6 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.payload.pull_request.number,
-                body: |
-                  ## ⚠️ CLA Updated – Please Re-sign
-
-                  The CLA has been updated. To continue with this contribution, please re-sign the new agreement by commenting with:
-
-                  > `I have read the CLA Document and I hereby sign the CLA`
-
-                  The bot will then record your new signature and update the check status.
+                body: `## ⚠️ CLA Updated – Please Re-sign\n\nThe CLA has been updated. To continue with this contribution, please re-sign the new agreement by commenting with:\n\n> \`I have read the CLA Document and I hereby sign the CLA\`\n\nThe bot will then record your new signature and update the check status.`
               });
             }

@@ -19,18 +19,18 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0          # 获取所有分支和提交历史，以便创建新分支
           persist-credentials: true   # 保留 Git 凭证，便于后续推送
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.x'   # 使用最新 Python 3，mike 需要 Python 环境
 
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version: '21'      # 根据你的项目 JDK 版本调整
