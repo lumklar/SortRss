@@ -1,6 +1,6 @@
 name: Release Binary
-#TODO 支持网页上手动发布时执行ci/cd
-#TODO 发布前校验tag，commit，gradle.properties中版本是否一致
+# TODO 支持网页上手动发布时执行ci/cd
+# TODO 发布前校验tag，commit，gradle.properties中版本是否一致
 
 on:
   push:
@@ -33,7 +33,7 @@ jobs:
           - group: win
             os: windows-11-arm
 
-#TODO 编译mac和linux产物
+# TODO 编译mac和linux产物
           # macOS（同时提供 Intel 和 Apple Silicon）
 #          - group: mac
 #            os: macos-15-intel          # Intel x64

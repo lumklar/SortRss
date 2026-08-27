@@ -2,7 +2,7 @@ name: Deploy GitHub Pages
 
 on:
   push:
-    branches: [ main ]       # main 分支推送时触发
+    branches: [main]       # main 分支推送时触发
   workflow_dispatch:         # 允许手动在 Actions 页面触发
 
 # 关键权限：允许 GitHub Token 向 gh-pages 分支推送代码
@@ -73,7 +73,7 @@ jobs:
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           CURRENT_BRANCH=$(git branch --show-current)
-         # 检查远程是否存在 docs 分支
+          # 检查远程是否存在 docs 分支
           if git ls-remote --heads origin docs | grep -q docs; then
             echo "docs branch exists, updating local docs branch to match remote..."
             # 强制拉取远程 docs 到本地 docs（不切换分支）
@@ -111,6 +111,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./home/build/dist
           publish_branch: gh-pages    # 目标分支，GitHub Pages 默认读取这个分支
-#          force_orphan: true          # 强制清空历史记录，保持分支干净（推荐）。V4不支持该参数
+          # force_orphan: true          # 强制清空历史记录，保持分支干净（推荐）。V4不支持该参数
           # 可选：保留已部署文件的版本历史，如果想保留，设为 false
           # keep_files: false

@@ -2,7 +2,7 @@ name: Branch Dev Docker Image
 
 on:
   push:
-    branches: [ dev ]       # dev 分支推送时触发
+    branches: [dev]       # dev 分支推送时触发
   workflow_dispatch:         # 允许手动在 Actions 页面触发
 
 permissions:

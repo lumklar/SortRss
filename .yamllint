@@ -1,0 +1,14 @@
+extends: default
+ignore: |
+  build/
+  dist/
+  .gradle/
+rules:
+  document-start: disable
+  truthy: disable
+  comments-indentation: disable
+  new-lines:
+    type: unix   # unix = \n(LF)；dos = \r\n(CRLF)
+  line-length:
+    max: 140
+    level: warning

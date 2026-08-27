@@ -13,8 +13,8 @@ repo_name: SortRss
 repo_url:
 edit_uri: edit/dev/docs/src/doc/docs
 
-#Copyright (shown at the footer)
-#copyright: 'Copyright &copy; 2017 Your Name'
+# Copyright (shown at the footer)
+# copyright: 'Copyright &copy; 2017 Your Name'
 
 # Meterial theme
 theme:

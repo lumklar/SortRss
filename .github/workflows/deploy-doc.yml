@@ -44,10 +44,10 @@ jobs:
         run: |
           # 设置远程 URL 使用 GITHUB_TOKEN 以便后续推送
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          
+
           # 获取当前分支名
           CURRENT_BRANCH=$(git branch --show-current)
-          
+
           # 检查远程是否存在 docs 分支
           if git ls-remote --heads origin docs | grep -q docs; then
             echo "docs branch exists, updating local docs branch to match remote..."

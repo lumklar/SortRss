@@ -1,0 +1,31 @@
+# 停止向上查找父级 .editorconfig
+root = true
+
+# ---------- 全局默认规则（适用于所有文件） ----------
+[*]
+charset = utf-8                    # 统一 UTF-8 编码，避免乱码
+end_of_line = lf                   # 强制 LF 换行（跨平台兼容）
+indent_style = space               # 使用空格缩进（不用 Tab）
+indent_size = 4                    # 默认缩进 4 空格（后端/通用标准）
+trim_trailing_whitespace = true    # 自动删除行尾多余空格
+insert_final_newline = true        # 文件末尾保留一个空行
+max_line_length = 120              # 单行最大宽度 120 字符
+
+# ---------- Kotlin / Java / Gradle ----------
+[*.{kt,kts,java}]
+continuation_indent_size = 8       # 换行续行缩进 8 空格（基础 4 + 额外 4）
+# 缩进宽度继承全局 4，无需重复写 indent_size
+
+# ---------- Python ----------
+[*.py]
+max_line_length = 88               # 遵循 Black 格式化工具的行宽（比全局 120 更严格）
+
+# ---------- 前端 & YAML & XML ----------
+# HTML / CSS / JS / TS / YAML / XML 等层级较深，缩进改为 2 空格
+[*.{html,htm,css,scss,js,jsx,ts,tsx,yml,yaml,xml,xhtml}]
+indent_size = 2
+
+# ---------- Markdown ----------
+[*.md]
+trim_trailing_whitespace = false   # 保留行尾空格（Markdown 中两个空格表示换行）
+max_line_length = 0                # 不限行长（由编辑器软折行显示）
