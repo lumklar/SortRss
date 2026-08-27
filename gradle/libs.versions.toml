@@ -17,7 +17,7 @@ kotlin-insert = "4.2.2"
 
 # 插件版本
 ksp = "2.3.11"
-graalvm = "1.1.7"
+graalvm = "1.1.10"
 dependency-management = "1.1.7"
 # TODO 冲突检查，未使用检查
 dependency-check-jvm = "13.0.0"
