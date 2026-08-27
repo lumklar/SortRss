@@ -1,7 +1,18 @@
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-    <meta http-equiv="refresh" content="0;URL='0.0.1-SNAPSHOT'" />
+  <meta charset="utf-8">
+  <title>Redirecting</title>
+  <noscript>
+    <meta http-equiv="refresh" content="1; url=latest/" />
+  </noscript>
+  <script>
+    window.location.replace(
+      "latest/" + window.location.search + window.location.hash
+    );
+  </script>
 </head>
 <body>
+  Redirecting to <a href="latest/">latest/</a>...
 </body>
 </html>
