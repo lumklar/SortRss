@@ -12,7 +12,7 @@ compose = "1.11.1"
 material3 = "1.11.0-alpha07"
 androidx-lifecycle = "2.11.0"
 androidx-navigation = "2.9.2"
-kotlin-wrappers = "2026.8.3"
+kotlin-wrappers = "2026.8.5"
 kotlin-insert = "4.2.2"
 
 # 插件版本
