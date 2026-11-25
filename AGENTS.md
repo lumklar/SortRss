@@ -14,7 +14,7 @@ SortRss 是一个智能 RSS 聚合 / 排序 / 管理工具，采用 **Kotlin Mul
 - 语言 / 版本：Kotlin 2.4.0、JVM Toolchain 21
 - 客户端：Compose Multiplatform 1.11.1、Ktor Client 3.5.2、kotlinx.serialization
 - 服务端：Spring Boot 4.1.1、kotlin-spring、JPA + SQLite（sqlite-jpa）
-- 目标平台：`jvm` / `js(browser)` / `wasmJs(browser)` / Android（AGP 9.0.1，**当前未启用**）
+- 目标平台：`jvm` / `js(browser)` / `wasmJs(browser)` / Android（AGP 9.1.0，入口为 `:app:androidApp`）
 - 构建：Gradle Wrapper 9.7.1 + `refreshVersions`（`settings.gradle.kts`）+ `ben-manes.versions`（根工程与 `buildSrc` 各自声明）
 
 ### 1.1 版本目录：**两套**，各自独立
@@ -62,7 +62,7 @@ SortRss 是一个智能 RSS 聚合 / 排序 / 管理工具，采用 **Kotlin Mul
 ```
 :app:webApp              wasmJs 浏览器端入口
 :app:desktopApp          JVM 桌面端入口
-:app:androidApp          Android 入口（settings 中已注释，当前不参与构建）
+:app:androidApp          Android 入口（assembleDebug 可产出 APK）
 
 :client:composer         客户端组装 / 依赖注入
 :client:contract:data    客户端数据契约（接口、模型）
@@ -171,7 +171,7 @@ server:bootstrap ─→ server:{adaptor, application, infrastructure}
 
 - Windows 下优先用 `.\gradlew.bat <任务>`，其他环境用 `./gradlew <任务>`
 - 具体任务名以各模块 `build.gradle.kts` 与 `gradle/*.gradle.kts` 定义为准；服务端入口在 `:server:bootstrap`
-- `:app:androidApp` 当前未 `include`，Android 相关任务不可用
+- Android 端入口为 `:app:androidApp`：`./gradlew.bat :app:androidApp:assembleDebug` 产出 APK（输出在 `app/androidApp/build/outputs/apk/debug/`）。AGP 9.x 下共享模块统一用 `alias(libs.plugins.android.kmp.library)` + `kotlin { android {} }`，入口壳用 `com.android.application`，Kotlin 入口代码放 `src/main/kotlin`
 - 构建输出统一落 `build/`；**构建日志写到 `ai_agents/logs/`**，不要写在仓库目录
 - 本地仓库镜像：非 CI 环境默认走阿里云镜像（见 `build.gradle.kts`），CI 环境走官方仓库
 

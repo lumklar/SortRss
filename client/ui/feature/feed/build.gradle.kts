@@ -1,9 +1,11 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.android.kmp.library)
     alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.kotlin.compose)
 }
 
 kotlin {
@@ -23,8 +25,27 @@ kotlin {
         browser()
     }
 
+    android {
+        namespace = "io.github.lumklar.sortrss.client.ui.feature.feed"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
+        }
+        androidResources {
+            enable = true
+        }
+        withHostTest {
+            isIncludeAndroidResources = true
+        }
+    }
+
     // 配置源集（source sets）
     sourceSets {
+        androidMain.dependencies {
+            implementation(libs.compose.uiToolingPreview)
+        }
         // 公共代码（所有平台共享）
         val commonMain = getByName("commonMain") {
             dependencies {
@@ -36,13 +57,14 @@ kotlin {
                 implementation(libs.compose.material3)
                 implementation(libs.compose.ui)
                 implementation(libs.compose.components.resources)
+                implementation(libs.compose.uiToolingPreview)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
                 implementation(libs.androidx.lifecycle.viewmodelCompose)
             }
         }
         val commonTest = getByName("commonTest") {
             dependencies {
-
+                implementation(libs.kotlin.test)
             }
         }
         val jsMain = getByName("jsMain") {
@@ -51,4 +73,8 @@ kotlin {
             }
         }
     }
+}
+
+dependencies {
+    androidRuntimeClasspath(libs.compose.uiTooling)
 }

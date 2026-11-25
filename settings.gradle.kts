@@ -1,3 +1,7 @@
+// 根项目名称
+rootProject.name = "sortrss"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
     repositories {
         val isCI = providers.environmentVariable("CI").map { it.toBoolean() }.getOrElse(false)
@@ -37,9 +41,6 @@ pluginManagement {
 //    }
 //}
 
-// 根项目名称
-rootProject.name = "sortrss"
-
 // settings.gradle.kts
 plugins {
     id("de.fayard.refreshVersions") version "0.60.6"
@@ -50,6 +51,7 @@ plugins {
 //include(":app")
 include(":app:webApp")
 include(":app:desktopApp")
+include(":app:androidApp")
 //include(":client")
 include(":client:composer")
 //include(":client:contract")

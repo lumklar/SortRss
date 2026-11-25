@@ -19,8 +19,7 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation(libs.kotlinx.coroutinesSwing)
 
-    //TODO 需要删除吗？
-    compileOnly(libs.compose.uiToolingPreview)
+    implementation(libs.compose.uiToolingPreview)
 }
 compose.desktop {
     application {

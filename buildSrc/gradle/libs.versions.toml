@@ -10,7 +10,7 @@ lz4-java = "1.8.0"            # 用于 LZ4
 snappy-java = "1.1.10.5"      # 用于 Snappy
 
 # 插件版本
-ben-manes-versions = "0.59.0"
+ben-manes-versions = "0.62.0"
 
 [libraries]
 # 核心库

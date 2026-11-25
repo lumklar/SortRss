@@ -40,6 +40,9 @@ replay_pid*
 .gradle/
 versions.properties
 
+### Android 本地 SDK 路径（每台机器不同，禁止入库）###
+local.properties
+
 ### Runtime ###
 logs/
 *.log

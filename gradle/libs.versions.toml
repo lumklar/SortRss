@@ -1,7 +1,7 @@
 [versions]
 
 # 核心框架版本
-kotlin = "2.4.10"
+kotlin = "2.4.0"
 ktor = "3.5.2"
 spring-boot = "4.1.1"
 serialization = "1.11.0"
@@ -12,8 +12,15 @@ compose = "1.11.1"
 material3 = "1.11.0-alpha07"
 androidx-lifecycle = "2.11.0"
 androidx-navigation = "2.9.2"
-kotlin-wrappers = "2026.8.3"
+kotlin-wrappers = "2026.6.1"
 kotlin-insert = "4.2.2"
+# Android
+#https://www.jetbrains.com.cn/en-us/help/kotlin-multiplatform-dev/multiplatform-compatibility-guide.html?utm_source=kotlinblog&utm_medium=cta&utm_campaign=compose-1.6.0#version-compatibility
+agp = "9.1.0"
+androidx-activity = "1.13.0"
+android-compileSdk = "37"
+android-minSdk = "24"
+android-targetSdk = "37"
 
 # 插件版本
 ksp = "2.3.11"
@@ -27,18 +34,18 @@ use-python = "4.1.0"
 mkdocs = "4.0.1"
 node = "7.1.0"
 refresh-versions = "0.60.6"
-ben-manes-versions = "0.61.0"
+ben-manes-versions = "0.62.0"
 
 # 工具库版本
 therapi = "0.15.0"
 kotlinLogging = "8.0.4"
-springdoc = "3.1.0"
+springdoc = "3.1.1"
 jbcrypt = "0.4"
 rome = "2.1.0"
 sqlite = "3.53.2.1"
 sqlite-jpa = "7.4.6.Final"
 commons-compress = "1.28.0"
-fastjson2 = "2.0.64"
+fastjson2 = "2.0.65"
 wiremock = "3.0.1"
 
 [libraries]
@@ -56,12 +63,14 @@ androidx-lifecycle-viewmodelCompose = { group = "org.jetbrains.androidx.lifecycl
 androidx-lifecycle-runtimeCompose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 androidx-navigation = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "androidx-navigation" }
 compose-components-resources = { group = "org.jetbrains.compose.components", name = "components-resources", version.ref = "compose" }
+compose-uiTooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose" }
 compose-uiToolingPreview = { group = "org.jetbrains.compose.ui", name = "ui-tooling-preview", version.ref = "compose" }
 compose-uiToolingDesktopPreview = { group = "org.jetbrains.compose.ui", name = "ui-tooling-desktop", version.ref = "compose" }
 wrappers-browser = { group = "org.jetbrains.kotlin-wrappers", name = "kotlin-browser", version.ref = "kotlin-wrappers" }
 kotlinx-coroutinesSwing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }
 kotlin-insert = { group = "io.insert-koin", name = "koin-core", version.ref = "kotlin-insert" }
 kotlin-insert-compose = { group = "io.insert-koin", name = "koin-compose", version.ref = "kotlin-insert" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 
 # ==============================================
 # 🚀 Kotlin 核心依赖
@@ -165,6 +174,9 @@ kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+android-kmp-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 
 # ==============================================
 # 🔧 通用插件

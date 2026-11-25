@@ -37,6 +37,12 @@ plugins {
     id("base")
     alias(libs.plugins.ben.manes.versions)
 
+    // 与官方模板 Compose2 对齐：在根构建脚本 classpath 上预置 Android/Compose 插件，
+    // 避免每个子项目重复加载插件导致类加载器差异（NoClassDefFoundError: KotlinMultiplatformAndroidComponentsExtension）
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.android.kmp.library) apply false
+
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.spring) apply false
