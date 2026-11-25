@@ -33,6 +33,12 @@ We adhere to the [Contributor Covenant](https://www.contributor-covenant.org/). 
 - [ ] Clear description of changes
 - [ ] Follow existing coding style
 
+## Development docs
+
+- Repository layout, build, and release: [`docs/README.md`](../docs/README.md) (dev docs in `docs/dev/`)
+- AI agents and automation: read [`AGENTS.md`](../AGENTS.md) first
+- User-facing documentation: `docs/src/doc/docs/`
+
 ## Questions?
 
 Open an issue or contact the maintainer at `lumklar@outlook.com`.

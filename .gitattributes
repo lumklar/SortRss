@@ -26,7 +26,8 @@
 *.txt              text eol=lf
 Dockerfile         text eol=lf
 Makefile           text eol=lf
-gradlew            text eol=lf   # Unix 执行脚本
+# Unix 执行脚本
+gradlew            text eol=lf
 
 # 3. Windows 批处理必须保留 CRLF
 *.bat              text eol=crlf
@@ -46,7 +47,8 @@ gradlew.bat        text eol=crlf
 *.gif              binary
 *.ico              binary
 *.bmp              binary
-*.svg              binary           # 矢量图虽然是文本，但通常按二进制处理更安全
+# 矢量图虽然是文本，但通常按二进制处理更安全
+*.svg              binary
 *.ttf              binary
 *.woff             binary
 *.woff2            binary
@@ -57,7 +59,8 @@ gradlew.bat        text eol=crlf
 *.xlsx             binary
 *.pptx             binary
 *.db               binary
-*.lock             binary           # 依赖锁文件通常不参与 diff
+# 依赖锁文件通常不参与 diff
+*.lock             binary
 *.so               binary
 *.dll              binary
 *.exe              binary
@@ -65,7 +68,8 @@ gradlew.bat        text eol=crlf
 *.o                binary
 *.a                binary
 *.pyc              binary
-*.class            binary           # Java/Kotlin 字节码
+# Java/Kotlin 字节码
+*.class            binary
 *.keystore         binary
 *.jks              binary
 
