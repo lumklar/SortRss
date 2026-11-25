@@ -27,6 +27,10 @@ jobs:
           - group: web
             os: ubuntu-latest
 
+          # Android（架构无关；签名密钥由 repository secrets 注入）
+          - group: android
+            os: ubuntu-latest
+
           # Windows（提供 x64 和 arm64）
           - group: win
             os: windows-latest
@@ -69,6 +73,18 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
+      # compileSdk 37 不在 GitHub Runner 预装 SDK 中，包名是 android-37.0（不是 android-37）
+      - name: Setup Android SDK 37
+        if: matrix.group == 'android'
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK 37 platform
+        if: matrix.group == 'android'
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
+          sdkmanager "platforms;android-37.0" "build-tools;36.0.0"
+
       - name: Get version from tag
         id: get_version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
@@ -78,9 +94,27 @@ jobs:
         run: chmod +x gradlew
         shell: bash
 
+      # 签名材料只通过环境变量注入，仓库内不出现任何密钥文件名或路径；
+      # 构建阶段由 Gradle 解码 base64 到系统临时目录
+      - name: Verify Android signing secrets
+        if: matrix.group == 'android'
+        shell: bash
+        env:
+          SIGNING_MATERIAL: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$SIGNING_MATERIAL" ]; then
+            echo "::error::缺少 ANDROID_KEYSTORE_BASE64，无法签名 Android 产物"
+            exit 1
+          fi
+
       - name: Run release group task
         run: ./gradlew release-${{ matrix.group }}
         shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ matrix.group == 'android' && secrets.ANDROID_KEYSTORE_BASE64 || '' }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ matrix.group == 'android' && secrets.ANDROID_KEYSTORE_PASSWORD || '' }}
+          ANDROID_KEY_ALIAS: ${{ matrix.group == 'android' && secrets.ANDROID_KEY_ALIAS || '' }}
+          ANDROID_KEY_PASSWORD: ${{ matrix.group == 'android' && secrets.ANDROID_KEY_PASSWORD || '' }}
 
       - name: Upload artifacts to GitHub Release
         uses: softprops/action-gh-release@v3

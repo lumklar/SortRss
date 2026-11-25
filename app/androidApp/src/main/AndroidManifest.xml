@@ -7,7 +7,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SortRSS">
         <activity
-            android:name=".MainActivity"
+            android:name="io.github.lumklar.sortrss.app.android.MainActivity"
             android:exported="true"
             android:label="SortRSS"
             android:theme="@style/Theme.SortRSS">

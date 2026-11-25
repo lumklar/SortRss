@@ -172,6 +172,10 @@ server:bootstrap ─→ server:{adaptor, application, infrastructure}
 - Windows 下优先用 `.\gradlew.bat <任务>`，其他环境用 `./gradlew <任务>`
 - 具体任务名以各模块 `build.gradle.kts` 与 `gradle/*.gradle.kts` 定义为准；服务端入口在 `:server:bootstrap`
 - Android 端入口为 `:app:androidApp`：`./gradlew.bat :app:androidApp:assembleDebug` 产出 APK（输出在 `app/androidApp/build/outputs/apk/debug/`）。AGP 9.x 下共享模块统一用 `alias(libs.plugins.android.kmp.library)` + `kotlin { android {} }`，入口壳用 `com.android.application`，Kotlin 入口代码放 `src/main/kotlin`
+- Android 发布目标：`./gradlew.bat release-apk-network`（在 `gradle/release.gradle.kts` 注册，NETWORK flavor），产物为 `build/release/sortrss-apk-network-<version>.apk`。`:app:androidApp` 的 `cleanOldReleaseArtifacts` 任务挂在 `assembleRelease` 前，会删除 `build/release/sortrss-apk-*.apk` 与模块内残留的 release APK，因此重跑不会再因同名文件失败
+- Android 发布签名：仓库工作区内**不存放密钥文件，也不出现具体密钥名称/路径**。本地在根目录 `local.properties` 配 `android.keystore.file`（指向仓库外的绝对路径）或 `android.keystore.base64`，以及 `android.keystore.password` / `android.key.alias` / `android.key.password`；CI 通过 `ANDROID_KEYSTORE_BASE64` 等环境变量注入，构建时由 `prepareSigningKeystore` 解码到系统临时目录。`ConfigUtils.getConfigString` 优先级为 `-P` > 系统属性 > 环境变量 > `gradle.properties` > `local.properties`
+- CI 的 Android  targets 需 `android-actions/setup-android@v3` + `sdkmanager "platforms;android-37.0" "build-tools;36.0.0"`（GitHub Runner 不预装 API 37；包名为 `android-37.0`）
+- `:common:api` 的 `kapt`(therapi-scribe) 仅供 JVM 侧 springdoc 生成 Swagger 元数据，必须保留；AGP 9 下其 Android kapt 任务不兼容，已在该模块禁用 `kaptAndroid*` / `kaptGenerateStubsAndroid*`，只跑 `kaptKotlinJvm`
 - 构建输出统一落 `build/`；**构建日志写到 `ai_agents/logs/`**，不要写在仓库目录
 - 本地仓库镜像：非 CI 环境默认走阿里云镜像（见 `build.gradle.kts`），CI 环境走官方仓库
 

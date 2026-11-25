@@ -47,6 +47,22 @@ registerReleaseTasks(
             group = "web",
             architectureIndependent = true,
         ),
+        // ========== Android ==========
+        ReleaseConfig(
+            target = "apk",
+            moduleName = ":app:androidApp",
+            moduleTask = "assembleRelease",
+            // 签名后为 androidApp-release.apk；未配置签名时为 -unsigned.apk。
+            // 两种都能匹配，assembleRelease 前的 cleanOldReleaseArtifacts 保证只会存在一个
+            artifactRelativePath = "outputs/apk/release/androidApp-release*.apk",
+            envVarsCombinations = listOf(
+                listOf(
+                    DataFlavor.NETWORK
+                )
+            ),
+            group = "android",
+            architectureIndependent = true,
+        ),
         // ========== macOS ==========
 //        ReleaseConfig(
 //            target = "dmg",

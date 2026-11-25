@@ -56,3 +56,21 @@ kotlin {
 dependencies {
     add("kapt", libs.therapi.scribe)
 }
+
+// scribe 只服务于 JVM 侧（server:adaptor 的 springdoc 读取其生成的 javadoc 元数据）。
+// AGP 9 的 Android-KMP 插件与 kotlin-kapt 不兼容（kaptAndroidMain 的
+// kotlinCompileDestinationDirectory provider 无值），故禁用 Android/HostTest 上的 kapt 任务，
+// 仅保留 kaptKotlinJvm 生成 Swagger 所需元数据。
+listOf(
+    "kaptAndroidMain",
+    "kaptGenerateStubsAndroidMain",
+    "kaptAndroidHostTest",
+    "kaptGenerateStubsAndroidHostTest"
+).forEach { taskName ->
+    tasks.matching { it.name == taskName }.configureEach { enabled = false }
+}
+
+// 生成源目录为所有 target 共享，显式声明顺序避免隐式依赖校验失败
+tasks.matching { it.name == "compileAndroidMain" }.configureEach {
+    mustRunAfter("kaptKotlinJvm")
+}
