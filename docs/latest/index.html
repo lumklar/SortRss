@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
     
     
       
@@ -29,10 +29,10 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#welcome-to-mkdocs" class="md-skip">
+        <a href="#sortrss" class="md-skip">
           Skip to content
         </a>
       
@@ -298,10 +298,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#project-layout" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Project layout
+        支持平台
       
     </span>
   </a>
@@ -309,21 +309,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gradle-tasks" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Gradle tasks
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mkdocs-native-commands" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mkdocs native Commands
+        开始使用
       
     </span>
   </a>
@@ -529,10 +518,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#project-layout" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Project layout
+        支持平台
       
     </span>
   </a>
@@ -540,21 +529,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gradle-tasks" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Gradle tasks
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mkdocs-native-commands" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mkdocs native Commands
+        开始使用
       
     </span>
   </a>
@@ -586,31 +564,44 @@
   
 
 
-<h1 id="welcome-to-mkdocs">Welcome to MkDocs<a class="headerlink" href="#welcome-to-mkdocs" title="Permanent link">&para;</a></h1>
+<h1 id="sortrss">SortRss<a class="headerlink" href="#sortrss" title="Permanent link">&para;</a></h1>
+<p>SortRss 是一个智能 RSS 聚合、排序与管理工具：把多个订阅源汇总到一处，按你的规则排序与整理。</p>
+<h2 id="_1">支持平台<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>平台</th>
+<th>形态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Web</td>
+<td>浏览器直接访问（wasmJs / js）</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>桌面客户端（exe / msi）</td>
+</tr>
+<tr>
+<td>Android</td>
+<td>手机 App（APK）</td>
+</tr>
+<tr>
+<td>服务端</td>
+<td>自建后端服务（jar / Docker 镜像）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_2">开始使用<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="http://mkdocs.org">mkdocs documentation</a>.</li>
-<li><a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material documentation</a>.</li>
+<li><a href="guide/installation/">安装</a>：各平台的安装与服务端部署方式</li>
+<li><a href="about/history/">版本记录</a>：各版本变更</li>
 </ul>
-<h2 id="project-layout">Project layout<a class="headerlink" href="#project-layout" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>mkdocs.yml    # The configuration file.
-docs/
-    index.md  # The documentation homepage.
-    ...       # Other markdown pages, images and other files.
-</code></pre></div>
-<h2 id="gradle-tasks">Gradle tasks<a class="headerlink" href="#gradle-tasks" title="Permanent link">&para;</a></h2>
-<ul>
-<li><code>mkdocsInit</code> - Create new mkdocs site (like this).</li>
-<li><code>mkdocsBuild</code> - Build the documentation site.</li>
-<li><code>mkdocsServe</code> - Start the live-reloading docs server.</li>
-<li><code>mkdocsPublish</code> - Publish generated site version to GitHub pages.</li>
-</ul>
-<h2 id="mkdocs-native-commands">Mkdocs native Commands<a class="headerlink" href="#mkdocs-native-commands" title="Permanent link">&para;</a></h2>
-<ul>
-<li><code>mkdocs new [dir-name]</code> - Create a new project.</li>
-<li><code>mkdocs serve</code> - Start the live-reloading docs server.</li>
-<li><code>mkdocs build</code> - Build the documentation site.</li>
-<li><code>mkdocs help</code> - Print this help message.</li>
-</ul>
+<blockquote>
+<p>本站在 <code>docs/src/doc</code> 下维护，只收录面向使用者的内容。
+仓库结构、构建与发布等开发文档位于仓库的 <code>docs/dev/</code>，不在此发布。</p>
+</blockquote>
 
 
 
@@ -666,10 +657,10 @@ docs/
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tracking", "navigation.top", "content.action.edit"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tracking", "navigation.top", "content.action.edit"], "search": "assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>
