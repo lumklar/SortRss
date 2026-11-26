@@ -47,5 +47,11 @@ class WebNativeHints : RuntimeHintsRegistrar {
         hints.proxies().registerJdkProxy(
             TypeReference.of("kotlin.internal.IntrinsicConstEvaluation")
         )
+
+        // springdoc 通过 therapi-runtime-javadoc 读取 KAPT 生成的 API 注释，
+        // 这些元数据以 <包名>/<类名>__Javadoc.json 资源形式打包在依赖 jar 中。
+        // native 默认不会把未显式声明的资源打进镜像，导致 /v3/api-docs 丢失
+        // 接口/字段/参数的 summary、description、@param、@return 等文档。
+        hints.resources().registerPattern("**/*__Javadoc.json")
     }
 }
