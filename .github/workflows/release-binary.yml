@@ -111,17 +111,29 @@ jobs:
             exit 1
           fi
 
-      # ARM runner 绕过 release-win（其中嵌套 Gradle 进程在 ARM 上收尾超时）
+      # ARM runner 上 Gradle 9.9.2 在 jpackage 结束后收尾必现 60s 超时
+      # （"Timeout waiting for concurrent jobs to complete"，产物其实已生成）。
+      # 因此：关掉 VFS 监听和使用一次性 daemon，并按产物存在与否验收。
       - name: Build Windows ARM exe directly
         if: matrix.os == 'windows-11-arm'
         shell: bash
         env:
           FLAVOR_DATA: network
         run: |
-          ./gradlew :app:desktopApp:packageReleaseExe
+          set +e
+          ./gradlew :app:desktopApp:packageReleaseExe --no-daemon -Dorg.gradle.vfs.watch=false
+          gradle_status=$?
+          set -e
+          exe=$(ls app/desktopApp/build/compose/binaries/main-release/exe/*.exe 2>/dev/null | head -1)
+          if [ -z "$exe" ]; then
+            echo "::error::未找到 ARM exe 产物（Gradle 退出码 $gradle_status）"
+            exit 1
+          fi
+          if [ "$gradle_status" -ne 0 ]; then
+            echo "::warning::Gradle 退出码 $gradle_status，但 exe 已生成，按产物验收"
+          fi
           mkdir -p build/release
-          cp app/desktopApp/build/compose/binaries/main-release/exe/*.exe \
-            "build/release/sortrss-exe-arm64-network-${VERSION}.exe"
+          cp "$exe" "build/release/sortrss-exe-arm64-network-${VERSION}.exe"
 
       - name: Run release group task
         if: matrix.os != 'windows-11-arm'
