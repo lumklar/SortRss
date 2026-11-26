@@ -100,12 +100,7 @@ internal abstract class ReleasePublishTask @Inject constructor(
                 commandLine = listOf(
                     gradlewPath.get(),
                     "-p", targetProjectDir.get().absolutePath,
-                    moduleTask.get(),
-                    // windows-11-arm 上嵌套构建的常驻 daemon 会持有输出管道，
-                    // 导致外层构建在关闭 executor 时等待 60 秒后报
-                    // "Timeout waiting for concurrent jobs to complete"。
-                    // 用一次性 daemon，构建结束即退出，避免残留 java 进程。
-                    "--no-daemon"
+                    moduleTask.get()
                 )
                 environment = System.getenv() + envVars.get().associate { it.envKey to it.value }
             }
