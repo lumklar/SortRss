@@ -53,17 +53,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # ------------------------------------------------------------
-      # 1. 安装所有需要的 JDK，供 Gradle Toolchain 自动识别
-      #    Gradle 会扫描这些安装路径
-      # ------------------------------------------------------------
-      - name: Set up JDK 25 (用于 toolchain 编译)
-        uses: actions/setup-java@v6
-        with:
-          java-version: '25'
-          distribution: 'oracle'        # Temurin 可能暂无 25，Oracle 提供早期版本
-        continue-on-error: true         # 若安装失败，Gradle 会自动下载，不影响构建
-
+      # 所有模块 toolchain 均为 Java 21，无需额外安装 JDK 25
+      # （Oracle 发行版也不提供 windows/aarch64 的 JDK 25，会在 arm runner 上报错）
       - name: Set up JDK 21 (用于运行 Gradle 守护进程)
         uses: actions/setup-java@v6
         with:
@@ -73,10 +64,11 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      # compileSdk 37 不在 GitHub Runner 预装 SDK 中，包名是 android-37.0（不是 android-37）
+      # v3 默认 packages 为 "tools platform-tools"，其中 legacy `tools` 包已从
+      # Google 仓库下架，sdkmanager 会直接失败；v4 默认只装 platform-tools。
       - name: Setup Android SDK 37
         if: matrix.group == 'android'
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Install Android SDK 37 platform
         if: matrix.group == 'android'
