@@ -64,30 +64,33 @@ registerReleaseTasks(
             architectureIndependent = true,
         ),
         // ========== macOS ==========
-//        ReleaseConfig(
-//            target = "dmg",
-//            moduleName = ":app:desktopApp",
-//            moduleTask = "packageReleaseDmg",
-//            artifactRelativePath = "compose/binaries/main-release/dmg/SortRSS-$releaseVersion.dmg",
-//            envVarsCombinations = listOf(
-//                listOf(
-//                    DataFlavor.NETWORK
-//                )
-//            ),
-//            group = "mac"
-//        ),
-//        ReleaseConfig(
-//            target = "pkg",
-//            moduleName = ":app:desktopApp",
-//            moduleTask = "packageReleasePkg",
-//            artifactRelativePath = "compose/binaries/main-release/pkg/SortRSS-$releaseVersion.pkg",
-//            envVarsCombinations = listOf(
-//                listOf(
-//                    DataFlavor.NETWORK
-//                )
-//            ),
-//            group = "mac"
-//        ),
+        // jpackage 产物名可能带架构后缀，用通配符匹配；
+        // 输出名由 renameTo 统一加 -x64 / -arm64 后缀（见 ReleaseExtensions）。
+        // 未签名包：首次打开需右键 → 打开，或 xattr -cr 绕过 Gatekeeper。
+        ReleaseConfig(
+            target = "dmg",
+            moduleName = ":app:desktopApp",
+            moduleTask = "packageReleaseDmg",
+            artifactRelativePath = "compose/binaries/main-release/dmg/*.dmg",
+            envVarsCombinations = listOf(
+                listOf(
+                    DataFlavor.NETWORK
+                )
+            ),
+            group = "mac"
+        ),
+        ReleaseConfig(
+            target = "pkg",
+            moduleName = ":app:desktopApp",
+            moduleTask = "packageReleasePkg",
+            artifactRelativePath = "compose/binaries/main-release/pkg/*.pkg",
+            envVarsCombinations = listOf(
+                listOf(
+                    DataFlavor.NETWORK
+                )
+            ),
+            group = "mac"
+        ),
         // ========== Windows ==========
         ReleaseConfig(
             target = "exe",
@@ -116,6 +119,7 @@ registerReleaseTasks(
         // ========== Linux ==========
         // jpackage 产物命名里带架构（amd64/arm64、x86_64/aarch64），
         // 用 * 通配避免在 x64 与 arm64 两个 runner 上维护两套路径。
+        // 注意 deb/rpm/app-image 均带架构后缀，两个平台的产物不会互相覆盖。
         ReleaseConfig(
             target = "deb",
             moduleName = ":app:desktopApp",
@@ -143,7 +147,9 @@ registerReleaseTasks(
             group = "linux"
         ),
         ReleaseConfig(
-            target = "appimage",
+            // 实际是 jpackage app-image 目录的 tar.gz，不是单文件 AppImage，
+            // 产物名如实写为 app-image，避免误导用户。
+            target = "app-image",
             moduleName = ":app:desktopApp",
             moduleTask = "packageReleaseAppImage",
             // 注意：Compose 的 TargetFormat.AppImage 实际是 `jpackage --type app-image`，
