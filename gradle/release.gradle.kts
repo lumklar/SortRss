@@ -1,7 +1,7 @@
 import buildlogic.release.*
 import buildlogic.flavors.*
 
-//FIXME 支持mac和linux，排查问题
+//TODO 支持 macOS：dmg/pkg 只能由 macOS 的 jpackage 产出，需在 macos runner 上构建
 
 val version = project.version.toString()
 val releaseVersion = version.replace("-SNAPSHOT", "")
@@ -114,41 +114,48 @@ registerReleaseTasks(
             group = "win"
         ),
         // ========== Linux ==========
-//        ReleaseConfig(
-//            target = "deb",
-//            moduleName = ":app:desktopApp",
-//            moduleTask = "packageReleaseDeb",
-//            artifactRelativePath = "compose/binaries/main-release/deb/sortrss_${releaseVersion}-1_amd64.deb",
-//            envVarsCombinations = listOf(
-//                listOf(
-//                    DataFlavor.NETWORK
-//                )
-//            ),
-//            group = "linux"
-//        ),
-//        ReleaseConfig(
-//            target = "rpm",
-//            moduleName = ":app:desktopApp",
-//            moduleTask = "packageReleaseRpm",
-//            artifactRelativePath = "compose/binaries/main-release/rpm/sortrss-${releaseVersion}-1.x86_64.rpm",
-//            envVarsCombinations = listOf(
-//                listOf(
-//                    DataFlavor.NETWORK
-//                )
-//            ),
-//            group = "linux"
-//        ),
-//        ReleaseConfig(
-//            target = "appimage",
-//            moduleName = ":app:desktopApp",
-//            moduleTask = "packageReleaseAppImage",
-//            artifactRelativePath = "compose/binaries/main-release/appimage/SortRSS-$releaseVersion.AppImage",
-//            envVarsCombinations = listOf(
-//                listOf(
-//                    DataFlavor.NETWORK
-//                )
-//            ),
-//            group = "linux"
-//        )
+        // jpackage 产物命名里带架构（amd64/arm64、x86_64/aarch64），
+        // 用 * 通配避免在 x64 与 arm64 两个 runner 上维护两套路径。
+        ReleaseConfig(
+            target = "deb",
+            moduleName = ":app:desktopApp",
+            moduleTask = "packageReleaseDeb",
+            // jpackage 实测产物：sortrss_0.0.1_amd64.deb（无 -1 release 段）
+            artifactRelativePath = "compose/binaries/main-release/deb/*_${releaseVersion}_*.deb",
+            envVarsCombinations = listOf(
+                listOf(
+                    DataFlavor.NETWORK
+                )
+            ),
+            group = "linux"
+        ),
+        ReleaseConfig(
+            target = "rpm",
+            moduleName = ":app:desktopApp",
+            moduleTask = "packageReleaseRpm",
+            // <包名>-<版本>-<release>.<rpm 架构>.rpm
+            artifactRelativePath = "compose/binaries/main-release/rpm/*-${releaseVersion}-*.*.rpm",
+            envVarsCombinations = listOf(
+                listOf(
+                    DataFlavor.NETWORK
+                )
+            ),
+            group = "linux"
+        ),
+        ReleaseConfig(
+            target = "appimage",
+            moduleName = ":app:desktopApp",
+            moduleTask = "packageReleaseAppImage",
+            // 注意：Compose 的 TargetFormat.AppImage 实际是 `jpackage --type app-image`，
+            // 产物是免安装目录（含内置 JRE），不是 .AppImage 单文件，因此打包成 tar.gz。
+            artifactRelativePath = "compose/binaries/main-release/app/*",
+            compression = CompressionMode.GZIP,
+            envVarsCombinations = listOf(
+                listOf(
+                    DataFlavor.NETWORK
+                )
+            ),
+            group = "linux"
+        )
     )
 )

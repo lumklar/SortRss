@@ -19,9 +19,11 @@ import org.gradle.process.ExecOperations
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.nio.file.attribute.PosixFilePermission
 import javax.inject.Inject
 
 /**
@@ -73,6 +75,12 @@ internal abstract class ReleasePublishTask @Inject constructor(
     abstract val moduleTask: Property<String>
 
     companion object {
+        /** tar 权限位：0755（目录、可执行文件） */
+        private const val MODE_EXECUTABLE = 493
+
+        /** tar 权限位：0644（普通文件） */
+        private const val MODE_REGULAR = 420
+
         // 按模块目录存储锁，保证同一模块的任务串行
         private val locks = java.util.concurrent.ConcurrentHashMap<String, java.util.concurrent.locks.ReentrantLock>()
     }
@@ -213,11 +221,15 @@ internal abstract class ReleasePublishTask @Inject constructor(
 
     /**
      * 递归将文件或目录添加到 tar 输出流中
+     *
+     * 必须显式写入权限位：`TarArchiveEntry(File, String)` 不会带上 POSIX mode，
+     * 归档里的启动脚本会退化成 0644，解包后无法执行（Linux app-image 包依赖它）。
      */
     private fun addFileToTar(tarOut: TarArchiveOutputStream, file: File, entryBaseName: String) {
         if (file.isDirectory) {
             // 添加目录条目（以 '/' 结尾）
             val dirEntry = TarArchiveEntry(file, entryBaseName + "/")
+            dirEntry.mode = resolveTarMode(file)
             tarOut.putArchiveEntry(dirEntry)
             tarOut.closeArchiveEntry()
             // 遍历子项
@@ -228,10 +240,41 @@ internal abstract class ReleasePublishTask @Inject constructor(
         } else {
             val entry = TarArchiveEntry(file, entryBaseName)
             entry.size = file.length()
+            entry.mode = resolveTarMode(file)
             tarOut.putArchiveEntry(entry)
             Files.copy(file.toPath(), tarOut)
             tarOut.closeArchiveEntry()
         }
+    }
+
+    /**
+     * 读取文件/目录的 POSIX 权限位，作为 tar entry 的 mode（如 0755 = 493）。
+     * 非 POSIX 文件系统（Windows）读不到权限，按“目录或可执行文件 → 755，其余 → 644”退化。
+     */
+    private fun resolveTarMode(file: File): Int {
+        val permissions = try {
+            Files.getPosixFilePermissions(file.toPath())
+        } catch (e: UnsupportedOperationException) {
+            null
+        } catch (e: IOException) {
+            null
+        }
+
+        if (permissions == null) {
+            return if (file.isDirectory || file.canExecute()) MODE_EXECUTABLE else MODE_REGULAR
+        }
+
+        fun bit(permission: PosixFilePermission, mask: Int) = if (permission in permissions) mask else 0
+
+        return bit(PosixFilePermission.OWNER_READ, 0b100_000_000) or
+                bit(PosixFilePermission.OWNER_WRITE, 0b010_000_000) or
+                bit(PosixFilePermission.OWNER_EXECUTE, 0b001_000_000) or
+                bit(PosixFilePermission.GROUP_READ, 0b000_100_000) or
+                bit(PosixFilePermission.GROUP_WRITE, 0b000_010_000) or
+                bit(PosixFilePermission.GROUP_EXECUTE, 0b000_001_000) or
+                bit(PosixFilePermission.OTHERS_READ, 0b000_000_100) or
+                bit(PosixFilePermission.OTHERS_WRITE, 0b000_000_010) or
+                bit(PosixFilePermission.OTHERS_EXECUTE, 0b000_000_001)
     }
 
     /**

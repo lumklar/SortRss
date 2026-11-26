@@ -37,18 +37,18 @@ jobs:
           - group: win
             os: windows-11-arm
 
-# TODO 编译mac和linux产物
+# TODO 编译mac产物
           # macOS（同时提供 Intel 和 Apple Silicon）
 #          - group: mac
 #            os: macos-15-intel          # Intel x64
 #          - group: mac
 #            os: macos-15          # Apple Silicon arm64
 
-          # Linux（提供 x64 和 arm64）
-#          - group: linux
-#            os: ubuntu-latest     # x64
-#          - group: linux
-#            os: ubuntu-24.04-arm  # arm64
+          # Linux（提供 x64 和 arm64；deb/rpm/AppImage 名称带架构后缀，互不冲突）
+          - group: linux
+            os: ubuntu-latest     # x64
+          - group: linux
+            os: ubuntu-24.04-arm  # arm64
 
     steps:
       - uses: actions/checkout@v7
@@ -84,6 +84,16 @@ jobs:
         run: |
           yes | sdkmanager --licenses > /dev/null 2>&1 || true
           sdkmanager "platforms;android-37.0" "build-tools;36.0.0"
+
+      - name: Install Linux packaging deps
+        if: matrix.group == 'linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          # jpackage 打 deb/rpm 需要的工具链：
+          # rpm / fakeroot / binutils 是打包依赖，file 用于识别二进制架构。
+          # AppImage 目标只是 `jpackage --type app-image`（免安装目录），不需要 appimagetool/fuse。
+          sudo apt-get install -y --no-install-recommends rpm fakeroot binutils file
 
       - name: Get version from tag
         id: get_version

@@ -1,4 +1,3 @@
-import org.gradle.declarative.dsl.schema.FqName.Empty.packageName
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
@@ -38,6 +37,10 @@ compose.desktop {
             //TODO 统一变量名
             packageName = "SortRSS"
             packageVersion = project.version.toString().replace("-SNAPSHOT", "")
+            // deb/rpm/msi 的元数据：不设置时包内 Maintainer / License 会写成 Unknown
+            vendor = "lumklar"
+            description = "SortRSS - RSS aggregation, sorting and management"
+            copyright = "Copyright 2026 lumklar"
         }
     }
 }
