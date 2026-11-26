@@ -16,7 +16,7 @@ import java.lang.reflect.Method
 
 /**
  * 自动扫描并注册 [ApiRoute] 注解的路由配置
- * TODO 支持native
+ * native 下接口方法的反射提示由 [WebNativeHints] 提供。
  * @see ApiRoute
  */
 class ApiRouteAutoRegister(

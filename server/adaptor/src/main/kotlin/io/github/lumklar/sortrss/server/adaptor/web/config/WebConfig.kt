@@ -3,12 +3,14 @@ package io.github.lumklar.sortrss.server.adaptor.web.config
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.ImportRuntimeHints
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 
 /**
- * TODO 支持native自动扫描controller出入参
+ * Controller 出入参由 Spring AOT 自动注册；@ApiRoute 接口的反射提示见 [WebNativeHints]。
  */
 @Configuration
+@ImportRuntimeHints(WebNativeHints::class)
 class WebConfig {
 
     /**

@@ -2,58 +2,35 @@ package io.github.lumklar.sortrss.server.infrastructure.config.database
 
 import io.github.lumklar.sortrss.server.infrastructure.config.database.DatabaseTypeDetector.isSQLite
 import io.github.lumklar.sortrss.server.infrastructure.persistence.PersistenceAnchor
-import org.springframework.boot.jpa.EntityManagerFactoryBuilder
-import org.springframework.boot.jpa.autoconfigure.JpaProperties
+import org.springframework.boot.hibernate.autoconfigure.HibernatePropertiesCustomizer
 import org.springframework.boot.persistence.autoconfigure.EntityScan
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.ImportRuntimeHints
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter
 import javax.sql.DataSource
 
 @Configuration
 @EntityScan(basePackageClasses = [PersistenceAnchor::class])
 @EnableJpaRepositories(basePackageClasses = [PersistenceAnchor::class])
+@ImportRuntimeHints(DatabaseNativeHints::class)
 class JpaConfig(
-    private val dataSource: DataSource,
-    private val jpaProperties: JpaProperties
+    private val dataSource: DataSource
 ) {
 
     /**
-     * FIXME native下不生效，注释后才能正常扫描@Entity注解
+     * 不能用自定义 EntityManagerFactory Bean：native 下它会绕过 AOT 生成的
+     * 持久化单元元数据，导致所有 @Entity 都变成 "Not a managed type"。
+     * 方言改为通过 HibernatePropertiesCustomizer 注入，保留 Boot 自动配置的 EMF。
      */
     @Bean
-    fun entityManagerFactory(builder: EntityManagerFactoryBuilder): LocalContainerEntityManagerFactoryBean {
-        val vendorAdapter = HibernateJpaVendorAdapter().apply {
-            // 根据 DataSource URL 自动选择合适的方言？更稳妥的方式是手动判断
-            // 但 Spring Boot 会自动根据 DataSource 推断方言，除非我们使用 SQLite 需要特殊指定
-            // 在此我们手动设置方言（如果 DataSource 是 SQLite 则设置社区方言）
+    fun sqliteHibernatePropertiesCustomizer(): HibernatePropertiesCustomizer =
+        HibernatePropertiesCustomizer { properties ->
             if (dataSource.isSQLite()) {
-                setDatabasePlatform("org.hibernate.dialect.SQLiteDialect") // 需要导入 hibernate-community-dialects
+                // 方言来自 hibernate-community-dialects（runtimeOnly），
+                // 这里用类名字符串并在 DatabaseNativeHints 中注册反射。
+                properties["hibernate.dialect"] = "org.hibernate.community.dialect.SQLiteDialect"
+                properties["hibernate.connection.initSQL"] = "PRAGMA journal_mode=WAL;"
             }
-            // 其他数据库如 PostgreSQL/MySQL 让 Hibernate 自动识别
-            // 但也可以显式设置，不过自动识别更通用
         }
-
-        val properties = jpaProperties.properties.toMutableMap()
-        // 如果是 SQLite，可能需要额外配置（如 WAL 模式）
-        if (dataSource.isSQLite()) {
-            properties["hibernate.connection.url"] = dataSource.connection.metaData.url
-            // 可选：开启 SQLite 的 WAL 模式
-            properties["hibernate.connection.initSQL"] = "PRAGMA journal_mode=WAL;"
-        }
-
-        return builder
-            .dataSource(dataSource)
-            .packages(PersistenceAnchor::class.java)
-            .properties(properties)
-            .jta(false)
-            .build()
-    }
-
-//    @Bean
-//    fun transactionManager(entityManagerFactory: EntityManagerFactory): JpaTransactionManager {
-//        return JpaTransactionManager(entityManagerFactory)
-//    }
 }

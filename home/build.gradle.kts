@@ -9,8 +9,12 @@ plugins {
 
 // -------- Node 配置 ----------
 node {
-    version = "24.13.0"          // 直接赋值
-    npmVersion = "10.5.0"       // 直接赋值
+    // node-gradle 7.x 的 download 默认为 false（直接使用 PATH 里的系统 Node），
+    // 那样 version/npmVersion 配置不会生效。显式打开下载，确保构建使用下面固定的
+    // Node/npm 版本，而不是开发者机器上偶然安装的 Node。
+    download = true
+    version = "24.22.3"          // 直接赋值（Node 24 LTS Krypton，含安全修复）
+    npmVersion = "11.19.1"      // 直接赋值（随 Node 24.22.3 捆绑）
 }
 
 // 注册转换任务

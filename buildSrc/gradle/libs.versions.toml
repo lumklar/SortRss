@@ -3,14 +3,14 @@
 commons-compress = "1.28.0"
 
 # 可选压缩库版本（根据实际需要添加）
-xz = "1.12"                   # 用于 XZ / LZMA
-brotli = "0.1.2"              # 用于 Brotli
-zstd-jni = "1.5.7-12"          # 用于 Zstandard
-lz4-java = "1.8.0"            # 用于 LZ4
-snappy-java = "1.1.10.5"      # 用于 Snappy
+xz = "1.12"                   # 用于 XZ / LZMA（已是最新稳定版）
+brotli = "0.1.2"              # 用于 Brotli（已是最新稳定版）
+zstd-jni = "1.6.0-1"          # 用于 Zstandard
+lz4-java = "1.8.1"            # 用于 LZ4
+snappy-java = "1.1.10.12"     # 用于 Snappy
 
 # 插件版本
-ben-manes-versions = "0.62.0"
+ben-manes-versions = "0.67.0"
 
 [libraries]
 # 核心库

@@ -41,14 +41,26 @@ tasks.withType<Test> {
 
 // 配置 Spring Boot AOT 处理，提前声明所有 Profile
 tasks.withType<org.springframework.boot.gradle.tasks.aot.ProcessAot> {
-    // 将 dev, test, pro 全部声明，这样它们的 Bean 才会被包含在镜像中
-    args("--spring.profiles.active=dev,test,pro")
+    // 将 dev, test, pro 全部声明，这样它们的 Bean 才会被包含在镜像中。
+    // 注意：pro 配置会关闭 springdoc，而 @ConditionalOnProperty 在 AOT 期即固化，
+    // 若不覆盖则生成的镜像里根本没有 OpenAPI / Swagger UI 的 Bean，dev 下也无法访问文档。
+    args(
+        "--spring.profiles.active=dev,test,pro",
+        "--springdoc.api-docs.enabled=true",
+        "--springdoc.swagger-ui.enabled=true"
+    )
 }
 
 graalvmNative {
     binaries {
         named("main") {
             buildArgs.add("-Ob")
+            // Spring Boot 4.2 起 spring-core 改用真实 commons-logging 1.4，
+            // 默认 Log4jApiLogFactory 会经 log4j-to-slf4j 在启动极早期触碰
+            // org.slf4j.MarkerFactory，native 下 Provider 尚未绑定导致
+            // "Could not initialize class org.slf4j.MarkerFactory"。
+            // 强制使用 commons-logging 自带的 SLF4J 直连工厂，绕开 log4j 桥接。
+            buildArgs.add("-Dorg.apache.commons.logging.LogFactory=org.apache.commons.logging.impl.Slf4jLogFactory")
         }
     }
 }
