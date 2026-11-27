@@ -34,17 +34,19 @@ jobs:
           # Windows（提供 x64 和 arm64）
           - group: win
             os: windows-latest
+          # ARM runner 上自定义 release-* 任务的嵌套 Gradle 构建会在收尾时
+          # 稳定等待 60s 后超时（产物其实已生成），因此改为直接调打包任务。
           - group: win
             os: windows-11-arm
 
-# TODO 编译mac产物
           # macOS（同时提供 Intel 和 Apple Silicon）
-#          - group: mac
-#            os: macos-15-intel          # Intel x64
-#          - group: mac
-#            os: macos-15          # Apple Silicon arm64
+          # 未签名包：用户首次打开需右键 → 打开，或 xattr -cr 绕过 Gatekeeper
+          - group: mac
+            os: macos-15-intel          # Intel x64
+          - group: mac
+            os: macos-15                # Apple Silicon arm64
 
-          # Linux（提供 x64 和 arm64；deb/rpm/AppImage 名称带架构后缀，互不冲突）
+          # Linux（提供 x64 和 arm64；deb/rpm/app-image 名称带架构后缀，互不冲突）
           - group: linux
             os: ubuntu-latest     # x64
           - group: linux
@@ -53,17 +55,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # ------------------------------------------------------------
-      # 1. 安装所有需要的 JDK，供 Gradle Toolchain 自动识别
-      #    Gradle 会扫描这些安装路径
-      # ------------------------------------------------------------
-      - name: Set up JDK 25 (用于 toolchain 编译)
-        uses: actions/setup-java@v6
-        with:
-          java-version: '25'
-          distribution: 'oracle'        # Temurin 可能暂无 25，Oracle 提供早期版本
-        continue-on-error: true         # 若安装失败，Gradle 会自动下载，不影响构建
-
+      # 所有模块 toolchain 均为 Java 21，无需额外安装 JDK 25
+      # （Oracle 发行版也不提供 windows/aarch64 的 JDK 25，会在 arm runner 上报错）
       - name: Set up JDK 21 (用于运行 Gradle 守护进程)
         uses: actions/setup-java@v6
         with:
@@ -73,10 +66,11 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      # compileSdk 37 不在 GitHub Runner 预装 SDK 中，包名是 android-37.0（不是 android-37）
+      # v3 默认 packages 为 "tools platform-tools"，其中 legacy `tools` 包已从
+      # Google 仓库下架，sdkmanager 会直接失败；v4 默认只装 platform-tools。
       - name: Setup Android SDK 37
         if: matrix.group == 'android'
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Install Android SDK 37 platform
         if: matrix.group == 'android'
@@ -92,7 +86,7 @@ jobs:
           sudo apt-get update
           # jpackage 打 deb/rpm 需要的工具链：
           # rpm / fakeroot / binutils 是打包依赖，file 用于识别二进制架构。
-          # AppImage 目标只是 `jpackage --type app-image`（免安装目录），不需要 appimagetool/fuse。
+          # app-image 目标只是 `jpackage --type app-image`（免安装目录），不需要 appimagetool/fuse。
           sudo apt-get install -y --no-install-recommends rpm fakeroot binutils file
 
       - name: Get version from tag
@@ -117,7 +111,40 @@ jobs:
             exit 1
           fi
 
+      # ARM runner 上 Gradle 9.9.2 在 jpackage 结束后收尾必现 60s 超时
+      # （"Timeout waiting for concurrent jobs to complete"，产物其实已生成）。
+      # 因此：关掉 VFS 监听和使用一次性 daemon，并按产物存在与否验收。
+      # exe 与 msi 一次调用一起产出，避免第二个任务重复触发收尾超时。
+      - name: Build Windows ARM packages directly
+        if: matrix.os == 'windows-11-arm'
+        shell: bash
+        env:
+          FLAVOR_DATA: network
+        run: |
+          set +e
+          ./gradlew :app:desktopApp:packageReleaseExe :app:desktopApp:packageReleaseMsi \
+            --no-daemon -Dorg.gradle.vfs.watch=false
+          gradle_status=$?
+          set -e
+          exe=$(ls app/desktopApp/build/compose/binaries/main-release/exe/*.exe 2>/dev/null | head -1)
+          msi=$(ls app/desktopApp/build/compose/binaries/main-release/msi/*.msi 2>/dev/null | head -1)
+          if [ -z "$exe" ]; then
+            echo "::error::未找到 ARM exe 产物（Gradle 退出码 $gradle_status）"
+            exit 1
+          fi
+          if [ -z "$msi" ]; then
+            echo "::error::未找到 ARM msi 产物（Gradle 退出码 $gradle_status）"
+            exit 1
+          fi
+          if [ "$gradle_status" -ne 0 ]; then
+            echo "::warning::Gradle 退出码 $gradle_status，但 exe/msi 均已生成，按产物验收"
+          fi
+          mkdir -p build/release
+          cp "$exe" "build/release/sortrss-exe-arm64-network-${VERSION}.exe"
+          cp "$msi" "build/release/sortrss-msi-arm64-network-${VERSION}.msi"
+
       - name: Run release group task
+        if: matrix.os != 'windows-11-arm'
         run: ./gradlew release-${{ matrix.group }}
         shell: bash
         env:
@@ -125,6 +152,17 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ matrix.group == 'android' && secrets.ANDROID_KEYSTORE_PASSWORD || '' }}
           ANDROID_KEY_ALIAS: ${{ matrix.group == 'android' && secrets.ANDROID_KEY_ALIAS || '' }}
           ANDROID_KEY_PASSWORD: ${{ matrix.group == 'android' && secrets.ANDROID_KEY_PASSWORD || '' }}
+
+      # Compose 把 jpackage 的 stdout/stderr 写进 build/compose/logs，
+      # Gradle 日志里只有路径没有内容；macOS 打包失败时转储出来便于定位。
+      - name: Dump jpackage logs on failure (macOS)
+        if: failure() && matrix.group == 'mac'
+        shell: bash
+        run: |
+          echo "===== disk usage ====="
+          df -h || true
+          echo "===== jpackage logs ====="
+          find app/desktopApp/build/compose/logs -type f -name '*.txt' -print -exec cat {} \; 2>/dev/null || true
 
       - name: Upload artifacts to GitHub Release
         uses: softprops/action-gh-release@v3

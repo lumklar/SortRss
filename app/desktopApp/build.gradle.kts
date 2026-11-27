@@ -36,6 +36,9 @@ compose.desktop {
             )
             //TODO 统一变量名
             packageName = "SortRSS"
+            // jpackage 不接受 SNAPSHOT 后缀，统一去掉后作为安装包版本。
+            // 项目版本已升到 1.0.0，首位非 0，macOS 无需再做 0→1 映射；
+            // 产物文件名由 release 的 renameTo 控制（用 project.version），不受影响。
             packageVersion = project.version.toString().replace("-SNAPSHOT", "")
             // deb/rpm/msi 的元数据：不设置时包内 Maintainer / License 会写成 Unknown
             vendor = "lumklar"
