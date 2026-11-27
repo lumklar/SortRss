@@ -74,14 +74,17 @@ Windows 用 `.\gradlew.bat`，其他环境用 `./gradlew`。
 | `wasmjs` | `:app:webApp:wasmJsBrowserDistribution` | GZIP 压缩 |
 | `js` | `:app:webApp:jsBrowserDistribution` | GZIP 压缩 |
 | `apk` | `:app:androidApp:assembleRelease` | NETWORK flavor，需签名配置 |
-| `exe` / `msi` | `:app:desktopApp:packageReleaseExe/Msi` | Windows；macOS(dmg/pkg) 条目仍注释 |
+| `exe` / `msi` | `:app:desktopApp:packageReleaseExe/Msi` | Windows |
+| `dmg` / `pkg` | `:app:desktopApp:packageReleaseDmg/Pkg` | macOS（未签名），CI 用 `macos-15-intel`、`macos-15` 分别出 x64/arm64 |
 | `deb` / `rpm` | `:app:desktopApp:packageReleaseDeb/Rpm` | Linux，由 jpackage 产出，文件名含包架构（`amd64`/`arm64`、`x86_64`/`aarch64`） |
-| `appimage` | `:app:desktopApp:packageReleaseAppImage` | Linux 免安装目录（Compose 的 `TargetFormat.AppImage` 实为 `jpackage --type app-image`，不是 `.AppImage` 单文件），打 tar.gz |
+| `app-image` | `:app:desktopApp:packageReleaseAppImage` | Linux 免安装目录（Compose 的 `TargetFormat.AppImage` 实为 `jpackage --type app-image`，不是 `.AppImage` 单文件），打 tar.gz；产物名沿用历史的 `appimage` |
 
-命名规则：`sortrss-<target>[-<arch>][-<flavor>]-<version>[.gz|.xz|...]`；
-分组聚合为 `release-server` / `release-web` / `release-android` / `release-win` / `release-linux`。
+命名规则：`sortrss-<artifactName>[-<arch>][-<flavor>]-<version>[.gz|.xz|...]`。
+`artifactName` 默认等于 `target`，仅在两者需不同时显式声明（当前 `app-image` 任务产出 `appimage` 文件）；
+任务名与产物名、分组均在配置期校验唯一性。安装名用 `SortRSS`，与产物名小写前缀分别来自 `ReleaseNames`。
+分组聚合为 `release-server` / `release-web` / `release-android` / `release-win` / `release-mac` / `release-linux`。
 
-桌面端产物只能在对应宿主系统上产出（jpackage 的平台限制）：Windows 出 `exe/msi`，Linux 出 `deb/rpm/appimage`。
+桌面端产物只能在对应宿主系统上产出（jpackage 的平台限制）：Windows 出 `exe/msi`，macOS 出 `dmg/pkg`，Linux 出 `deb/rpm/app-image`。
 在 Windows/macOS 上验证 Linux 打包，用容器最省事（需 JDK 21 与 `rpm`、`fakeroot`、`file`）：
 
 ```bash

@@ -10,5 +10,6 @@ enum class CompressionMode(val suffix: String) {
     XZ(".xz"),
     LZMA(".lzma"),
     ZSTANDARD(".zst"),
-    DEFLATE(".deflate"),          // 原始 Deflate 流（无 zlib 头）
+    // commons-compress 的 DeflateCompressorOutputStream 默认带 zlib 头（RFC 1950）
+    DEFLATE(".deflate"),
 }

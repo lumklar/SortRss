@@ -1,7 +1,8 @@
 import buildlogic.release.*
 import buildlogic.flavors.*
 
-//TODO 支持 macOS：dmg/pkg 只能由 macOS 的 jpackage 产出，需在 macos runner 上构建
+// macOS 的 dmg/pkg 只能由 macOS 的 jpackage 产出：
+// CI 在 release-binary.yml 里用 macos-15-intel / macos-15 两个 runner 分别构建 x64 与 arm64。
 
 val version = project.version.toString()
 val releaseVersion = version.replace("-SNAPSHOT", "")
@@ -96,7 +97,8 @@ registerReleaseTasks(
             target = "exe",
             moduleName = ":app:desktopApp",
             moduleTask = "packageReleaseExe",
-            artifactRelativePath = "compose/binaries/main-release/exe/SortRSS-$releaseVersion.exe",
+            // 用通配符吸收 jpackage 在不同架构/版本下的产物名差异（A5）
+            artifactRelativePath = "compose/binaries/main-release/exe/*.exe",
             envVarsCombinations = listOf(
                 listOf(
                     DataFlavor.NETWORK
@@ -108,7 +110,7 @@ registerReleaseTasks(
             target = "msi",
             moduleName = ":app:desktopApp",
             moduleTask = "packageReleaseMsi",
-            artifactRelativePath = "compose/binaries/main-release/msi/SortRSS-$releaseVersion.msi",
+            artifactRelativePath = "compose/binaries/main-release/msi/*.msi",
             envVarsCombinations = listOf(
                 listOf(
                     DataFlavor.NETWORK
@@ -147,9 +149,11 @@ registerReleaseTasks(
             group = "linux"
         ),
         ReleaseConfig(
-            // 实际是 jpackage app-image 目录的 tar.gz，不是单文件 AppImage，
-            // 产物名如实写为 app-image，避免误导用户。
+            // 实际是 jpackage app-image 目录的 tar.gz，不是单文件 AppImage。
+            // 任务名用 app-image（对应 packageReleaseAppImage），产物名沿用历史 appimage，
+            // 避免 CI/下游脚本按 sortrss-appimage-* 找产物时断掉（A4：任务名与产物名解耦）。
             target = "app-image",
+            artifactName = "appimage",
             moduleName = ":app:desktopApp",
             moduleTask = "packageReleaseAppImage",
             // 注意：Compose 的 TargetFormat.AppImage 实际是 `jpackage --type app-image`，

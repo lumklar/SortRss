@@ -1,4 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import buildlogic.release.ReleaseNames
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
@@ -34,15 +35,16 @@ compose.desktop {
                 TargetFormat.Rpm,  // Linux (Red Hat/Fedora/CentOS)
                 TargetFormat.AppImage, // Linux
             )
-            //TODO 统一变量名
-            packageName = "SortRSS"
+            // 安装名与发布产物名统一从 ReleaseNames 读取，避免两处字面量漂移：
+            // 安装名 SortRSS（用户可见），产物名小写 sortrss-*（下载文件名）。
+            packageName = ReleaseNames.PACKAGE_NAME
             // jpackage 不接受 SNAPSHOT 后缀，统一去掉后作为安装包版本。
             // 项目版本已升到 1.0.0，首位非 0，macOS 无需再做 0→1 映射；
             // 产物文件名由 release 的 renameTo 控制（用 project.version），不受影响。
             packageVersion = project.version.toString().replace("-SNAPSHOT", "")
             // deb/rpm/msi 的元数据：不设置时包内 Maintainer / License 会写成 Unknown
             vendor = "lumklar"
-            description = "SortRSS - RSS aggregation, sorting and management"
+            description = "${ReleaseNames.PACKAGE_NAME} - RSS aggregation, sorting and management"
             copyright = "Copyright 2026 lumklar"
         }
     }

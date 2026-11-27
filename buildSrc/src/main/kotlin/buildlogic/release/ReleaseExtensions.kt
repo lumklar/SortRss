@@ -9,10 +9,13 @@ import java.io.File
 
 /**
  * 注册一个“发布产物”的 Gradle 任务。
- * TODO 支持不同cpu架构产物名称不一致
  *
  * 此函数在配置阶段会捕获所有需要的信息（路径、模块等），
  * 并将它们作为任务的输入属性，从而避免在执行阶段访问 Project，满足配置缓存要求。
+ *
+ * 不同 CPU 架构下 jpackage 产物名可能不同（deb 用 amd64/arm64、rpm 用 x86_64/aarch64、
+ * exe/msi 可能带架构后缀），统一由 artifactRelativePath 的通配符吸收，
+ * 输出名则由 [renameTo] 规范化为 `<artifactName>-<arch>-<flavor>-<version>`。
  *
  * @param taskName 注册的任务名称
  * @param moduleName 目标模块的名称（如 ":app"），必须在当前构建中存在
@@ -62,7 +65,8 @@ private fun Project.registerReleaseTask(
  * 批量注册发布任务。
  *
  * 根据传入的配置列表，依次为每个配置中的每个环境变量组合生成一个发布任务，
- * 任务命名遵循 `release-<target>-<envSuffix>` 格式。
+ * 任务命名遵循 `release-<target>-<envSuffix>` 格式，产物命名遵循
+ * `sortrss-<artifactName>[-<arch>]-<envSuffix>-<version>` 格式。
  * 同时为每个 group 创建聚合任务 `release-<group>`，依赖该组所有子任务；
  * 最后创建 `release-all` 任务，依赖所有 group 聚合任务。
  *
@@ -84,15 +88,29 @@ fun Project.registerReleaseTasks(configs: List<ReleaseConfig>) {
     val groupTasksMap = mutableMapOf<String, MutableList<Task>>()
     // 存储每个模块下的任务列表（Task 对象）
     val moduleTasksMap = mutableMapOf<String, MutableList<Task>>()
+    // 任务名与产物名都必须唯一，否则会互相覆盖。
+    // 注意：group 允许重复（wasmjs/js 同属 web），聚合任务按 group 去重后注册一次。
+    val seenTaskNames = mutableSetOf<String>()
+    val seenArtifactNames = mutableSetOf<String>()
 
     configs.forEach { config ->
         val group = config.group
+        val artifactName = config.effectiveArtifactName
+
+        // 任务名/产物名在不同风味下仍需唯一；用不含 env 的主键检查即可发现重复声明
+        check(seenTaskNames.add(config.target)) {
+            "重复的 release target '${config.target}'，任务名会冲突"
+        }
+        check(seenArtifactNames.add(artifactName)) {
+            "重复的 release artifactName '$artifactName'（target='${config.target}'），产物会互相覆盖"
+        }
+
         config.envVarsCombinations.forEach { envVarsList ->
             // 生成环境变量后缀（用 "-" 连接所有 value）
             val envSuffix = if (envVarsList.isNotEmpty()) "-${envVarsList.joinToString("-") { it.value }}" else ""
 
             // 任务名称：release-<target>-<envSuffix>
-            val taskName = "release-${config.target}$envSuffix"
+            val taskName = "${ReleaseNames.TASK_PREFIX}-${config.target}$envSuffix"
 
             // 从项目获取版本号，作为重命名的一部分
             val version = project.version.toString()
@@ -100,7 +118,7 @@ fun Project.registerReleaseTasks(configs: List<ReleaseConfig>) {
             // 构造基础名称
             // 若架构无关，则不添加 arch 段；否则添加 -<arch>
             val archSuffix = if (config.architectureIndependent) "" else "-$arch"
-            val baseName = "sortrss-${config.target}$archSuffix$envSuffix-$version"
+            val baseName = "${ReleaseNames.ARTIFACT_PREFIX}-$artifactName$archSuffix$envSuffix-$version"
 
             // 调用原有的注册函数
             registerReleaseTask(
@@ -122,7 +140,9 @@ fun Project.registerReleaseTasks(configs: List<ReleaseConfig>) {
         }
     }
 
-    //TODO 加锁之后是不是不需要这段逻辑了？
+    // 任务图级串行约束：同一模块的多个任务必须按顺序调度。
+    // 与 ReleasePublishTask 内的跨进程文件锁是互补的两层保护——
+    // mustRunAfter 保证单进程内任务不并发调度，文件锁保证跨进程/跨构建不争抢 build 目录。
     moduleTasksMap.values.forEach { taskList ->
         if (taskList.size > 1) {
             // 按任务名称排序，确保顺序稳定
@@ -136,7 +156,7 @@ fun Project.registerReleaseTasks(configs: List<ReleaseConfig>) {
 
     // 为每个 group 创建聚合任务
     groupTasksMap.forEach { (groupName, taskList) ->
-        tasks.register("release-$groupName") {
+        tasks.register("${ReleaseNames.TASK_PREFIX}-$groupName") {
             group = "release-group"
             description = "发布所有 $groupName 产物"
             dependsOn(taskList)
@@ -144,9 +164,9 @@ fun Project.registerReleaseTasks(configs: List<ReleaseConfig>) {
     }
 
     // 创建总任务 release-all，依赖所有 group 聚合任务
-    tasks.register("release-all") {
+    tasks.register("${ReleaseNames.TASK_PREFIX}-all") {
         group = "release-group"
         description = "发布所有组产物"
-        dependsOn(groupTasksMap.keys.map { "release-$it" })
+        dependsOn(groupTasksMap.keys.map { "${ReleaseNames.TASK_PREFIX}-$it" })
     }
 }

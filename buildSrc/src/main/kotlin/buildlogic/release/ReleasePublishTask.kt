@@ -21,6 +21,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
+import java.io.RandomAccessFile
+import java.nio.channels.FileLock
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.attribute.PosixFilePermission
@@ -30,7 +32,8 @@ import javax.inject.Inject
  * 发布产物任务：执行指定模块的 Gradle 任务 → 匹配产物（支持 * 通配符）→ 复制或打包到 build/release
  *
  * 所有输入属性在配置阶段设置，执行阶段不访问 Project 对象，兼容 Gradle 配置缓存。
- * 通过文件锁保证同一模块的发布任务不会并发执行，避免增量缓存冲突。
+ * 通过跨进程文件锁保证同一模块的发布任务不会并发执行，避免嵌套 Gradle 构建争抢同一 build 目录；
+ * 任务图层的 mustRunAfter 负责单进程内的调度顺序，两者互补。
  */
 internal abstract class ReleasePublishTask @Inject constructor(
     private val execOps: ExecOperations   // 注入执行外部命令的服务
@@ -80,22 +83,30 @@ internal abstract class ReleasePublishTask @Inject constructor(
 
         /** tar 权限位：0644（普通文件） */
         private const val MODE_REGULAR = 420
-
-        // 按模块目录存储锁，保证同一模块的任务串行
-        private val locks = java.util.concurrent.ConcurrentHashMap<String, java.util.concurrent.locks.ReentrantLock>()
     }
 
     @TaskAction
     fun publish() {
-        // ========== 0. 获取模块级文件锁，防止同一模块的多个发布任务并发 ==========
-        // 锁文件放在模块 build 目录下，每个模块独立，互不干扰
-        val moduleKey = targetBuildDir.get().absolutePath
-        val lock = locks.computeIfAbsent(moduleKey) { java.util.concurrent.locks.ReentrantLock() }
-        lock.lock()
+        // ========== 0. 获取模块级跨进程文件锁 ==========
+        // 同一模块的多个发布任务会各自启动嵌套 Gradle 构建并写同一 build 目录；
+        // 文件锁（而非 JVM 内 ReentrantLock）才能同时覆盖 --parallel 与多个 Gradle 进程并行的场景。
+        val buildDir = targetBuildDir.get()
+        val lockFile = File(buildDir, "release-publish.lock")
+        lockFile.parentFile.mkdirs()
 
-        try {
-            // ========== 1. 执行目标模块的 Gradle 任务 ==========
-            execOps.exec {
+        RandomAccessFile(lockFile, "rw").use { raf ->
+            val lock: FileLock = raf.channel.lock() // 阻塞直到获得独占锁
+            try {
+                publishLocked()
+            } finally {
+                lock.release()
+            }
+        }
+    }
+
+    private fun publishLocked() {
+        // ========== 1. 执行目标模块的 Gradle 任务 ==========
+        execOps.exec {
                 workingDir = targetProjectDir.get()
                 commandLine = listOf(
                     gradlewPath.get(),
@@ -196,22 +207,21 @@ internal abstract class ReleasePublishTask @Inject constructor(
                 }
                 logger.lifecycle("产物已输出: ${outputFile.absolutePath}")
             }
-
-        } finally {
-            lock.unlock()
-        }
     }
 
     /**
      * 根据压缩模式创建对应的 CompressorOutputStream。
      * 若模式为 NONE，则直接返回原输出流（不做压缩）。
+     *
+     * 除 BZIP2 显式指定 blockSize=9 外，其余保持 commons-compress 的默认值：
+     * 实际使用的 GZIP 默认 MTIME=0（可复现构建），其余格式未被 release.gradle.kts 使用；
+     * 无依据地调整参数只会破坏产物一致性，故固化此决策。
      */
     private fun createCompressorOutputStream(mode: CompressionMode, out: OutputStream): OutputStream {
-        //TODO 调整压缩参数？
         return when (mode) {
             CompressionMode.NONE -> out
             CompressionMode.GZIP -> GzipCompressorOutputStream(out)
-            CompressionMode.BZIP2 -> BZip2CompressorOutputStream(out)
+            CompressionMode.BZIP2 -> BZip2CompressorOutputStream(out, BZip2CompressorOutputStream.MAX_BLOCKSIZE)
             CompressionMode.XZ -> XZCompressorOutputStream(out)
             CompressionMode.LZMA -> LZMACompressorOutputStream(out)
             CompressionMode.ZSTANDARD -> ZstdCompressorOutputStream(out)

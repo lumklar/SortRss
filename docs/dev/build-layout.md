@@ -36,7 +36,7 @@
 | `version-overrides.gradle.kts` | 读 `version-overrides.properties`，把临时覆盖写入 `extra`，并注册 `checkVersionOverrides` |
 | `version-overrides.properties` | 临时安全覆盖声明（`BOM 属性名=版本目录别名`），当前为空 |
 | `docker.gradle.kts` | 读取 `docker.registry / namespace / repository`，用一条 `DockerConfig` 声明 `jvm-wasmJs` 镜像的构建与多架构推送任务 |
-| `release.gradle.kts` | `registerReleaseTasks(...)`：声明 `backend / wasmjs / js / apk / exe / msi` 等发布产物（macOS、Linux 条目当前注释掉） |
+| `release.gradle.kts` | `registerReleaseTasks(...)`：声明 `backend / wasmjs / js / apk / dmg / pkg / exe / msi / deb / rpm / app-image` 全部发布产物（macOS/Linux 已启用） |
 | `wrapper/gradle-wrapper.jar` | Wrapper 引导 jar，勿手改 |
 | `wrapper/gradle-wrapper.properties` | 锁定 Gradle 9.7.1、`distributionSha256Sum`，并开启 configuration cache |
 
@@ -71,7 +71,7 @@
 | `docker/` | 镜像构建与多架构发布 | `DockerConfig.kt`（声明式配置）、`DockerExtensions.kt`（`createDockerTask`，装配 build / flavor build / push / pushArch / mergeArch 及五个聚合任务）、`DockerBuildTask.kt` + `DockerBuildExtensions.kt`（`docker build` 单镜像）、`DockerPublishMultiArchTask.kt`（buildx 一次构建多平台）、`DockerArchBuildTask.kt` / `DockerArchMergeTask.kt`（逐平台推送、`imagetools create` 合并）、`DockerPushExtensions.kt`（三类发布任务注册与公共输入装配）、`DockerImageTask.kt`（任务公共输入、执行期解析标签/平台）、`DockerTaskSupport.kt`（依赖子进程、docker 命令、文件锁、buildx 命令拼装）、`DockerUtils.kt`（拼 `docker build` 命令、镜像名与 tag，统一校验项目版本和环境变量版本） |
 | `docs/` | MkDocs 站点构建与 mike 版本化部署 | `MikeDeployConfig.kt`（工作目录、分支、版本列表）、`MkDockerExtensions.kt`（`createMikeDeployTask`，产出 `install / deploy / deployPush / deployLatest / unpack` 任务）、`MkDocsDeployTask.kt`（调用 mike 的任务本体） |
 | `flavors/` | “数据风味”枚举与配置解析 | `StringEnum.kt`（枚举统一接口，含 envKey 推导）、`FlavorEnum.kt`（`DataFlavor`：`mock` / `network` / `local`）、`FlavorUtils.kt`（`matchEnum`、`getFlavorEnum`） |
-| `release/` | 产物发布：跑模块任务 → 匹配产物 → 拷贝/压缩到 `build/release` | `ReleaseConfig.kt`、`CompressionMode.kt`（NONE/GZIP/BZIP2/XZ/LZMA/ZSTANDARD/DEFLATE）、`ReleaseExtensions.kt`（`registerReleaseTasks`，生成 `release-<target>[-<env>]`、`release-<group>`、`release-all`）、`ReleasePublishTask.kt`（打包压缩、重命名） |
+| `release/` | 产物发布：跑模块任务 → 匹配产物 → 拷贝/压缩到 `build/release` | `ReleaseConfig.kt`（`target` 任务名 / `artifactName` 产物名解耦，配置期校验唯一）、`ReleaseNames.kt`（安装名 SortRSS、产物前缀 sortrss 的共享来源）、`CompressionMode.kt`（NONE/GZIP/BZIP2/XZ/LZMA/ZSTANDARD/DEFLATE，默认参数已固化）、`ReleaseExtensions.kt`（`registerReleaseTasks`，生成 `release-<target>[-<env>]`、`release-<group>`、`release-all`）、`ReleasePublishTask.kt`（跨进程文件锁、打包压缩、重命名） |
 | `toolchain/` | 调用外部工具的基础任务 | `GitTask.kt`（`GitArchiveUnpackTask`：从指定分支导出 tar.gz 并解压，供 mike 取历史版本）、`PythonTask.kt`（`PipInstallTask`：按 requirements.txt 装依赖） |
 | `utils/` | 通用工具 | `ConfigUtils.kt`（`getConfigString` 五级优先级、`getEnvString` 只从 env 读）、`EnvPropertyConverter.kt`（`DATABASE_URL` ↔ `database.url`）、`GradleUtils.kt`（`gradlewPath()` 跨平台）、`NameUtils.kt`（kebab / lowerCamel 转换、版本号校验） |
 
@@ -86,7 +86,10 @@
   `pushMultiArchFlavorDockerImageJvmWasmJsNetwork`；镜像 tag 用 kebab-case：
   `<version>-jvm-wasm-js[-network]`。
 - **发布任务命名**：`release-<target>[-<flavor>]`，聚合任务 `release-<group>`、`release-all`；
+  产物名为 `sortrss-<artifactName>[-<arch>][-<flavor>]-<version>`，默认 `artifactName=target`，
   架构相关的目标会带 `-<arch>` 后缀，产物统一落根 `build/release/`。
+  同模块任务既有 `mustRunAfter`（进程内排序），`ReleasePublishTask` 又按模块 build 目录加跨进程文件锁；
+  jpackage 不同架构产物名的差异由 `artifactRelativePath` 通配符吸收。
 - `buildSrc` 里的 Task 需满足 **configuration cache**：配置阶段捕获所有输入，执行阶段不访问 `Project`。
 
 ### 3.4 新增构建逻辑该放哪
