@@ -83,12 +83,22 @@ android {
     namespace = "com.github.lumklar.sortrss"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
+    // 版本号跟随根项目 gradle.properties，避免多处硬编码不一致。
+    // versionCode 必须是单调递增的整数（系统靠它判断覆盖安装是否允许），
+    // 用 major*10000 + minor*100 + patch 从语义化版本派生：
+    // 1.0.0-SNAPSHOT → 10000，大于已发布的 1，可正常覆盖更新。
+    // 注意：版本号不得回退，否则 versionCode 变小会导致用户装不上新版。
+    val releaseVersion = project.version.toString().removeSuffix("-SNAPSHOT")
+    val versionParts = releaseVersion.split(".").map { it.toIntOrNull() ?: 0 }
+
     defaultConfig {
         applicationId = "com.github.lumklar.sortrss"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = versionParts.getOrElse(0) { 0 } * 10000 +
+                versionParts.getOrElse(1) { 0 } * 100 +
+                versionParts.getOrElse(2) { 0 }
+        versionName = project.version.toString()
     }
     packaging {
         resources {

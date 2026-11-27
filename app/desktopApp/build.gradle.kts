@@ -36,18 +36,10 @@ compose.desktop {
             )
             //TODO 统一变量名
             packageName = "SortRSS"
-            // macOS 的 jpackage 要求 app-version 首位非 0，否则报
-            // "The first number in an app-version cannot be zero or negative"，
-            // 而项目版本是 0.0.1-SNAPSHOT。Compose DSL 没有独立 appVersion，
-            // 它直接用 packageVersion 作为 jpackage 的 --app-version，
-            // 因此仅 macOS 把首位 0 映射为 1；产物文件名由 release 的
-            // renameTo 控制（用 project.version），不受影响。
-            val rawVersion = project.version.toString().replace("-SNAPSHOT", "")
-            packageVersion = if (System.getProperty("os.name").contains("Mac", ignoreCase = true)) {
-                rawVersion.replace(Regex("^0\\."), "1.")
-            } else {
-                rawVersion
-            }
+            // jpackage 不接受 SNAPSHOT 后缀，统一去掉后作为安装包版本。
+            // 项目版本已升到 1.0.0，首位非 0，macOS 无需再做 0→1 映射；
+            // 产物文件名由 release 的 renameTo 控制（用 project.version），不受影响。
+            packageVersion = project.version.toString().replace("-SNAPSHOT", "")
             // deb/rpm/msi 的元数据：不设置时包内 Maintainer / License 会写成 Unknown
             vendor = "lumklar"
             description = "SortRSS - RSS aggregation, sorting and management"
