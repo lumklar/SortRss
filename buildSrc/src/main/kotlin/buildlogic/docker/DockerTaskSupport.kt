@@ -1,7 +1,7 @@
 package buildlogic.docker
 
+import buildlogic.constant.EnvConstant
 import buildlogic.flavors.StringEnum
-import buildlogic.utils.NameUtils
 import org.gradle.api.GradleException
 import org.gradle.process.ExecOperations
 import java.io.File
@@ -78,13 +78,13 @@ internal object DockerTaskSupport {
         val fromEnv = envVersion.split(',')
             .map { it.trim() }
             .filter { it.isNotBlank() }
-            .map { NameUtils.toKebabCase(it) }
+            .map { validateDockerTagPart(it, EnvConstant.DOCKER_IMAGE_VERSION) }
         if (fromEnv.isNotEmpty()) {
             return fromEnv.distinct().map { buildDockerTag(it, targetName, stringEnums) }
         }
 
         val versions = buildList {
-            add(projectVersion.lowercase())
+            add(validateDockerTagPart(projectVersion, "project version"))
             if (versionLatest) add("latest")
         }
         val tags = versions.map { buildDockerTag(it, targetName, stringEnums) }.toMutableList()

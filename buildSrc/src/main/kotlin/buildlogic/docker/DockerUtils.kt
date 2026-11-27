@@ -3,8 +3,23 @@ package buildlogic.docker
 import buildlogic.flavors.StringEnum
 import buildlogic.utils.NameUtils
 import org.gradle.api.GradleException
-import org.gradle.internal.impldep.org.eclipse.jgit.lib.ObjectChecker.tag
 import java.io.File
+
+private val DOCKER_TAG_REGEX = Regex("^[a-z0-9][a-z0-9._-]{0,127}$")
+
+/**
+ * 统一校验并规范化 Docker 标签片段。
+ *
+ * 项目版本和 DOCKER_IMAGE_VERSION 都走这里，避免常规版本走 NameUtils.validateVersion、
+ * 环境变量却直接拼进 tag 而产生 `dev/foo`、`..` 等非法镜像名。
+ */
+internal fun validateDockerTagPart(value: String, source: String): String {
+    val normalized = value.trim().lowercase().replace('_', '-')
+    require(normalized.matches(DOCKER_TAG_REGEX)) {
+        "Invalid Docker tag from $source: '$value'. Expected [a-z0-9][a-z0-9._-]{0,127}"
+    }
+    return normalized
+}
 
 /**
  * 构建 docker build 命令及镜像全名，并检查 Dockerfile 目录是否存在。
@@ -50,8 +65,12 @@ internal fun buildDockerTag(
     targetName: String,
     stringEnums: List<StringEnum> = emptyList()
 ): String {
-    var tagSuffix =
+    val normalizedVersion = validateDockerTagPart(imageVersion, "image version")
+    val tagSuffix =
         NameUtils.toKebabCase(targetName + stringEnums.joinToString(separator = "") { "-${it.value.lowercase()}" })
-    //TODO version有两种一种是常规的，一种是环境变量引入的，两种校验方式不一致
-    return imageVersion + "-" + tagSuffix
+    val tag = "$normalizedVersion-$tagSuffix"
+    require(tag.matches(DOCKER_TAG_REGEX)) {
+        "Invalid Docker tag: '$tag'. Expected [a-z0-9][a-z0-9._-]{0,127}"
+    }
+    return tag
 }

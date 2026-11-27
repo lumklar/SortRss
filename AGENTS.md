@@ -49,7 +49,9 @@ Kotlin 2.4.0 / JDK 21 / Gradle 9.7.1；目标平台 `jvm`、`js`、`wasmJs`、An
 | --- | --- |
 | `libs.versions.toml` | 主工程版本目录：全部模块依赖 + 根插件版本 |
 | `common.gradle.kts` | 子项目公共配置（`subprojects {}`，当前空壳） |
-| `check.gradle.kts` | `registerAllChecks()`：三个校验任务并挂到根 `check` |
+| `check.gradle.kts` | `registerAllChecks()`：四个校验任务并挂到根 `check`；另由 `version-overrides.gradle.kts` 注册 `checkVersionOverrides` |
+| `version-overrides.gradle.kts` | 读取 `version-overrides.properties` 的临时安全覆盖并写入 `extra`，注册过期检查 |
+| `version-overrides.properties` | 临时覆盖声明：`BOM 属性名=版本目录别名`，当前为空 |
 | `docker.gradle.kts` | 读 `docker.*` 配置，注册 `jvm-wasmJs` 镜像构建与多架构推送任务 |
 | `release.gradle.kts` | `registerReleaseTasks(...)`：各平台产物 `release-*` / `release-all` |
 | `wrapper/` | Gradle Wrapper 9.7.1（jar + properties），勿手改 |
@@ -60,7 +62,7 @@ Kotlin 2.4.0 / JDK 21 / Gradle 9.7.1；目标平台 `jvm`、`js`、`wasmJs`、An
 
 | 目录 | 用途 |
 | --- | --- |
-| `checks/` | 三个 `verification` 任务：模块重名、依赖版本、插件版本（入口 `registerAllChecks`） |
+| `checks/` | 四个 `verification` 任务：模块重名、依赖版本、插件版本、配置键冲突（入口 `registerAllChecks`）；另有 `CheckVersionOverridesTask` 由版本覆盖脚本注册 |
 | `constant/` | 配置键常量：`PropertiesContant`（Gradle 属性）、`EnvConstant`（环境变量） |
 | `docker/` | 镜像构建/推送：`DockerConfig`、`DockerExtensions`（装配）、`DockerBuildTask`、`DockerPublishMultiArchTask`（buildx）、`DockerUtils`（命令与 tag） |
 | `docs/` | MkDocs/mike 部署：`MikeDeployConfig`、`MkDockerExtensions`、`MikeDeployTask` |
@@ -85,7 +87,7 @@ Kotlin 2.4.0 / JDK 21 / Gradle 9.7.1；目标平台 `jvm`、`js`、`wasmJs`、An
 ## 5. 常用命令
 
 ```bash
-gradlew check                                  # 含三个校验任务
+gradlew check                                  # 含五个校验任务
 gradlew :app:webApp:wasmJsBrowserDistribution
 gradlew :app:androidApp:assembleDebug
 gradlew :server:bootstrap:bootRun

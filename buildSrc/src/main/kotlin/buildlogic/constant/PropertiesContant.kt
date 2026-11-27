@@ -1,7 +1,10 @@
 package buildlogic.constant
 
 /**
- * TODO 检查与EnvConstant中是否冲突
+ * Gradle 属性键的唯一声明处。
+ *
+ * 环境变量名由 [buildlogic.utils.EnvPropertyConverter] 从这里的属性键推导；
+ * `checkConfigKeys` 会检查与 EnvConstant 是否重复或格式非法。
  */
 object PropertiesContant {
     const val FLAVOR_PREFIX = "flavor."

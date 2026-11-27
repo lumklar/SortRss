@@ -32,7 +32,9 @@
 | --- | --- |
 | `libs.versions.toml` | **主工程**版本目录：全部子模块与根构建脚本使用的依赖、插件版本（`libs.*` / `alias(libs.plugins.*)`） |
 | `common.gradle.kts` | 子项目公共配置入口，目前仅 `subprojects { }` 空壳，用于将来统一约定 |
-| `check.gradle.kts` | `registerAllChecks()`：注册三个 `verification` 任务并挂到根 `check` |
+| `check.gradle.kts` | `registerAllChecks()`：注册四个 `verification` 任务并挂到根 `check` |
+| `version-overrides.gradle.kts` | 读 `version-overrides.properties`，把临时覆盖写入 `extra`，并注册 `checkVersionOverrides` |
+| `version-overrides.properties` | 临时安全覆盖声明（`BOM 属性名=版本目录别名`），当前为空 |
 | `docker.gradle.kts` | 读取 `docker.registry / namespace / repository`，用一条 `DockerConfig` 声明 `jvm-wasmJs` 镜像的构建与多架构推送任务 |
 | `release.gradle.kts` | `registerReleaseTasks(...)`：声明 `backend / wasmjs / js / apk / exe / msi` 等发布产物（macOS、Linux 条目当前注释掉） |
 | `wrapper/gradle-wrapper.jar` | Wrapper 引导 jar，勿手改 |
@@ -64,20 +66,21 @@
 
 | 目录 | 用途 | 主要文件 |
 | --- | --- | --- |
-| `checks/` | 三个 `verification` 任务：子模块名唯一、依赖版本必须走版本目录、插件版本必须走版本目录；`registerAllChecks()` 统一注册并挂到 `check` | `CheckExtensions.kt`（任务名常量 + `register*Check()`）、`CheckModuleNamesTask.kt`、`CheckDependencyVersionsTask.kt`、`CheckPluginVersionsTask.kt` |
-| `constant/` | 配置键常量，避免字符串散落 | `PropertiesContant.kt`（`flavor.data`、`docker.*`、`site.url`、`repo.url`）、`EnvConstant.kt`（`DOCKER_PLATFORMS`、`DOCKER_IMAGE_VERSION`、`SITE_URL`、`REPO_URL`） |
-| `docker/` | 镜像构建与多架构发布 | `DockerConfig.kt`（声明式配置）、`DockerExtensions.kt`（`createDockerTask`，装配 build / flavor build / push / pushArch / mergeArch 及五个聚合任务）、`DockerBuildTask.kt` + `DockerBuildExtensions.kt`（`docker build` 单镜像）、`DockerPublishMultiArchTask.kt`（buildx 一次构建多平台）、`DockerArchBuildTask.kt` / `DockerArchMergeTask.kt`（逐平台推送、`imagetools create` 合并）、`DockerPushExtensions.kt`（三类发布任务注册与公共输入装配）、`DockerImageTask.kt`（任务公共输入、执行期解析标签/平台）、`DockerTaskSupport.kt`（依赖子进程、docker 命令、文件锁、buildx 命令拼装）、`DockerUtils.kt`（拼 `docker build` 命令、镜像名与 tag） |
+| `checks/` | 四个 `verification` 任务：模块名唯一、依赖/插件版本走版本目录、配置键无冲突；`registerAllChecks()` 统一注册并挂到 `check`。`CheckVersionOverridesTask` 由 version-overrides 脚本单独注册 | `CheckExtensions.kt`（任务名常量 + `register*Check()`）、`CheckModuleNamesTask.kt`、`CheckDependencyVersionsTask.kt`、`CheckPluginVersionsTask.kt`、`CheckConfigKeysTask.kt`、`CheckVersionOverridesTask.kt` |
+| `constant/` | 配置键常量，避免字符串散落 | `PropertiesContant.kt`（`flavor.data`、`docker.*`、`site.url`、`repo.url`，唯一属性键来源）、`EnvConstant.kt`（仅 `DOCKER_PLATFORMS`、`DOCKER_IMAGE_VERSION` 等任务级环境变量） |
+| `docker/` | 镜像构建与多架构发布 | `DockerConfig.kt`（声明式配置）、`DockerExtensions.kt`（`createDockerTask`，装配 build / flavor build / push / pushArch / mergeArch 及五个聚合任务）、`DockerBuildTask.kt` + `DockerBuildExtensions.kt`（`docker build` 单镜像）、`DockerPublishMultiArchTask.kt`（buildx 一次构建多平台）、`DockerArchBuildTask.kt` / `DockerArchMergeTask.kt`（逐平台推送、`imagetools create` 合并）、`DockerPushExtensions.kt`（三类发布任务注册与公共输入装配）、`DockerImageTask.kt`（任务公共输入、执行期解析标签/平台）、`DockerTaskSupport.kt`（依赖子进程、docker 命令、文件锁、buildx 命令拼装）、`DockerUtils.kt`（拼 `docker build` 命令、镜像名与 tag，统一校验项目版本和环境变量版本） |
 | `docs/` | MkDocs 站点构建与 mike 版本化部署 | `MikeDeployConfig.kt`（工作目录、分支、版本列表）、`MkDockerExtensions.kt`（`createMikeDeployTask`，产出 `install / deploy / deployPush / deployLatest / unpack` 任务）、`MkDocsDeployTask.kt`（调用 mike 的任务本体） |
 | `flavors/` | “数据风味”枚举与配置解析 | `StringEnum.kt`（枚举统一接口，含 envKey 推导）、`FlavorEnum.kt`（`DataFlavor`：`mock` / `network` / `local`）、`FlavorUtils.kt`（`matchEnum`、`getFlavorEnum`） |
 | `release/` | 产物发布：跑模块任务 → 匹配产物 → 拷贝/压缩到 `build/release` | `ReleaseConfig.kt`、`CompressionMode.kt`（NONE/GZIP/BZIP2/XZ/LZMA/ZSTANDARD/DEFLATE）、`ReleaseExtensions.kt`（`registerReleaseTasks`，生成 `release-<target>[-<env>]`、`release-<group>`、`release-all`）、`ReleasePublishTask.kt`（打包压缩、重命名） |
 | `toolchain/` | 调用外部工具的基础任务 | `GitTask.kt`（`GitArchiveUnpackTask`：从指定分支导出 tar.gz 并解压，供 mike 取历史版本）、`PythonTask.kt`（`PipInstallTask`：按 requirements.txt 装依赖） |
-| `utils/` | 通用工具 | `ConfigUtils.kt`（`getConfigString` 五级优先级）、`EnvPropertyConverter.kt`（`DATABASE_URL` ↔ `database.url`）、`GradleUtils.kt`（`gradlewPath()` 跨平台）、`NameUtils.kt`（kebab / lowerCamel 转换、版本号校验） |
+| `utils/` | 通用工具 | `ConfigUtils.kt`（`getConfigString` 五级优先级、`getEnvString` 只从 env 读）、`EnvPropertyConverter.kt`（`DATABASE_URL` ↔ `database.url`）、`GradleUtils.kt`（`gradlewPath()` 跨平台）、`NameUtils.kt`（kebab / lowerCamel 转换、版本号校验） |
 
 ### 3.3 关键约定
 
 - **配置优先级**（`getConfigString`）：
   `-P` 命令行 > 系统属性 > 环境变量 > `gradle.properties` > 根 `local.properties`。
-  敏感信息只进 `local.properties`（不入库）或 CI 环境变量。
+  环境变量同时接受 `DATABASE_URL`、`database.url` 和调用时传入的原始键，规范大写形式优先；
+  `getEnvString` 只查环境变量，不回退到其他来源。敏感信息只进 `local.properties`（不入库）或 CI 环境变量。
 - **任务命名**由 `getTaskName(prefix, targetName, enums)` 统一生成（lowerCamelCase），
   例：`buildDockerImageJvmWasmJs`、`buildFlavorDockerImageJvmWasmJsNetwork`、
   `pushMultiArchFlavorDockerImageJvmWasmJsNetwork`；镜像 tag 用 kebab-case：

@@ -7,7 +7,7 @@ import java.util.Properties
  * 获取配置值，严格按照以下优先级：
  * 1. 命令行 -P 参数（小写点分隔形式，如 `database.url`）
  * 2. 系统属性（小写点分隔形式）
- * 3. 环境变量（大写，下划线分隔，如 `DATABASE_URL`）
+ * 3. 环境变量（优先 `DATABASE_URL`，也兼容 `database.url` 与调用时传入的原始键）
  * 4. gradle.properties 文件中的属性（小写点分隔形式）
  * 5. 根目录 local.properties 中的属性（小写点分隔形式，本地私密配置，禁止入库）
  *
@@ -26,12 +26,8 @@ fun Project.getConfigString(key: String): String? {
         ?.takeIf { it.isNotBlank() }
         ?.let { return it }
 
-    // 3. 环境变量（次高优先级） - 修复 NPE 风险
-    EnvPropertyConverter.propertyToEnv(propertyKey).let { envKey ->
-        System.getenv(envKey)
-            ?.takeIf { it.isNotBlank() }
-            ?.let { return it }
-    }
+    // 3. 环境变量（次高优先级）：规范大写形式、小写点形式、原始键都支持
+    getEnvString(key)?.let { return it }
 
     // 4. Gradle 属性文件
     providers.gradleProperty(propertyKey).orNull
@@ -48,6 +44,27 @@ fun Project.getConfigString(key: String): String? {
     }
 
     return null
+}
+
+/**
+ * 只从环境变量读取配置，不读取项目属性、系统属性或 properties 文件。
+ *
+ * 依次尝试：规范大写下划线形式（`DATABASE_URL`）、小写点形式（`database.url`）、
+ * 调用时传入的原始键。第一个非空白值生效。
+ */
+fun Project.getEnvString(key: String): String? {
+    envCandidates(key).forEach { envKey ->
+        System.getenv(envKey)
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+    }
+    return null
+}
+
+private fun envCandidates(key: String): List<String> {
+    val propertyKey = EnvPropertyConverter.envToProperty(key)
+    val canonicalEnvKey = EnvPropertyConverter.propertyToEnv(propertyKey)
+    return listOf(canonicalEnvKey, propertyKey, key).distinct()
 }
 
 /**

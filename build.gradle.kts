@@ -60,16 +60,13 @@ plugins {
     alias(libs.plugins.mkdocs.build) apply false
 }
 
-//TODO 写一个脚本+配置统一管理，防止遗漏删除
-//漏洞修复
-//extra["tomcat.version"] = "11.0.22"
-
 tasks.named<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>("dependencyUpdates") {
     revision = "release"          // 仅检查稳定版（正式发布版）
     outputFormatter = "html"      // 输出 HTML 格式报告（仅生成 HTML）
 }
 
 apply(from = "gradle/common.gradle.kts")
+apply(from = "gradle/version-overrides.gradle.kts")
 apply(from = "gradle/docker.gradle.kts")
 apply(from = "gradle/release.gradle.kts")
 apply(from = "gradle/check.gradle.kts")

@@ -7,7 +7,7 @@ Windows 用 `.\gradlew.bat`，其他环境用 `./gradlew`。
 | 目的 | 命令 | 产物/说明 |
 | --- | --- | --- |
 | 看任务 | `gradlew tasks --all` | 任务名以各 `build.gradle.kts` 与 `gradle/*.gradle.kts` 为准 |
-| 跑校验 | `gradlew check` | 连带 `checkModuleNames` / `checkDependencyVersions` / `checkPluginVersions` |
+| 跑校验 | `gradlew check` | 连带 `checkModuleNames` / `checkDependencyVersions` / `checkPluginVersions` / `checkConfigKeys` / `checkVersionOverrides` |
 | 依赖升级报告 | `gradlew dependencyUpdates` | 只查 release 版，输出 HTML |
 | Web（wasmJs） | `gradlew :app:webApp:wasmJsBrowserDistribution` | `app/webApp/build/dist/wasmJs/productionExecutable` |
 | 桌面端运行 | `gradlew :app:desktopApp:run` | `mainClass = io.github.lumklar.sortrss.app.desktop.MainKt` |
@@ -56,6 +56,8 @@ Windows 用 `.\gradlew.bat`，其他环境用 `./gradlew`。
 - 平台列表默认来自 `DockerConfig.platforms`，可用环境变量 `DOCKER_PLATFORMS`（逗号分隔）覆盖；
   标签可用 `DOCKER_IMAGE_VERSION`（逗号分隔，如 `dev,dev-<sha>`）覆盖。两者都在**任务执行期**解析：
   任务图只取决于 `DockerConfig`，配置缓存命中后改环境变量仍然生效。
+- 项目版本与 `DOCKER_IMAGE_VERSION` 统一走 Docker tag 校验：只允许 `[a-z0-9][a-z0-9._-]{0,127}`，
+  `dev`、`dev-abc123` 可用，`dev/foo`、`..` 等会在写镜像名前直接失败。
 - 单架构任务按 `DockerConfig.platforms` 的全集注册；`DOCKER_PLATFORMS` 只选中其中一部分时，
   其余任务打印 `Skip` 后直接返回。若环境变量指定了配置里没有的平台，合并任务会报错提示补全声明。
 - 并发安全：依赖任务的子 Gradle 调用按依赖集合、docker 命令按镜像标签分别加文件锁，

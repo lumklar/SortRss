@@ -29,9 +29,15 @@
 | --- | --- |
 | 模块依赖 / 根插件 | `gradle/libs.versions.toml` |
 | `buildSrc/src` 用到的库、`kotlin-dsl` 插件 | `buildSrc/gradle/libs.versions.toml` |
+| BOM 临时安全覆盖（如 `tomcat.version`） | 别名写根版本目录，映射写 `gradle/version-overrides.properties` |
 
 模块脚本一律用 `alias(libs.xxx)` / `libs.xxx` 引用，**禁止硬编码版本号**；
 `checkDependencyVersions` 与 `checkPluginVersions` 会扫描全部 `build.gradle(.kts)` 做校验。
+
+临时安全覆盖不再写在 `build.gradle.kts` 的 `extra[...]` 里：`gradle/version-overrides.properties`
+只声明 `BOM 属性名=版本目录别名`，由 `gradle/version-overrides.gradle.kts` 写入 `extra`。
+`checkVersionOverrides` 会解析当前 Spring Boot BOM；一旦 BOM 自带版本不低于覆盖版本，
+构建失败并要求同时删除配置和版本目录别名，避免老版本被长期钉住。
 
 ## 4. 工具链
 
@@ -45,4 +51,4 @@
 1. 在 `gradle/libs.versions.toml` 的 `[versions]` / `[libraries]`（或 `[plugins]`）登记
 2. 模块 `build.gradle.kts` 用 `implementation(libs.xxx)` / `alias(libs.plugins.xxx)`
 3. 若 `buildSrc` 也要用，另在 `buildSrc/gradle/libs.versions.toml` 登记，并保持版本一致
-4. `gradlew checkDependencyVersions checkPluginVersions` 通过后再提交
+4. `gradlew checkDependencyVersions checkPluginVersions checkConfigKeys checkVersionOverrides` 通过后再提交

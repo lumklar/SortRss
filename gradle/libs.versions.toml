@@ -1,5 +1,6 @@
 [versions]
 
+# 临时安全覆盖别名由 gradle/version-overrides.properties 引用；不再需要时由 checkVersionOverrides 提示删除。
 # 核心框架版本
 kotlin = "2.4.21"
 ktor = "3.6.2"
