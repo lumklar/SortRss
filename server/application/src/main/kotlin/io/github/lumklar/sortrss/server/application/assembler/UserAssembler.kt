@@ -1,7 +1,7 @@
 package io.github.lumklar.sortrss.server.application.assembler
 
 import io.github.lumklar.sortrss.common.domain.model.user.User
-import io.github.lumklar.sortrss.server.application.pojo.user.dto.UserDto
+import io.github.lumklar.sortrss.common.api.dto.user.UserDto
 
 /**
  * 将 User 聚合根转换为 UserDto（应用层扩展）

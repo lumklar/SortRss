@@ -92,3 +92,16 @@ server:bootstrap ─→ server:{adaptor, application, infrastructure}
 1. `settings.gradle.kts` 中 `include(":a:b")`
 2. 需要新依赖/插件版本时，补**根** `gradle/libs.versions.toml`
 3. 在本文 §3 登记职责与依赖关系；若影响分层规则，同步 `AGENTS.md` §0 与本文 §4
+
+## 6. 服务端路由声明
+
+HTTP 路由**只写在接口契约上**：`common:api` 的 `XxxApi` 接口方法用 `@ApiRoute(path, HttpMethod.*)` 声明，
+控制器实现方法不再写 `@GetMapping/@PostMapping`。
+
+- 路由由 `server:adaptor` 的 `ApiRouteRequestMappingHandlerMapping` 在 handler 扫描阶段生成，
+  与原生 `@RequestMapping` 等价；它不是启动后补注册，因此 springdoc 生成的 OpenAPI 文档包含全部接口。
+- 实现方法上若**同时**写了 `@RequestMapping`，两者必须完全一致（含类级前缀），否则启动即抛
+  `IllegalStateException`，错误信息里会打印合并后的实际路径。
+- suspend 控制器方法依赖 `kotlinx-coroutines-reactor`（`server:adaptor` 已引入），缺失会抛
+  `NoClassDefFoundError: org/reactivestreams/Publisher`。
+

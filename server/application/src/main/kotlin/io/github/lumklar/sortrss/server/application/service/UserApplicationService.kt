@@ -1,7 +1,7 @@
 package io.github.lumklar.sortrss.server.application.service
 
 import io.github.lumklar.sortrss.server.application.pojo.user.command.RegisterUserCommand
-import io.github.lumklar.sortrss.server.application.pojo.user.dto.UserDto
+import io.github.lumklar.sortrss.common.api.dto.user.UserDto
 import io.github.lumklar.sortrss.server.application.pojo.user.query.UserQuery
 import org.springframework.stereotype.Service
 

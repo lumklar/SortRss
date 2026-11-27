@@ -13,7 +13,7 @@ import org.springframework.aot.hint.RuntimeHintsRegistrar
 import org.springframework.aot.hint.TypeReference
 
 /**
- * [ApiRouteAutoRegister] 在启动期通过反射读取接口方法上的 @ApiRoute。
+ * [ApiRouteRequestMappingHandlerMapping] 在 handler 扫描期通过反射读取接口方法上的 @ApiRoute。
  * AOT 只会注册实现类的方法，接口方法/注解需要显式补注册，否则 native 下
  * 基于 @ApiRoute 的路由不会被注册。
  */

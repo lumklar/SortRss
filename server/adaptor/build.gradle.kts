@@ -39,6 +39,9 @@ dependencies {
     // Kotlin
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.reflect)
+    // suspend 控制器方法由 Spring 通过 kotlinx-coroutines-reactor 适配为 Mono，
+    // 缺少该依赖时调用会抛 NoClassDefFoundError: org/reactivestreams/Publisher
+    implementation(libs.kotlinx.coroutines.reactor)
 
     //日志
     implementation(libs.kotlin.logging.jvm)

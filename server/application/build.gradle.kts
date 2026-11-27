@@ -31,6 +31,8 @@ dependencyCheck {
 
 dependencies {
     implementation(project(":common:domain"))
+    // 用例出参直接复用 common:api 的契约 DTO，避免应用层与契约层两份同构模型
+    api(project(":common:api"))
     api(project(":common:business"))
 
     // Kotlin

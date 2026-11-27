@@ -5,7 +5,7 @@ import io.github.lumklar.sortrss.common.domain.shared.ability.IdGenerator
 import io.github.lumklar.sortrss.common.domain.shared.ability.PasswordEncoder
 import io.github.lumklar.sortrss.server.application.assembler.toDto
 import io.github.lumklar.sortrss.server.application.pojo.user.command.RegisterUserCommand
-import io.github.lumklar.sortrss.server.application.pojo.user.dto.UserDto
+import io.github.lumklar.sortrss.common.api.dto.user.UserDto
 import io.github.lumklar.sortrss.server.application.pojo.user.query.UserQuery
 import io.github.lumklar.sortrss.server.application.service.UserApplicationService
 import org.springframework.stereotype.Service
