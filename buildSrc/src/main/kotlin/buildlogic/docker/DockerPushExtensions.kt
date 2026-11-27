@@ -3,6 +3,7 @@ package buildlogic.docker
 import buildlogic.flavors.StringEnum
 import buildlogic.utils.gradlewPath
 import org.gradle.api.Project
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 
 /**
@@ -11,47 +12,151 @@ import org.gradle.api.tasks.TaskProvider
  *
  * 该任务支持多平台构建（如 linux/amd64、linux/arm64），并可将镜像同时推送到多个仓库。
  * 构建参数、环境变量、依赖任务均可配置，并会生成构建元数据 JSON 文件。
- *
- * @param taskName 任务名称（如 "publishApp"）
- * @param dockerfileDir Dockerfile 所在目录路径（相对于项目根目录）
- * @param imageVersion 镜像版本号（可选，用于 OCI 标签 `org.opencontainers.image.version`）
- * @param envVars 构建时传入的环境变量（`--build-arg`）
- * @param dependencies 前置依赖任务列表，格式为 `(模块路径, 任务名)`，执行时通过子 Gradle 进程调用
- * @param stringEnums 枚举值列表，会以 `-Pkey=value` 形式传递给依赖任务的子进程
- * @param targetRepositories 目标仓库完整前缀列表，如 `["docker.io/myuser/app", "ghcr.io/myorg/app"]`
- * @param tags 镜像标签列表，如 `["latest", "v1.0"]`，会与每个仓库拼接为完整标签
- * @param platforms 目标平台列表，如 `["linux/amd64", "linux/arm64"]`，默认可由实现决定
  */
 internal fun Project.createDockerPublishMultiArchTask(
     taskName: String,
+    targetName: String,
     dockerfileDir: String,
-    imageVersion: String?,
+    projectVersion: String,
+    envImageVersion: Provider<String>,
+    envPlatforms: Provider<String>,
+    versionLatest: Boolean,
+    latest: Boolean,
+    targetRepositories: List<String>,
+    configuredPlatforms: List<String>,
     envVars: Map<String, String> = emptyMap(),
     dependencies: List<Pair<String, String>> = emptyList(),
-    stringEnums: List<StringEnum> = emptyList(),
-    targetRepositories: List<String>,   // 完整的仓库前缀，如 "docker.io/myuser/app"
-    tags: List<String>,
-    platforms: List<String>
+    stringEnums: List<StringEnum> = emptyList()
 ): TaskProvider<DockerPublishMultiArchTask> {
     return tasks.register(taskName, DockerPublishMultiArchTask::class.java) {
         group = "docker-publish-arch"
         description =
-            "Build multi-arch Docker image and push to ${targetRepositories.size} repositories × ${tags.size} tags"
+            "Build multi-arch Docker image and push to ${targetRepositories.size} repositories × ${stringEnums.size} flavors"
 
-        gradlewPath.set(gradlewPath())
-        rootProjectDir.set(rootProject.projectDir)
-        this.dockerfileDir.set(project.file(dockerfileDir))
-        this.imageVersion.set(imageVersion)
-        this.envVars.set(envVars)
-        this.dependencies.set(dependencies)
-        this.stringEnums.set(stringEnums)
-        this.targetRepositories.set(targetRepositories)
-        this.tags.set(tags)
-        this.targetPlatforms.set(platforms)
+        configureCommon(
+            targetName = targetName,
+            dockerfileDir = dockerfileDir,
+            projectVersion = projectVersion,
+            envImageVersion = envImageVersion,
+            envPlatforms = envPlatforms,
+            versionLatest = versionLatest,
+            latest = latest,
+            targetRepositories = targetRepositories,
+            configuredPlatforms = configuredPlatforms,
+            envVars = envVars,
+            dependencies = dependencies,
+            stringEnums = stringEnums
+        )
+        metadataFile.set(layout.buildDirectory.file("docker-metadata/${taskName}.json"))
+    }
+}
 
-        // 元数据文件路径：build/docker-metadata/<taskName>.json
-        this.metadataFile.set(
-            project.layout.buildDirectory.file("docker-metadata/${taskName}.json")
+/**
+ * 创建单平台构建推送任务。任务覆盖 DockerConfig 声明的全部平台，
+ * 执行期由 DOCKER_PLATFORMS 决定哪些真正构建。
+ */
+internal fun Project.createDockerArchBuildTask(
+    taskName: String,
+    targetName: String,
+    dockerfileDir: String,
+    projectVersion: String,
+    envImageVersion: Provider<String>,
+    envPlatforms: Provider<String>,
+    versionLatest: Boolean,
+    latest: Boolean,
+    targetRepositories: List<String>,
+    configuredPlatforms: List<String>,
+    platform: String,
+    envVars: Map<String, String> = emptyMap(),
+    dependencies: List<Pair<String, String>> = emptyList(),
+    stringEnums: List<StringEnum> = emptyList()
+): TaskProvider<DockerArchBuildTask> {
+    return tasks.register(taskName, DockerArchBuildTask::class.java) {
+        group = "docker-publish-arch"
+        description = "Build and push Docker image for platform $platform"
+
+        configureCommon(
+            targetName = targetName,
+            dockerfileDir = dockerfileDir,
+            projectVersion = projectVersion,
+            envImageVersion = envImageVersion,
+            envPlatforms = envPlatforms,
+            versionLatest = versionLatest,
+            latest = latest,
+            targetRepositories = targetRepositories,
+            configuredPlatforms = configuredPlatforms,
+            envVars = envVars,
+            dependencies = dependencies,
+            stringEnums = stringEnums
+        )
+        this.platform.set(platform)
+        metadataFile.set(layout.buildDirectory.file("docker-metadata/${taskName}.json"))
+    }
+}
+
+/**
+ * 创建把单平台镜像合并成多架构清单的任务。
+ */
+internal fun Project.createDockerArchMergeTask(
+    taskName: String,
+    targetName: String,
+    dockerfileDir: String,
+    projectVersion: String,
+    envImageVersion: Provider<String>,
+    envPlatforms: Provider<String>,
+    versionLatest: Boolean,
+    latest: Boolean,
+    targetRepositories: List<String>,
+    configuredPlatforms: List<String>,
+    stringEnums: List<StringEnum> = emptyList()
+): TaskProvider<DockerArchMergeTask> {
+    return tasks.register(taskName, DockerArchMergeTask::class.java) {
+        group = "docker-publish-arch"
+        description = "Merge per-arch images into a multi-arch manifest"
+
+        configureCommon(
+            targetName = targetName,
+            dockerfileDir = dockerfileDir,
+            projectVersion = projectVersion,
+            envImageVersion = envImageVersion,
+            envPlatforms = envPlatforms,
+            versionLatest = versionLatest,
+            latest = latest,
+            targetRepositories = targetRepositories,
+            configuredPlatforms = configuredPlatforms,
+            envVars = emptyMap(),
+            dependencies = emptyList(),
+            stringEnums = stringEnums
         )
     }
+}
+
+private fun DockerImageTask.configureCommon(
+    targetName: String,
+    dockerfileDir: String,
+    projectVersion: String,
+    envImageVersion: Provider<String>,
+    envPlatforms: Provider<String>,
+    versionLatest: Boolean,
+    latest: Boolean,
+    targetRepositories: List<String>,
+    configuredPlatforms: List<String>,
+    envVars: Map<String, String>,
+    dependencies: List<Pair<String, String>>,
+    stringEnums: List<StringEnum>
+) {
+    gradlewPath.set(project.gradlewPath())
+    rootProjectDir.set(project.rootProject.projectDir)
+    this.dockerfileDir.set(project.file(dockerfileDir))
+    this.targetName.set(targetName)
+    this.projectVersion.set(projectVersion)
+    this.versionLatest.set(versionLatest)
+    extraLatest.set(latest)
+    this.envImageVersion.set(envImageVersion)
+    this.envPlatforms.set(envPlatforms)
+    this.configuredPlatforms.set(configuredPlatforms)
+    this.envVars.set(envVars)
+    this.dependencies.set(dependencies)
+    this.stringEnums.set(stringEnums)
+    this.targetRepositories.set(targetRepositories)
 }

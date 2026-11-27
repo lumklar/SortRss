@@ -1,48 +1,13 @@
 package buildlogic.docker
 
-import org.gradle.api.Project
-import org.gradle.api.tasks.Exec
 import buildlogic.flavors.StringEnum
 import buildlogic.utils.gradlewPath
+import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
-import kotlin.String
 
 /**
- * 原方法：无 stringEnums，使用 Exec 任务直接执行 docker build，依赖通过 dependsOn 添加（零额外开销）
- */
-internal fun Project.createDockerBuildTask(
-    taskName: String,
-    dockerfileDir: String,
-    namespace: String,
-    repository: String,
-    targetName: String,
-    imageVersion: String,
-    envVars: Map<String, String> = emptyMap(),
-    dependencies: List<Pair<String, String>> = emptyList()
-): TaskProvider<Exec> {
-    val dir = project.file(dockerfileDir)
-    val (fullImageName, dockerCommand) = buildDockerCommand(
-        projectDir = rootProject.projectDir,
-        dockerfileDir = dir,
-        namespace = namespace,
-        repository = repository,
-        targetName = targetName,
-        imageVersion = imageVersion,
-        envVars = envVars
-    )
-
-    return tasks.register(taskName, Exec::class.java) {
-        group = "docker-build"
-        description = "Build Docker image '$fullImageName' from $dir"
-        commandLine = dockerCommand
-        dependencies.forEach { (modulePath, taskNameDep) ->
-            dependsOn("$modulePath:$taskNameDep")
-        }
-    }
-}
-
-/**
- * 新方法：带 stringEnums，使用自定义 DockerBuildTask，依赖任务在子进程中执行以隔离参数
+ * 注册单镜像构建任务。是否带风味参数只影响任务分组与 -P 传参，
+ * 执行逻辑统一走 [DockerBuildTask]（含文件锁与子进程依赖构建）。
  */
 internal fun Project.createDockerBuildTask(
     taskName: String,
@@ -55,14 +20,25 @@ internal fun Project.createDockerBuildTask(
     dependencies: List<Pair<String, String>> = emptyList(),
     stringEnums: List<StringEnum> = emptyList()
 ): TaskProvider<DockerBuildTask> {
+    val dir = project.file(dockerfileDir)
+    val (fullImageName, _) = buildDockerCommand(
+        projectDir = rootProject.projectDir,
+        dockerfileDir = dir,
+        namespace = namespace,
+        repository = repository,
+        targetName = targetName,
+        imageVersion = imageVersion,
+        envVars = envVars,
+        stringEnums = stringEnums
+    )
+
     return tasks.register(taskName, DockerBuildTask::class.java) {
-        val dir = project.file(dockerfileDir)
-        group = "docker-build-flavor"
-        description = "Build Docker flavor image from $dir"
+        group = if (stringEnums.isEmpty()) "docker-build" else "docker-build-flavor"
+        description = "Build Docker image '$fullImageName' from $dir"
 
         gradlewPath.set(gradlewPath())
         rootProjectDir.set(rootProject.projectDir)
-        this.dockerfileDir.set(project.file(dockerfileDir))
+        this.dockerfileDir.set(dir)
         this.namespace.set(namespace)
         this.repository.set(repository)
         this.targetName.set(targetName)

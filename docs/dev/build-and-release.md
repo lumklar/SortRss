@@ -46,12 +46,20 @@ Windows 用 `.\gradlew.bat`，其他环境用 `./gradlew`。
 | --- | --- |
 | `buildDockerImageJvmWasmJs` | 构建单镜像（后端 jar + wasmJs 前端），注入 `VERSION`、`DIST_ROOT` |
 | `buildFlavorDockerImageJvmWasmJsNetwork` | 带 `network` 风味的镜像构建 |
-| `pushMultiArchFlavorDockerImageJvmWasmJsNetwork` | `docker buildx` 多平台构建并推送 |
-| `buildAllDockerImages` / `buildAllFlavorDockerImages` / `pushAllMultiArchFlavorDockerImage` | 聚合入口 |
+| `pushMultiArchFlavorDockerImageJvmWasmJsNetwork` | `docker buildx` 一次构建推送多平台镜像（原有入口） |
+| `pushArchDockerImageJvmWasmJsNetwork<Platform>` | 单平台构建推送，标签带 `-linux-amd64` 等后缀；未选中的平台自动跳过 |
+| `mergeArchDockerImageJvmWasmJsNetwork` | `docker buildx imagetools create`，把单平台镜像合成多架构清单；自动依赖全部 `pushArch*` |
+| `buildAllDockerImages` / `buildAllFlavorDockerImages` / `pushAllMultiArchFlavorDockerImage` | 聚合入口（原有） |
+| `pushAllArchFlavorDockerImage` / `mergeAllArchFlavorDockerImage` | 新流程聚合入口：先推全部单架构镜像，再合并清单 |
 
 - 镜像名 `registry/namespace/repository:<version>-jvm-wasm-js[-network]`，默认 `ghcr.io/lumklar/sortrss`。
 - 平台列表默认来自 `DockerConfig.platforms`，可用环境变量 `DOCKER_PLATFORMS`（逗号分隔）覆盖；
-  标签可用 `DOCKER_IMAGE_VERSION`（逗号分隔，如 `dev,dev-<sha>`）覆盖。
+  标签可用 `DOCKER_IMAGE_VERSION`（逗号分隔，如 `dev,dev-<sha>`）覆盖。两者都在**任务执行期**解析：
+  任务图只取决于 `DockerConfig`，配置缓存命中后改环境变量仍然生效。
+- 单架构任务按 `DockerConfig.platforms` 的全集注册；`DOCKER_PLATFORMS` 只选中其中一部分时，
+  其余任务打印 `Skip` 后直接返回。若环境变量指定了配置里没有的平台，合并任务会报错提示补全声明。
+- 并发安全：依赖任务的子 Gradle 调用按依赖集合、docker 命令按镜像标签分别加文件锁，
+  锁文件在根项目 `build/docker-locks/`，不入库；不同平台/风味的镜像可以并行，相同标签串行。
 - Dockerfile 见 `scripts/docker/jvm-with-frontend/`，构建上下文是仓库根。
 
 ## 4. 发布产物

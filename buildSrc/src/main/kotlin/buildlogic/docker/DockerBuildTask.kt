@@ -1,6 +1,5 @@
 package buildlogic.docker
 
-import buildlogic.docker.buildDockerCommand
 import buildlogic.flavors.StringEnum
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.ListProperty
@@ -48,26 +47,17 @@ internal abstract class DockerBuildTask @Inject constructor(
 
     @TaskAction
     fun build() {
-        // 1. 执行依赖任务（子进程隔离）
-        val deps = dependencies.getOrElse(emptyList())
-        if (deps.isNotEmpty()) {
-            val taskPaths = deps.map { (module, task) -> "$module:$task" }
-            val command = mutableListOf<String>().apply {
-                add(gradlewPath.get())
-                addAll(taskPaths)
-                stringEnums.getOrElse(emptyList()).forEach { enum ->
-                    add("-P${enum.envKey}=${enum.value}")
-                }
-            }
-            execOps.exec {
-                workingDir = rootProjectDir.get()
-                commandLine = command
-            }
-        }
+        val rootDir = rootProjectDir.get()
+        DockerTaskSupport.runDependencyTasks(
+            execOps = execOps,
+            gradlewPath = gradlewPath.get(),
+            rootDir = rootDir,
+            dependencies = dependencies.getOrElse(emptyList()),
+            stringEnums = stringEnums.getOrElse(emptyList())
+        )
 
-        // 2. 执行 docker build（使用公共函数）
-        val (_, dockerCommand) = buildDockerCommand(
-            projectDir = rootProjectDir.get(),
+        val (fullImageName, dockerCommand) = buildDockerCommand(
+            projectDir = rootDir,
             dockerfileDir = dockerfileDir.get(),
             namespace = namespace.get(),
             repository = repository.get(),
@@ -76,9 +66,6 @@ internal abstract class DockerBuildTask @Inject constructor(
             envVars = envVars.get(),
             stringEnums = stringEnums.get()
         )
-        execOps.exec {
-            workingDir = rootProjectDir.get()
-            commandLine = dockerCommand
-        }
+        DockerTaskSupport.runDockerCommand(execOps, rootDir, listOf(fullImageName), dockerCommand)
     }
 }
