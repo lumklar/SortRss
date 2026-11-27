@@ -153,6 +153,17 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ matrix.group == 'android' && secrets.ANDROID_KEY_ALIAS || '' }}
           ANDROID_KEY_PASSWORD: ${{ matrix.group == 'android' && secrets.ANDROID_KEY_PASSWORD || '' }}
 
+      # Compose 把 jpackage 的 stdout/stderr 写进 build/compose/logs，
+      # Gradle 日志里只有路径没有内容；macOS 打包失败时转储出来便于定位。
+      - name: Dump jpackage logs on failure (macOS)
+        if: failure() && matrix.group == 'mac'
+        shell: bash
+        run: |
+          echo "===== disk usage ====="
+          df -h || true
+          echo "===== jpackage logs ====="
+          find app/desktopApp/build/compose/logs -type f -name '*.txt' -print -exec cat {} \; 2>/dev/null || true
+
       - name: Upload artifacts to GitHub Release
         uses: softprops/action-gh-release@v3
         with:
