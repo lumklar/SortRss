@@ -99,6 +99,9 @@ kotlin-test-common = { group = "org.jetbrains.kotlin", name = "kotlin-test-commo
 kotlin-test-junit4 = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
 kotlin-test-junit5 = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit5", version.ref = "kotlin" }
 
+# Gradle 9 的 test runtime 需要显式 launcher，版本由 Spring Boot BOM 管理
+junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher" }
+
 #序列化
 kotlin-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "serialization" }
 kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }

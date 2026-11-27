@@ -6,9 +6,9 @@ import io.github.lumklar.sortrss.common.api.dto.ApiResultCode
 import io.github.lumklar.sortrss.common.api.dto.ErrorSource
 import io.github.lumklar.sortrss.common.shared.utils.ExceptionStackTraceUtil
 import io.github.lumklar.sortrss.server.application.exception.ApplicationException
+import io.github.lumklar.sortrss.server.application.exception.toErrorSource
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -18,12 +18,14 @@ import org.springframework.web.servlet.resource.NoResourceFoundException
 /**
  * Spring Boot 4 全局异常处理器
  * 统一封装返回 ApiResult，根据配置控制是否暴露 ApiExtra
- * TODO 异常打印支持native
- * TODO 去掉RegisterReflectionForBinding支持native
+ *
+ * 异常提示不走 Slf4J 的 Throwable 重载：native 镜像里 logback 的堆栈渲染依赖
+ * ThrowableProxy 反射，堆栈往往缺失或不稳定。这里统一用纯 Kotlin 格式化后按字符串输出，
+ * JVM 与 native 的日志形态保持一致（E4）。
+ *
+ * ApiExtra 的反射注册由 [WebNativeHints] 统一提供，无需再叠加
+ * `@RegisterReflectionForBinding`（E5）。
  */
-@RegisterReflectionForBinding(
-    ApiExtra::class,
-)
 @RestControllerAdvice
 class GlobalExceptionHandler(
     private val apiResponseProperties: ApiResponseProperties
@@ -33,11 +35,14 @@ class GlobalExceptionHandler(
     // ====================== 1. 自定义业务异常（核心） ======================
     @ExceptionHandler(ApplicationException::class)
     fun handleBusinessException(e: ApplicationException): ApiResult<Nothing> {
-        //TODO 区分异常来源
-        log.warn("Business exception: code=${e.code}, msg=${e.message}", e)
-        // 根据配置决定是否构建 ApiExtra
+        logException(
+            "Application exception: code=${e.code}, type=${e.type}, domainCode=${e.domainCodeValue}, msg=${e.message}",
+            e,
+            LogLevel.WARN
+        )
+        // 异常来源由应用层异常类型决定，不再一律标记为 DOMAIN（E6）
         val extra = buildExtra(
-            source = ErrorSource.DOMAIN,
+            source = e.type.toErrorSource(),
             errorCode = e.code,
             errorMsg = e.message,
             throwable = e
@@ -69,16 +74,20 @@ class GlobalExceptionHandler(
     // ====================== 3. 权限/资源异常 ======================
     // 无权限
     @ExceptionHandler(AccessDeniedException::class)
-    fun handleAccessDeniedException(e: AccessDeniedException , request: HttpServletRequest): ApiResult<Nothing> {
-        log.warn("Access denied for URI: ${request.requestURI}", e)
+    fun handleAccessDeniedException(e: AccessDeniedException, request: HttpServletRequest): ApiResult<Nothing> {
+        logException("Access denied for URI: ${request.requestURI}", e, LogLevel.WARN)
         val extra = buildExtra(source = ErrorSource.WEB, throwable = e)
         return ApiResult.failure(ApiResultCode.NOT_FOUND, extra)
     }
 
     // 404 资源不存在
     @ExceptionHandler(NoResourceFoundException::class)
-    fun handleNotFoundException(e: NoResourceFoundException , request: HttpServletRequest): ApiResult<Nothing> {
-        log.info("Resource not found: uri=${request.requestURI}, method=${request.method}", e)
+    fun handleNotFoundException(e: NoResourceFoundException, request: HttpServletRequest): ApiResult<Nothing> {
+        logException(
+            "Resource not found: uri=${request.requestURI}, method=${request.method}",
+            e,
+            LogLevel.INFO
+        )
 
         val extra = buildExtra(source = ErrorSource.WEB, throwable = e)
         return ApiResult.failure(ApiResultCode.NOT_FOUND, extra)
@@ -93,14 +102,33 @@ class GlobalExceptionHandler(
 
     // ====================== 5. 系统兜底异常 ======================
     @ExceptionHandler(Exception::class)
-    fun handleGlobalException(e: Exception , request: HttpServletRequest): ApiResult<Nothing> {
-        log.error("Unhandled system exception: uri=${request.requestURI}, method=${request.method}, params=${request.parameterMap}", e)
+    fun handleGlobalException(e: Exception, request: HttpServletRequest): ApiResult<Nothing> {
+        logException(
+            "Unhandled system exception: uri=${request.requestURI}, method=${request.method}, params=${request.parameterMap}",
+            e,
+            LogLevel.ERROR
+        )
 
         val extra = buildExtra(source = ErrorSource.SYSTEM, throwable = e)
         return ApiResult.failure(ApiResultCode.SERVER_ERROR, extra)
     }
 
-    // ====================== 工具方法：根据配置构建 ApiExtra ======================
+    // ====================== 工具方法 ======================
+    /**
+     * 用纯 Kotlin 格式化堆栈后以字符串写入日志，避免 native 下 logback 的 ThrowableProxy 反射。
+     */
+    private fun logException(message: String, throwable: Throwable, level: LogLevel) {
+        val stack = ExceptionStackTraceUtil
+            .formatStackTrace(throwable, maxFrames = LOG_STACK_FRAMES)
+            .joinToString(System.lineSeparator())
+        val text = "$message${System.lineSeparator()}$stack"
+        when (level) {
+            LogLevel.INFO -> log.info(text)
+            LogLevel.WARN -> log.warn(text)
+            LogLevel.ERROR -> log.error(text)
+        }
+    }
+
     /**
      * 核心：配置控制是否返回 ApiExtra
      */
@@ -121,5 +149,11 @@ class GlobalExceptionHandler(
             errorMsg = errorMsg,
             stackTrace = ExceptionStackTraceUtil.formatStackTrace(throwable)
         )
+    }
+
+    private enum class LogLevel { INFO, WARN, ERROR }
+
+    companion object {
+        private const val LOG_STACK_FRAMES = 30
     }
 }

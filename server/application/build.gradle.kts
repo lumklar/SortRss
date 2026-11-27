@@ -60,4 +60,6 @@ dependencies {
 
     // 测试
     testImplementation(libs.spring.boot.starter.test)
+    // Gradle 9 不再自动向测试运行时注入 JUnit Platform launcher
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
