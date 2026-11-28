@@ -54,6 +54,10 @@ internal fun Project.createDockerPublishMultiArchTask(
 /**
  * 创建单平台构建推送任务。任务覆盖 DockerConfig 声明的全部平台，
  * 执行期由 DOCKER_PLATFORMS 决定哪些真正构建。
+ *
+ * 单平台任务只推带平台后缀的标签（`<tag>-linux-amd64` 等），**不推裸标签**：
+ * 裸标签由 [DockerArchMergeTask] 从各架构镜像合成。若这里也推 `latest`，
+ * 多个架构会互相覆盖，且任一架构失败时远端会残留单架构的 `latest`。
  */
 internal fun Project.createDockerArchBuildTask(
     taskName: String,
@@ -63,7 +67,6 @@ internal fun Project.createDockerArchBuildTask(
     envImageVersion: Provider<String>,
     envPlatforms: Provider<String>,
     versionLatest: Boolean,
-    latest: Boolean,
     targetRepositories: List<String>,
     configuredPlatforms: List<String>,
     platform: String,
@@ -82,7 +85,7 @@ internal fun Project.createDockerArchBuildTask(
             envImageVersion = envImageVersion,
             envPlatforms = envPlatforms,
             versionLatest = versionLatest,
-            latest = latest,
+            latest = false,
             targetRepositories = targetRepositories,
             configuredPlatforms = configuredPlatforms,
             envVars = envVars,

@@ -87,7 +87,6 @@ fun Project.createDockerTask(
                     envImageVersion = envImageVersion,
                     envPlatforms = envPlatforms,
                     versionLatest = config.versionLatest,
-                    latest = config.latest,
                     targetRepositories = targetRepositories,
                     configuredPlatforms = config.platforms,
                     platform = platform,

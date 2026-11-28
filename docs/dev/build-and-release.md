@@ -47,7 +47,7 @@ Windows 用 `.\gradlew.bat`，其他环境用 `./gradlew`。
 | `buildDockerImageJvmWasmJs` | 构建单镜像（后端 jar + wasmJs 前端），注入 `VERSION`、`DIST_ROOT` |
 | `buildFlavorDockerImageJvmWasmJsNetwork` | 带 `network` 风味的镜像构建 |
 | `pushMultiArchFlavorDockerImageJvmWasmJsNetwork` | `docker buildx` 一次构建推送多平台镜像（原有入口） |
-| `pushArchDockerImageJvmWasmJsNetwork<Platform>` | 单平台构建推送，标签带 `-linux-amd64` 等后缀；未选中的平台自动跳过 |
+| `pushArchDockerImageJvmWasmJsNetwork<Platform>` | 单平台构建推送，标签带 `-linux-amd64` 等后缀（不推裸标签）；未选中的平台自动跳过 |
 | `mergeArchDockerImageJvmWasmJsNetwork` | `docker buildx imagetools create`，把单平台镜像合成多架构清单；自动依赖全部 `pushArch*` |
 | `buildAllDockerImages` / `buildAllFlavorDockerImages` / `pushAllMultiArchFlavorDockerImage` | 聚合入口（原有） |
 | `pushAllArchFlavorDockerImage` / `mergeAllArchFlavorDockerImage` | 新流程聚合入口：先推全部单架构镜像，再合并清单 |
